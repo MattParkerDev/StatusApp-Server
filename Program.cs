@@ -8,7 +8,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-Console.WriteLine(connectionString);
 builder.Services.AddDbContext<ChatContext>(
     options => options.UseNpgsql(connectionString).EnableSensitiveDataLogging()
 );
@@ -29,18 +28,22 @@ app.UseHttpsRedirection();
 using var scope = app.Services.CreateScope();
 await using var db = scope.ServiceProvider.GetRequiredService<ChatContext>();
 
+//Only during development
 await db.Database.EnsureDeletedAsync();
 await db.Database.EnsureCreatedAsync();
 
-var newMessage = new Message();
-newMessage.Data = "test2";
-newMessage.ChatId = 2;
+var newMessage = new Message { Data = "test2", ChatId = 2 };
 
-var newUser = new User();
-newUser.FirstName = "Umang";
-newUser.LastName = "Smith";
-newUser.Email = "test@email.com";
-newUser.UserName = "GoatRat";
+var newUser = new User
+{
+    FirstName = "Umang",
+    LastName = "Smith",
+    Email = "test@email.com",
+    UserName = "GoatRat",
+    Password = "password",
+    PhoneNumber = "0418354655",
+    Status = "Available"
+};
 
 db.Users.Add(newUser);
 db.Messages.Add(new() { Data = "Test", ChatId = 1 });
