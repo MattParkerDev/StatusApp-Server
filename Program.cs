@@ -7,7 +7,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+var connectionString = "";
+if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+{
+    connectionString = builder.Configuration.GetConnectionString("LocalConnection");
+}
+else
+{
+    connectionString = Environment.GetEnvironmentVariable("ConnectionString");
+}
+
 builder.Services.AddDbContext<ChatContext>(
     options => options.UseNpgsql(connectionString).EnableSensitiveDataLogging()
 );
