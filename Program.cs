@@ -29,7 +29,7 @@ app.UseHttpsRedirection();
 using var scope = app.Services.CreateScope();
 await using var db = scope.ServiceProvider.GetRequiredService<ChatContext>();
 
-//await db.Database.EnsureDeletedAsync();
+await db.Database.EnsureDeletedAsync();
 await db.Database.EnsureCreatedAsync();
 
 var newMessage = new Message();
