@@ -90,7 +90,7 @@ namespace StatusApp_Server.Application
                     "/getUser",
                     (ChatContext db, int AccountId) =>
                     {
-                        var user = db.Users.Where(s => s.AccountId == AccountId);
+                        var user = db.Users.First(s => s.AccountId == AccountId);
                         return Results.Ok(user);
                     }
                 )
