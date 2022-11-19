@@ -7,11 +7,8 @@ namespace StatusApp_Server.Infrastructure
     {
         public DbSet<Message> Messages { get; set; }
         public DbSet<User> Users { get; set; }
-
-        public string? ConnectionString { get; }
-
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
-        //    optionsBuilder.UseNpgsql(ConnectionString).EnableSensitiveDataLogging();
+        public DbSet<Account> Accounts { get; set; }
+        public DbSet<Friendship> Friendships { get; set; }
 
         public ChatContext(DbContextOptions<ChatContext> options) : base(options) { }
 

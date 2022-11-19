@@ -10,7 +10,7 @@ namespace StatusApp_Server.Application
         public static void RegisterMessageAPIs(this WebApplication app)
         {
             app.MapGet(
-                    "/messages",
+                    "/getmessages",
                     (ChatContext db, int ChatId) =>
                     {
                         var messages = db.Messages.Where(s => s.ChatId == ChatId);
@@ -96,16 +96,31 @@ namespace StatusApp_Server.Application
                 )
                 .WithName("GetUser")
                 .WithOpenApi();
+
+            app.MapGet(
+                    "/getAccount",
+                    (ChatContext db, int AccountId) =>
+                    {
+                        var account = db.Accounts.First(s => s.AccountId == AccountId);
+                        return Results.Ok(account);
+                    }
+                )
+                .WithName("GetAccount")
+                .WithOpenApi();
+
             app.MapPut(
                     "/createUser",
                     async (ChatContext db, string FirstName, string LastName, string Email) =>
                     {
                         var user = new User();
+                        var account = new Account();
                         var success = false;
                         user.FirstName = FirstName;
                         user.LastName = LastName;
-                        user.Email = Email;
+                        account.Email = Email;
+
                         db.Users.Add(user);
+                        db.Accounts.Add(account);
                         try
                         {
                             await db.SaveChangesAsync();
@@ -127,7 +142,9 @@ namespace StatusApp_Server.Application
                     async (ChatContext db, int AccountId) =>
                     {
                         var targetUser = db.Users.First(s => s.AccountId == AccountId);
+                        var targetAccount = db.Accounts.First(s => s.AccountId == AccountId);
                         db.Users.Remove(targetUser);
+                        db.Accounts.Remove(targetAccount);
                         await db.SaveChangesAsync();
                         return Results.Ok(targetUser);
                     }
@@ -151,24 +168,183 @@ namespace StatusApp_Server.Application
                     ) =>
                     {
                         var targetUser = db.Users.First(s => s.AccountId == AccountId);
+                        var targetAccount = db.Accounts.First(s => s.AccountId == AccountId);
 
                         targetUser.FirstName = FirstName ?? targetUser.FirstName;
                         targetUser.LastName = LastName ?? targetUser.LastName;
-                        targetUser.Email = Email ?? targetUser.Email;
-                        targetUser.Password = Password ?? targetUser.Password;
+                        targetAccount.Email = Email ?? targetAccount.Email;
+                        targetAccount.Password = Password ?? targetAccount.Password;
                         targetUser.UserName = UserName ?? targetUser.UserName;
-                        targetUser.PhoneNumber = PhoneNumber ?? targetUser.PhoneNumber;
+                        targetAccount.UserName = UserName ?? targetAccount.UserName;
+                        targetAccount.PhoneNumber = PhoneNumber ?? targetAccount.PhoneNumber;
                         targetUser.Status = Status ?? targetUser.Status;
                         targetUser.Online = Online ?? targetUser.Online;
 
                         db.Users.Update(targetUser);
+                        db.Accounts.Update(targetAccount);
                         await db.SaveChangesAsync();
                         return Results.Ok(targetUser);
                     }
                 )
                 .WithName("UpdateUser")
                 .WithOpenApi();
-            ;
+        }
+
+        public static void RegisterFriendAPIs(this WebApplication app)
+        {
+            app.MapGet(
+                    "/getfriends",
+                    (ChatContext db, int AccountId) => // Pass your AccountId here to retrieve your associated friends
+                    {
+                        var friendships = db.Friendships
+                            .Where(s => s.AccountId == AccountId && s.AreFriends == true)
+                            .ToList();
+                        var friendIdList = new List<int>();
+                        foreach (var item in friendships)
+                        {
+                            friendIdList.Add(item.FriendId);
+                        }
+                        //Console.WriteLine(friendIdList);
+                        var friends = db.Users.Where(s => friendIdList.Contains(s.AccountId));
+                        return friends.Count() != 0 ? Results.Ok(friends) : Results.NoContent();
+                    }
+                )
+                .WithName("GetFriends")
+                .WithOpenApi();
+
+            app.MapGet(
+                    "/getfriendships",
+                    (ChatContext db, int AccountId, bool? AreFriends) => // Pass your AccountId here to retrieve your associated friendships
+                    {
+                        var friendships =
+                            AreFriends == null // Optional AreFriends returns all friendships regardless of status if not supplied in request
+                                ? db.Friendships.Where(s => s.AccountId == AccountId)
+                                : db.Friendships.Where(
+                                    s => s.AccountId == AccountId && s.AreFriends == AreFriends
+                                );
+                        return friendships.Count() != 0
+                            ? Results.Ok(friendships)
+                            : Results.NoContent();
+                    }
+                )
+                .WithName("GetFriendships")
+                .WithOpenApi();
+
+            app.MapPut(
+                    "/sendfriendrequest",
+                    async (ChatContext db, int AccountId, int FriendId) =>
+                    {
+                        var success = false;
+                        var myFriendship = new Friendship
+                        {
+                            AccountId = AccountId,
+                            FriendId = FriendId,
+                            Accepted = true,
+                            AreFriends = false
+                        };
+                        var theirFriendship = new Friendship
+                        {
+                            AccountId = FriendId,
+                            FriendId = AccountId,
+                            Accepted = false,
+                            AreFriends = false
+                        };
+                        db.Friendships.Add(myFriendship);
+                        db.Friendships.Add(theirFriendship);
+                        try
+                        {
+                            await db.SaveChangesAsync();
+                            success = true;
+                        }
+                        catch (Exception e)
+                        {
+                            var errorString = $"Error: {e.Message}";
+                        }
+                        return success == true
+                            ? Results.Ok(myFriendship)
+                            : Results.Conflict(myFriendship);
+                    }
+                )
+                .WithName("SendFriendRequest")
+                .WithOpenApi();
+
+            app.MapGet(
+                    "/actionfriendrequest",
+                    async (ChatContext db, int AccountId, int FriendId, bool Accepted) => // Pass AccountId of your friend
+                    {
+                        var success = false;
+                        var myFriendship = db.Friendships.FirstOrDefault(
+                            s => s.AccountId == AccountId && s.FriendId == FriendId
+                        );
+                        var theirFriendship = db.Friendships.FirstOrDefault(
+                            s => s.AccountId == FriendId && s.FriendId == AccountId
+                        );
+                        if (myFriendship != null && theirFriendship != null)
+                        {
+                            if (Accepted == true)
+                            {
+                                var datetime = DateTime.UtcNow;
+                                myFriendship.Accepted = true;
+                                myFriendship.AreFriends = true;
+                                myFriendship.BecameFriendsDate = datetime;
+                                theirFriendship.AreFriends = true;
+                                theirFriendship.BecameFriendsDate = datetime;
+                            }
+                            else
+                            {
+                                db.Friendships.Remove(myFriendship);
+                                db.Friendships.Remove(theirFriendship);
+                            }
+                        }
+                        try
+                        {
+                            await db.SaveChangesAsync();
+                            success = true;
+                        }
+                        catch (Exception e)
+                        {
+                            var errorString = $"Error: {e.Message}";
+                        }
+                        return success == true
+                            ? Results.Ok(myFriendship)
+                            : Results.Conflict(myFriendship);
+                    }
+                )
+                .WithName("ActionFriendRequest")
+                .WithOpenApi();
+
+            app.MapDelete(
+                    "/removefriend",
+                    async (ChatContext db, int AccountId, int FriendId) => // Pass AccountId of your friend
+                    {
+                        var success = false;
+                        var myFriendship = db.Friendships.FirstOrDefault(
+                            s => s.AccountId == AccountId && s.FriendId == FriendId
+                        );
+                        var theirFriendship = db.Friendships.FirstOrDefault(
+                            s => s.AccountId == FriendId && s.FriendId == AccountId
+                        );
+                        if (myFriendship != null && theirFriendship != null)
+                        {
+                            db.Friendships.Remove(myFriendship);
+                            db.Friendships.Remove(theirFriendship);
+                        }
+                        try
+                        {
+                            await db.SaveChangesAsync();
+                            success = true;
+                        }
+                        catch (Exception e)
+                        {
+                            var errorString = $"Error: {e.Message}";
+                        }
+                        return success == true
+                            ? Results.Ok(myFriendship)
+                            : Results.Conflict(myFriendship);
+                    }
+                )
+                .WithName("RemoveFriend")
+                .WithOpenApi();
         }
     }
 }

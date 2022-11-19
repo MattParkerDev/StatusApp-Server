@@ -46,21 +46,87 @@ var newMessage = new Message { Data = "test2", ChatId = 2 };
 
 var newUser = new User
 {
-    FirstName = "Umang",
+    FirstName = "Maurice",
     LastName = "Smith",
-    Email = "test@email.com",
-    UserName = "GoatRat",
+    UserName = "MauriceSmith",
+    Status = "Open to plans",
+    Online = true
+};
+
+var newAccount = new Account
+{
+    Email = "maurice@email.com",
+    UserName = "MauriceSmith",
     Password = "password",
     PhoneNumber = "0418354655",
-    Status = "Available"
+};
+
+var secondUser = new User
+{
+    FirstName = "Katie",
+    LastName = "Murray",
+    UserName = "Katieee",
+    Status = "Keen for dinner",
+    Online = true
+};
+
+var secondAccount = new Account
+{
+    Email = "katie@email.com",
+    UserName = "Katieee",
+    Password = "password",
+    PhoneNumber = "0432485567",
+};
+
+var thirdUser = new User
+{
+    FirstName = "Jarrod",
+    LastName = "Lee",
+    UserName = "Jrod1",
+    Status = "Quiet night in",
+    Online = false
+};
+
+var thirdAccount = new Account
+{
+    Email = "jrod@email.com",
+    UserName = "Jrod1",
+    Password = "password",
+    PhoneNumber = "0418213324",
+};
+
+var newFriendship = new Friendship
+{
+    AccountId = 1,
+    FriendId = 2,
+    Accepted = true,
+    AreFriends = true,
+    BecameFriendsDate = DateTime.UtcNow
+};
+
+var secondFriendship = new Friendship
+{
+    AccountId = 2,
+    FriendId = 1,
+    Accepted = true,
+    AreFriends = true,
+    BecameFriendsDate = DateTime.UtcNow
 };
 
 db.Users.Add(newUser);
+db.Users.Add(secondUser);
+db.Users.Add(thirdUser);
+db.Accounts.Add(newAccount);
+db.Accounts.Add(secondAccount);
+db.Accounts.Add(thirdAccount);
+db.Friendships.Add(newFriendship);
+db.Friendships.Add(secondFriendship);
 db.Messages.Add(new() { Data = "Test", ChatId = 1 });
 db.Messages.Add(newMessage);
 await db.SaveChangesAsync();
 
 app.RegisterMessageAPIs();
 app.RegisterUserAPIs();
+app.RegisterFriendAPIs();
 
 app.Run();
