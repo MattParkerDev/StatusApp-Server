@@ -249,14 +249,20 @@ namespace StatusApp_Server.Application
                             AccountId = AccountId,
                             FriendId = FriendId,
                             Accepted = true,
-                            AreFriends = false
+                            AreFriends = false,
+                            FriendFirstName = db.Users.First(s => s.AccountId == FriendId).FirstName,
+                            FriendLastName = db.Users.First(s => s.AccountId == FriendId).LastName,
+                            FriendUserName = db.Users.First(s => s.AccountId == FriendId).UserName
                         };
                         var theirFriendship = new Friendship
                         {
                             AccountId = FriendId,
                             FriendId = AccountId,
                             Accepted = false,
-                            AreFriends = false
+                            AreFriends = false,
+                            FriendFirstName = db.Users.First(s => s.AccountId == AccountId).FirstName,
+                            FriendLastName = db.Users.First(s => s.AccountId == AccountId).LastName,
+                            FriendUserName = db.Users.First(s => s.AccountId == AccountId).UserName
                         };
                         db.Friendships.Add(myFriendship);
                         db.Friendships.Add(theirFriendship);

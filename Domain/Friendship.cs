@@ -10,5 +10,9 @@ namespace StatusApp_Server.Domain
         public bool Accepted { get; set; } = false;
         public bool AreFriends { get; set; } = false;
         public DateTime BecameFriendsDate { get; set; }
+        public string? FriendFirstName { get; set; }
+        public string? FriendLastName { get; set; }
+        public string? FriendUserName { get; set; }
+
     }
 }

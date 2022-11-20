@@ -65,7 +65,7 @@ var secondUser = new User
 {
     FirstName = "Katie",
     LastName = "Murray",
-    UserName = "Katieee",
+    UserName = "Katieee1",
     Status = "Keen for dinner",
     Online = true
 };
@@ -101,7 +101,10 @@ var newFriendship = new Friendship
     FriendId = 2,
     Accepted = true,
     AreFriends = true,
-    BecameFriendsDate = DateTime.UtcNow
+    BecameFriendsDate = DateTime.UtcNow,
+    FriendFirstName = "Katie",
+    FriendLastName = "Murray",
+    FriendUserName = "Katieee1",
 };
 
 var secondFriendship = new Friendship
@@ -110,7 +113,10 @@ var secondFriendship = new Friendship
     FriendId = 1,
     Accepted = true,
     AreFriends = true,
-    BecameFriendsDate = DateTime.UtcNow
+    BecameFriendsDate = DateTime.UtcNow,
+    FriendFirstName = "Maurice",
+    FriendLastName = "Smith",
+    FriendUserName = "MauriceSmith",
 };
 
 db.Users.Add(newUser);
