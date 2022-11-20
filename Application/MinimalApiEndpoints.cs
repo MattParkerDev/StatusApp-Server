@@ -235,6 +235,15 @@ namespace StatusApp_Server.Application
                     async (ChatContext db, int AccountId, int FriendId) =>
                     {
                         var success = false;
+                        try 
+                        {
+                            var friendUser = db.Users.First(s => s.AccountId == FriendId);
+                        }
+                        catch (InvalidOperationException e)
+                        {
+                            var errorString = $"Error: {e.Message}";
+                            return Results.Conflict();
+                        }
                         var myFriendship = new Friendship
                         {
                             AccountId = AccountId,
@@ -268,7 +277,7 @@ namespace StatusApp_Server.Application
                 .WithName("SendFriendRequest")
                 .WithOpenApi();
 
-            app.MapGet(
+            app.MapPut(
                     "/actionfriendrequest",
                     async (ChatContext db, int AccountId, int FriendId, bool Accepted) => // Pass AccountId of your friend
                     {
