@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using StatusApp_Server.Domain;
 using StatusApp_Server.Infrastructure;
 using System.Runtime.CompilerServices;
@@ -131,6 +132,7 @@ namespace StatusApp_Server.Application
                             var errorString = $"Error: {e.Message}";
                             throw;
                         }
+
                         return success == true ? Results.Ok(user) : Results.Conflict(user);
                     }
                 )
@@ -156,6 +158,7 @@ namespace StatusApp_Server.Application
                     "updateUser",
                     async (
                         ChatContext db,
+                        IHubContext<StatusHub, IStatusClient> context,
                         int AccountId,
                         string? FirstName,
                         string? LastName,
@@ -183,6 +186,12 @@ namespace StatusApp_Server.Application
                         db.Users.Update(targetUser);
                         db.Accounts.Update(targetAccount);
                         await db.SaveChangesAsync();
+
+                        var friendships = FriendMethods.GetFriendships(db, AccountId);
+                        var friendIdList = FriendMethods.GetFriendIdList(friendships);
+                        var usersToNotify = db.Connections.Where(s => friendIdList.Contains(s.AccountId))
+                            .Select(s => s.ConnectionId).ToList();
+                        await context.Clients.Clients(usersToNotify).ReceiveUpdatedUser(targetUser);
                         return Results.Ok(targetUser);
                     }
                 )
@@ -204,6 +213,7 @@ namespace StatusApp_Server.Application
                         {
                             friendIdList.Add(item.FriendId);
                         }
+
                         //Console.WriteLine(friendIdList);
                         var friends = db.Users.Where(s => friendIdList.Contains(s.AccountId));
                         return friends.Count() != 0 ? Results.Ok(friends) : Results.NoContent();
@@ -214,10 +224,12 @@ namespace StatusApp_Server.Application
 
             app.MapGet(
                     "/getfriendships",
-                    (ChatContext db, int AccountId, bool? AreFriends) => // Pass your AccountId here to retrieve your associated friendships
+                    (ChatContext db, int AccountId,
+                        bool? AreFriends) => // Pass your AccountId here to retrieve your associated friendships
                     {
                         var friendships =
-                            AreFriends == null // Optional AreFriends returns all friendships regardless of status if not supplied in request
+                            AreFriends ==
+                            null // Optional AreFriends returns all friendships regardless of status if not supplied in request
                                 ? db.Friendships.Where(s => s.AccountId == AccountId)
                                 : db.Friendships.Where(
                                     s => s.AccountId == AccountId && s.AreFriends == AreFriends
@@ -235,7 +247,7 @@ namespace StatusApp_Server.Application
                     async (ChatContext db, int AccountId, int FriendId) =>
                     {
                         var success = false;
-                        try 
+                        try
                         {
                             var friendUser = db.Users.First(s => s.AccountId == FriendId);
                         }
@@ -244,13 +256,16 @@ namespace StatusApp_Server.Application
                             var errorString = $"Error: {e.Message}";
                             return Results.Conflict();
                         }
+
                         var myFriendship = new Friendship
                         {
                             AccountId = AccountId,
                             FriendId = FriendId,
                             Accepted = true,
                             AreFriends = false,
-                            FriendFirstName = db.Users.First(s => s.AccountId == FriendId).FirstName,
+                            FriendFirstName = db.Users
+                                .First(s => s.AccountId == FriendId)
+                                .FirstName,
                             FriendLastName = db.Users.First(s => s.AccountId == FriendId).LastName,
                             FriendUserName = db.Users.First(s => s.AccountId == FriendId).UserName
                         };
@@ -260,7 +275,9 @@ namespace StatusApp_Server.Application
                             FriendId = AccountId,
                             Accepted = false,
                             AreFriends = false,
-                            FriendFirstName = db.Users.First(s => s.AccountId == AccountId).FirstName,
+                            FriendFirstName = db.Users
+                                .First(s => s.AccountId == AccountId)
+                                .FirstName,
                             FriendLastName = db.Users.First(s => s.AccountId == AccountId).LastName,
                             FriendUserName = db.Users.First(s => s.AccountId == AccountId).UserName
                         };
@@ -275,6 +292,7 @@ namespace StatusApp_Server.Application
                         {
                             var errorString = $"Error: {e.Message}";
                         }
+
                         return success == true
                             ? Results.Ok(myFriendship)
                             : Results.Conflict(myFriendship);
@@ -285,7 +303,8 @@ namespace StatusApp_Server.Application
 
             app.MapPut(
                     "/actionfriendrequest",
-                    async (ChatContext db, int AccountId, int FriendId, bool Accepted) => // Pass AccountId of your friend
+                    async (ChatContext db, int AccountId, int FriendId,
+                        bool Accepted) => // Pass AccountId of your friend
                     {
                         var success = false;
                         var myFriendship = db.Friendships.FirstOrDefault(
@@ -311,6 +330,7 @@ namespace StatusApp_Server.Application
                                 db.Friendships.Remove(theirFriendship);
                             }
                         }
+
                         try
                         {
                             await db.SaveChangesAsync();
@@ -320,6 +340,7 @@ namespace StatusApp_Server.Application
                         {
                             var errorString = $"Error: {e.Message}";
                         }
+
                         return success == true
                             ? Results.Ok(myFriendship)
                             : Results.Conflict(myFriendship);
@@ -344,6 +365,7 @@ namespace StatusApp_Server.Application
                             db.Friendships.Remove(myFriendship);
                             db.Friendships.Remove(theirFriendship);
                         }
+
                         try
                         {
                             await db.SaveChangesAsync();
@@ -353,6 +375,7 @@ namespace StatusApp_Server.Application
                         {
                             var errorString = $"Error: {e.Message}";
                         }
+
                         return success == true
                             ? Results.Ok(myFriendship)
                             : Results.Conflict(myFriendship);

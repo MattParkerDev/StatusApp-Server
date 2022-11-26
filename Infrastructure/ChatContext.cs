@@ -9,9 +9,10 @@ namespace StatusApp_Server.Infrastructure
         public DbSet<User> Users { get; set; }
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Friendship> Friendships { get; set; }
+        public DbSet<Connection> Connections { get; set; }
 
         public ChatContext(DbContextOptions<ChatContext> options) : base(options) { }
 
-        public ChatContext() { }
+        //public ChatContext() { }
     }
 }

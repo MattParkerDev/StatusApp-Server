@@ -21,6 +21,7 @@ else
 builder.Services.AddDbContext<ChatContext>(
     options => options.UseNpgsql(connectionString).EnableSensitiveDataLogging()
 );
+builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -134,5 +135,6 @@ await db.SaveChangesAsync();
 app.RegisterMessageAPIs();
 app.RegisterUserAPIs();
 app.RegisterFriendAPIs();
+app.MapHub<StatusHub>("/statushub");
 
 app.Run();
