@@ -10,7 +10,7 @@ namespace StatusApp_Server.Domain
         public string? UserName { get; set; }
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
-        public string? Status { get; set; }
+        public string Status { get; set; } = "";
         public bool Online { get; set; }
     }
 }

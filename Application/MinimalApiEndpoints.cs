@@ -100,16 +100,15 @@ namespace StatusApp_Server.Application
                             return Results.NotFound();
                         }
 
-                        return Results.Ok(
-                            new Profile
-                            {
-                                UserName = user.UserName,
-                                FirstName = user.FirstName,
-                                LastName = user.LastName,
-                                Status = user.Status,
-                                Online = user.Online
-                            }
-                        );
+                        var profile = new Profile
+                        {
+                            UserName = user.UserName,
+                            FirstName = user.FirstName,
+                            LastName = user.LastName,
+                            Status = user.Status,
+                            Online = user.Online
+                        };
+                        return Results.Ok(profile);
                         //return Results.Ok(user);
                     }
                 )
