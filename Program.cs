@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using StatusApp_Server.Application;
 using StatusApp_Server.Domain;
@@ -21,6 +22,18 @@ else
 builder.Services.AddDbContext<ChatContext>(
     options => options.UseNpgsql(connectionString).EnableSensitiveDataLogging()
 );
+builder.Services
+    .AddIdentityCore<User>(options =>
+    {
+        options.SignIn.RequireConfirmedAccount = false;
+        options.User.RequireUniqueEmail = false;
+        options.Password.RequireDigit = false;
+        options.Password.RequiredLength = 6;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireLowercase = false;
+    })
+    .AddEntityFrameworkStores<ChatContext>();
 builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -38,6 +51,7 @@ app.UseHttpsRedirection();
 
 using var scope = app.Services.CreateScope();
 await using var db = scope.ServiceProvider.GetRequiredService<ChatContext>();
+using var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
 
 //Only during development
 await db.Database.EnsureDeletedAsync();
@@ -45,90 +59,87 @@ await db.Database.EnsureCreatedAsync();
 
 var newMessage = new Message { Data = "test2", ChatId = 2 };
 
-var newUser = new User
+var friendship1 = new Friendship
 {
-    FirstName = "Maurice",
-    LastName = "Smith",
-    UserName = "MauriceSmith",
-    Status = "Open to plans",
-    Online = true
-};
-
-var newAccount = new Account
-{
-    Email = "maurice@email.com",
-    UserName = "MauriceSmith",
-    Password = "password",
-    PhoneNumber = "0418354655",
-};
-
-var secondUser = new User
-{
-    FirstName = "Katie",
-    LastName = "Murray",
-    UserName = "Katieee1",
-    Status = "Keen for dinner",
-    Online = true
-};
-
-var secondAccount = new Account
-{
-    Email = "katie@email.com",
-    UserName = "Katieee",
-    Password = "password",
-    PhoneNumber = "0432485567",
-};
-
-var thirdUser = new User
-{
-    FirstName = "Jarrod",
-    LastName = "Lee",
-    UserName = "Jrod1",
-    Status = "Quiet night in",
-    Online = false
-};
-
-var thirdAccount = new Account
-{
-    Email = "jrod@email.com",
-    UserName = "Jrod1",
-    Password = "password",
-    PhoneNumber = "0418213324",
-};
-
-var newFriendship = new Friendship
-{
-    AccountId = 1,
-    FriendId = 2,
+    UserName = "BigMaurice",
+    FriendUserName = "Katie11",
     Accepted = true,
     AreFriends = true,
     BecameFriendsDate = DateTime.UtcNow,
     FriendFirstName = "Katie",
     FriendLastName = "Murray",
-    FriendUserName = "Katieee1",
 };
 
-var secondFriendship = new Friendship
+var friendship2 = new Friendship
 {
-    AccountId = 2,
-    FriendId = 1,
+    UserName = "Katie11",
+    FriendUserName = "BigMaurice",
     Accepted = true,
     AreFriends = true,
     BecameFriendsDate = DateTime.UtcNow,
     FriendFirstName = "Maurice",
     FriendLastName = "Smith",
-    FriendUserName = "MauriceSmith",
 };
 
-db.Users.Add(newUser);
-db.Users.Add(secondUser);
-db.Users.Add(thirdUser);
-db.Accounts.Add(newAccount);
-db.Accounts.Add(secondAccount);
-db.Accounts.Add(thirdAccount);
-db.Friendships.Add(newFriendship);
-db.Friendships.Add(secondFriendship);
-db.Messages.Add(new() { Data = "Test", ChatId = 1 });
+var friendship3 = new Friendship
+{
+    UserName = "BigMaurice",
+    FriendUserName = "Jrod1",
+    Accepted = true,
+    AreFriends = true,
+    BecameFriendsDate = DateTime.UtcNow,
+    FriendFirstName = "Jarrod",
+    FriendLastName = "Lee",
+};
+
+var friendship4 = new Friendship
+{
+    UserName = "Jrod1",
+    FriendUserName = "BigMaurice",
+    Accepted = true,
+    AreFriends = true,
+    BecameFriendsDate = DateTime.UtcNow,
+    FriendFirstName = "Maurice",
+    FriendLastName = "Smith",
+};
+
+var newIdentityUser = new User
+{
+    UserName = "BigMaurice",
+    Email = "Bigmaurice@gmail.com",
+    FirstName = "Maurice",
+    LastName = "Smith",
+    Status = "Open to Plans",
+    Online = true,
+};
+var newIdentityUser2 = new User
+{
+    UserName = "Katie11",
+    Email = "katie@hotmail.com",
+    FirstName = "Katie",
+    LastName = "Murray",
+    Status = "Keen for dinner",
+    Online = true,
+};
+var newIdentityUser3 = new User
+{
+    UserName = "Jrod1",
+    Email = "jrod1@hotmail.com",
+    FirstName = "Jarrod",
+    LastName = "Lee",
+    Status = "Quiet night in",
+    Online = false,
+};
+
+await userManager.CreateAsync(newIdentityUser, "password1");
+await userManager.CreateAsync(newIdentityUser2, "password1");
+await userManager.CreateAsync(newIdentityUser3, "password1");
+
+db.Friendships.Add(friendship1);
+db.Friendships.Add(friendship2);
+db.Friendships.Add(friendship3);
+db.Friendships.Add(friendship4);
+db.Messages.Add(new Message() { Data = "Test", ChatId = 1 });
 db.Messages.Add(newMessage);
 await db.SaveChangesAsync();
 

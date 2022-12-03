@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using StatusApp_Server.Domain;
 using StatusApp_Server.Infrastructure;
 using System.Runtime.CompilerServices;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
 
 namespace StatusApp_Server.Application
 {
@@ -89,21 +91,57 @@ namespace StatusApp_Server.Application
         {
             app.MapGet(
                     "/getUser",
-                    (ChatContext db, int AccountId) =>
+                    async (ChatContext db, UserManager<User> userManager, string userName) =>
                     {
-                        var user = db.Users.First(s => s.AccountId == AccountId);
-                        return Results.Ok(user);
+                        //var user = db.Profiles.First(s => s.AccountId == AccountId);
+                        User? user = await userManager.FindByNameAsync(userName);
+                        if (user == null)
+                        {
+                            return Results.NotFound();
+                        }
+
+                        return Results.Ok(
+                            new Profile
+                            {
+                                UserName = user.UserName,
+                                FirstName = user.FirstName,
+                                LastName = user.LastName,
+                                Status = user.Status,
+                                Online = user.Online
+                            }
+                        );
+                        //return Results.Ok(user);
                     }
                 )
                 .WithName("GetUser")
                 .WithOpenApi();
 
             app.MapGet(
-                    "/getAccount",
-                    (ChatContext db, int AccountId) =>
+                    "/signin",
+                    async (
+                        ChatContext db,
+                        UserManager<User> userManager,
+                        string userName,
+                        string password
+                    ) =>
                     {
-                        var account = db.Accounts.First(s => s.AccountId == AccountId);
-                        return Results.Ok(account);
+                        var user = await userManager.FindByNameAsync(userName);
+                        if (user == null)
+                        {
+                            return Results.BadRequest();
+                        }
+
+                        var profile = new Profile
+                        {
+                            UserName = user.UserName,
+                            FirstName = user.FirstName,
+                            LastName = user.LastName,
+                            Status = user.Status,
+                            Online = user.Online
+                        };
+
+                        var success = await userManager.CheckPasswordAsync(user, password);
+                        return success ? Results.Ok(profile) : Results.Unauthorized();
                     }
                 )
                 .WithName("GetAccount")
@@ -111,29 +149,62 @@ namespace StatusApp_Server.Application
 
             app.MapPut(
                     "/createUser",
-                    async (ChatContext db, string FirstName, string LastName, string Email) =>
+                    async (
+                        ChatContext db,
+                        UserManager<User> userManager,
+                        string userName,
+                        string password,
+                        string firstName,
+                        string lastName,
+                        string email
+                    ) =>
                     {
-                        var user = new User();
-                        var account = new Account();
-                        var success = false;
-                        user.FirstName = FirstName;
-                        user.LastName = LastName;
-                        account.Email = Email;
+                        // var user = new Profile();
+                        // var account = new Account();
+                        // var success = false;
+                        // user.FirstName = firstName;
+                        // user.LastName = lastName;
+                        // account.Email = email;
+                        //
+                        // db.Profiles.Add(user);
+                        // db.Accounts.Add(account);
+                        // try
+                        // {
+                        //     await db.SaveChangesAsync();
+                        //     success = true;
+                        // }
+                        // catch (Exception e)
+                        // {
+                        //     var errorString = $"Error: {e.Message}";
+                        //     throw;
+                        // }
 
-                        db.Users.Add(user);
-                        db.Accounts.Add(account);
-                        try
-                        {
-                            await db.SaveChangesAsync();
-                            success = true;
-                        }
-                        catch (Exception e)
-                        {
-                            var errorString = $"Error: {e.Message}";
-                            throw;
-                        }
+                        // Testing Identity
 
-                        return success == true ? Results.Ok(user) : Results.Conflict(user);
+                        var newUser = new User
+                        {
+                            UserName = userName,
+                            Email = email,
+                            FirstName = firstName,
+                            LastName = lastName
+                        };
+
+                        var newProfile = new Profile
+                        {
+                            UserName = userName,
+                            FirstName = firstName,
+                            LastName = lastName
+                        };
+
+                        var result = await userManager.CreateAsync(newUser, password);
+
+                        if (!result.Succeeded)
+                        {
+                            return Results.BadRequest(result.Errors);
+                        }
+                        return Results.Ok(newProfile);
+
+                        //return success == true ? Results.Ok(user) : Results.Conflict(user);
                     }
                 )
                 .WithName("CreateUser")
@@ -141,58 +212,69 @@ namespace StatusApp_Server.Application
 
             app.MapDelete(
                     "deleteUser",
-                    async (ChatContext db, int AccountId) =>
+                    async (ChatContext db, UserManager<User> userManager, string userName) =>
                     {
-                        var targetUser = db.Users.First(s => s.AccountId == AccountId);
-                        var targetAccount = db.Accounts.First(s => s.AccountId == AccountId);
-                        db.Users.Remove(targetUser);
-                        db.Accounts.Remove(targetAccount);
-                        await db.SaveChangesAsync();
-                        return Results.Ok(targetUser);
+                        var targetUser = await userManager.FindByNameAsync(userName);
+                        if (targetUser == null)
+                        {
+                            return Results.BadRequest();
+                        }
+                        await userManager.DeleteAsync(targetUser);
+                        //TODO: Also delete Friendships
+                        return Results.Ok();
                     }
                 )
                 .WithName("DeleteUser")
                 .WithOpenApi();
+
+            //TODO: Create separate route for updating Password
 
             app.MapPatch(
                     "updateUser",
                     async (
                         ChatContext db,
                         IHubContext<StatusHub, IStatusClient> context,
-                        int AccountId,
-                        string? FirstName,
-                        string? LastName,
-                        string? Email,
-                        string? Password,
-                        string? UserName,
-                        string? PhoneNumber,
-                        string? Status,
-                        bool? Online
+                        UserManager<User> userManager,
+                        string userName,
+                        string? firstName,
+                        string? lastName,
+                        string? status,
+                        bool? online
                     ) =>
                     {
-                        var targetUser = db.Users.First(s => s.AccountId == AccountId);
-                        var targetAccount = db.Accounts.First(s => s.AccountId == AccountId);
+                        //TODO: Update Friendships too
+                        var targetUser = await userManager.FindByNameAsync(userName);
+                        if (targetUser == null)
+                        {
+                            return Results.BadRequest();
+                        }
 
-                        targetUser.FirstName = FirstName ?? targetUser.FirstName;
-                        targetUser.LastName = LastName ?? targetUser.LastName;
-                        targetAccount.Email = Email ?? targetAccount.Email;
-                        targetAccount.Password = Password ?? targetAccount.Password;
-                        targetUser.UserName = UserName ?? targetUser.UserName;
-                        targetAccount.UserName = UserName ?? targetAccount.UserName;
-                        targetAccount.PhoneNumber = PhoneNumber ?? targetAccount.PhoneNumber;
-                        targetUser.Status = Status ?? targetUser.Status;
-                        targetUser.Online = Online ?? targetUser.Online;
+                        targetUser.FirstName = firstName ?? targetUser.FirstName;
+                        targetUser.LastName = lastName ?? targetUser.LastName;
+                        targetUser.Status = status ?? targetUser.Status;
+                        targetUser.Online = online ?? targetUser.Online;
+                        await userManager.UpdateAsync(targetUser);
 
-                        db.Users.Update(targetUser);
-                        db.Accounts.Update(targetAccount);
-                        await db.SaveChangesAsync();
+                        var updatedProfile = new Profile
+                        {
+                            UserName = targetUser.UserName,
+                            FirstName = targetUser.FirstName,
+                            LastName = targetUser.LastName,
+                            Status = targetUser.Status,
+                            Online = targetUser.Online,
+                        };
 
-                        var friendships = FriendMethods.GetFriendships(db, AccountId);
-                        var friendIdList = FriendMethods.GetFriendIdList(friendships);
-                        var usersToNotify = db.Connections.Where(s => friendIdList.Contains(s.AccountId))
-                            .Select(s => s.ConnectionId).ToList();
-                        await context.Clients.Clients(usersToNotify).ReceiveUpdatedUser(targetUser);
-                        return Results.Ok(targetUser);
+                        // Push changes to user to any of their friends
+                        var friendships = FriendMethods.GetFriendships(db, userName);
+                        var friendUserNameList = FriendMethods.GetFriendUserNameList(friendships);
+                        var usersToNotify = db.Connections
+                            .Where(s => friendUserNameList.Contains(s.UserName))
+                            .Select(s => s.ConnectionId)
+                            .ToList();
+                        //Fix sending to specific users
+                        //context.Clients.Clients(usersToNotify).ReceiveUpdatedUser(targetUser);
+                        await context.Clients.All.ReceiveUpdatedUser(updatedProfile);
+                        return Results.Ok(updatedProfile);
                     }
                 )
                 .WithName("UpdateUser")
@@ -203,19 +285,9 @@ namespace StatusApp_Server.Application
         {
             app.MapGet(
                     "/getfriends",
-                    (ChatContext db, int AccountId) => // Pass your AccountId here to retrieve your associated friends
+                    async (ChatContext db, UserManager<User> userManager, string userName) => // Pass your userName here to retrieve your associated friends
                     {
-                        var friendships = db.Friendships
-                            .Where(s => s.AccountId == AccountId && s.AreFriends == true)
-                            .ToList();
-                        var friendIdList = new List<int>();
-                        foreach (var item in friendships)
-                        {
-                            friendIdList.Add(item.FriendId);
-                        }
-
-                        //Console.WriteLine(friendIdList);
-                        var friends = db.Users.Where(s => friendIdList.Contains(s.AccountId));
+                        var friends = await FriendMethods.GetFriends(db, userManager, userName);
                         return friends.Count() != 0 ? Results.Ok(friends) : Results.NoContent();
                     }
                 )
@@ -224,15 +296,13 @@ namespace StatusApp_Server.Application
 
             app.MapGet(
                     "/getfriendships",
-                    (ChatContext db, int AccountId,
-                        bool? AreFriends) => // Pass your AccountId here to retrieve your associated friendships
+                    (ChatContext db, string userName, bool? areFriends) => // Pass your AccountId here to retrieve your associated friendships
                     {
                         var friendships =
-                            AreFriends ==
-                            null // Optional AreFriends returns all friendships regardless of status if not supplied in request
-                                ? db.Friendships.Where(s => s.AccountId == AccountId)
+                            areFriends == null // Optional AreFriends returns all friendships regardless of status if not supplied in request
+                                ? db.Friendships.Where(s => s.UserName == userName)
                                 : db.Friendships.Where(
-                                    s => s.AccountId == AccountId && s.AreFriends == AreFriends
+                                    s => s.UserName == userName && s.AreFriends == areFriends
                                 );
                         return friendships.Count() != 0
                             ? Results.Ok(friendships)
@@ -244,42 +314,39 @@ namespace StatusApp_Server.Application
 
             app.MapPut(
                     "/sendfriendrequest",
-                    async (ChatContext db, int AccountId, int FriendId) =>
+                    async (
+                        ChatContext db,
+                        UserManager<User> userManager,
+                        string userName,
+                        string friendUserName
+                    ) =>
                     {
                         var success = false;
-                        try
+
+                        User? friendUser = await userManager.FindByNameAsync(friendUserName);
+                        User? user = await userManager.FindByNameAsync(friendUserName);
+                        if (friendUser == null || user == null)
                         {
-                            var friendUser = db.Users.First(s => s.AccountId == FriendId);
-                        }
-                        catch (InvalidOperationException e)
-                        {
-                            var errorString = $"Error: {e.Message}";
-                            return Results.Conflict();
+                            return Results.NotFound();
                         }
 
                         var myFriendship = new Friendship
                         {
-                            AccountId = AccountId,
-                            FriendId = FriendId,
+                            UserName = userName,
+                            FriendUserName = friendUserName,
                             Accepted = true,
                             AreFriends = false,
-                            FriendFirstName = db.Users
-                                .First(s => s.AccountId == FriendId)
-                                .FirstName,
-                            FriendLastName = db.Users.First(s => s.AccountId == FriendId).LastName,
-                            FriendUserName = db.Users.First(s => s.AccountId == FriendId).UserName
+                            FriendFirstName = friendUser.FirstName,
+                            FriendLastName = friendUser.LastName,
                         };
                         var theirFriendship = new Friendship
                         {
-                            AccountId = FriendId,
-                            FriendId = AccountId,
+                            UserName = friendUserName,
+                            FriendUserName = userName,
                             Accepted = false,
                             AreFriends = false,
-                            FriendFirstName = db.Users
-                                .First(s => s.AccountId == AccountId)
-                                .FirstName,
-                            FriendLastName = db.Users.First(s => s.AccountId == AccountId).LastName,
-                            FriendUserName = db.Users.First(s => s.AccountId == AccountId).UserName
+                            FriendFirstName = user.FirstName,
+                            FriendLastName = user.LastName,
                         };
                         db.Friendships.Add(myFriendship);
                         db.Friendships.Add(theirFriendship);
@@ -293,9 +360,7 @@ namespace StatusApp_Server.Application
                             var errorString = $"Error: {e.Message}";
                         }
 
-                        return success == true
-                            ? Results.Ok(myFriendship)
-                            : Results.Conflict(myFriendship);
+                        return success ? Results.Ok(myFriendship) : Results.Conflict(myFriendship);
                     }
                 )
                 .WithName("SendFriendRequest")
@@ -303,19 +368,18 @@ namespace StatusApp_Server.Application
 
             app.MapPut(
                     "/actionfriendrequest",
-                    async (ChatContext db, int AccountId, int FriendId,
-                        bool Accepted) => // Pass AccountId of your friend
+                    async (ChatContext db, string userName, string friendUserName, bool accepted) => // Pass AccountId of your friend
                     {
                         var success = false;
                         var myFriendship = db.Friendships.FirstOrDefault(
-                            s => s.AccountId == AccountId && s.FriendId == FriendId
+                            s => s.UserName == userName && s.FriendUserName == friendUserName
                         );
                         var theirFriendship = db.Friendships.FirstOrDefault(
-                            s => s.AccountId == FriendId && s.FriendId == AccountId
+                            s => s.UserName == friendUserName && s.FriendUserName == userName
                         );
                         if (myFriendship != null && theirFriendship != null)
                         {
-                            if (Accepted == true)
+                            if (accepted)
                             {
                                 var datetime = DateTime.UtcNow;
                                 myFriendship.Accepted = true;
@@ -341,9 +405,7 @@ namespace StatusApp_Server.Application
                             var errorString = $"Error: {e.Message}";
                         }
 
-                        return success == true
-                            ? Results.Ok(myFriendship)
-                            : Results.Conflict(myFriendship);
+                        return success ? Results.Ok(myFriendship) : Results.Conflict(myFriendship);
                     }
                 )
                 .WithName("ActionFriendRequest")
@@ -351,14 +413,14 @@ namespace StatusApp_Server.Application
 
             app.MapDelete(
                     "/removefriend",
-                    async (ChatContext db, int AccountId, int FriendId) => // Pass AccountId of your friend
+                    async (ChatContext db, string userName, string friendUserName) =>
                     {
                         var success = false;
                         var myFriendship = db.Friendships.FirstOrDefault(
-                            s => s.AccountId == AccountId && s.FriendId == FriendId
+                            s => s.UserName == userName && s.FriendUserName == friendUserName
                         );
                         var theirFriendship = db.Friendships.FirstOrDefault(
-                            s => s.AccountId == FriendId && s.FriendId == AccountId
+                            s => s.UserName == friendUserName && s.FriendUserName == userName
                         );
                         if (myFriendship != null && theirFriendship != null)
                         {
@@ -376,9 +438,7 @@ namespace StatusApp_Server.Application
                             var errorString = $"Error: {e.Message}";
                         }
 
-                        return success == true
-                            ? Results.Ok(myFriendship)
-                            : Results.Conflict(myFriendship);
+                        return success ? Results.Ok() : Results.Conflict();
                     }
                 )
                 .WithName("RemoveFriend")

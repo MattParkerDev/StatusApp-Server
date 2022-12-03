@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using StatusApp_Server.Domain;
 using StatusApp_Server.Infrastructure;
 
@@ -5,30 +6,55 @@ namespace StatusApp_Server.Application;
 
 public static class FriendMethods
 {
-    public static List<User> GetFriends(ChatContext db, int accountId)
+    public static async Task<List<Profile>> GetFriends(
+        ChatContext db,
+        UserManager<User> userManager,
+        string userName
+    )
     {
-        var friendships = GetFriendships(db, accountId);
-
-        var friendIdList = GetFriendIdList(friendships);
-        var friends = db.Users.Where(s => friendIdList.Contains(s.AccountId)).ToList();
-        return friends;
+        var friendships = GetFriendships(db, userName);
+        var friendUserNameList = GetFriendUserNameList(friendships);
+        List<Profile> friendUsers = new List<Profile>();
+        foreach (var name in friendUserNameList)
+        {
+            User? friend = await userManager.FindByNameAsync(name);
+            if (friend == null)
+            {
+                return friendUsers;
+            }
+            else
+            {
+                var profile = new Profile
+                {
+                    UserName = friend.UserName,
+                    FirstName = friend.FirstName,
+                    LastName = friend.LastName,
+                    Status = friend.Status,
+                    Online = friend.Online,
+                };
+                friendUsers.Add(profile);
+            }
+        }
+        //db.Profiles.Where(s => friendUserNameList.Contains(s.UserName)).ToList();
+        return friendUsers;
     }
 
-    public static List<int> GetFriendIdList(List<Friendship> friendships)
+    public static List<string> GetFriendUserNameList(List<Friendship> friendships)
     {
-        var friendIdList = new List<int>();
+        var friendIdList = new List<string>();
         foreach (var item in friendships)
         {
-            friendIdList.Add(item.FriendId);
+            friendIdList.Add(item.FriendUserName);
         }
 
         return friendIdList;
     }
 
-    public static List<Friendship> GetFriendships(ChatContext db, int accountId)
+    // Returns all friendships associated with the passed userName
+    public static List<Friendship> GetFriendships(ChatContext db, string userName)
     {
         var friendships = db.Friendships
-            .Where(s => s.AccountId == accountId && s.AreFriends == true)
+            .Where(s => s.UserName == userName && s.AreFriends == true)
             .ToList();
         return friendships;
     }

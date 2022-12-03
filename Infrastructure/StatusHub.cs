@@ -9,7 +9,6 @@ namespace StatusApp_Server.Infrastructure
     {
         private readonly IServiceProvider _serviceProvider;
 
-
         public StatusHub(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -19,13 +18,13 @@ namespace StatusApp_Server.Infrastructure
         {
             var requestContext = Context.GetHttpContext();
             using var db = requestContext.RequestServices.GetRequiredService<ChatContext>();
-            var accountId = requestContext.Request.Query["AccountId"];
+            var userName = requestContext.Request.Query["userName"].ToString();
             var connectionPair = new Connection
             {
-                AccountId = Convert.ToInt32(accountId),
+                UserName = userName,
                 ConnectionId = Context.ConnectionId
             };
-            var existingPair = db.Connections.FirstOrDefault(s => s.AccountId == Convert.ToInt32(accountId));
+            var existingPair = db.Connections.FirstOrDefault(s => s.UserName == userName);
             if (existingPair == null)
             {
                 db.Connections.Add(connectionPair);
@@ -44,13 +43,12 @@ namespace StatusApp_Server.Infrastructure
         {
             using var scope = _serviceProvider.CreateScope();
             using var db = scope.ServiceProvider.GetRequiredService<ChatContext>();
-            var accountId = Context.GetHttpContext().Request.Query["AccountId"];
-            var connectionPair = db.Connections.First(s => s.AccountId == Convert.ToInt32(accountId));
+            var userName = Context.GetHttpContext().Request.Query["userName"].ToString();
+            var connectionPair = db.Connections.First(s => s.UserName == userName);
             db.Connections.Remove(connectionPair);
             db.SaveChanges();
             return base.OnDisconnectedAsync(exception);
         }
-
 
         // Server methods that a client can invoke - connection.invoke(...)
         public async Task SendMessage(string user, string message)
@@ -62,12 +60,17 @@ namespace StatusApp_Server.Infrastructure
         {
             return Context.ConnectionId;
         }
+
+        public string GetConnectionUserName()
+        {
+            return Context.UserIdentifier;
+        }
     }
 
     public interface IStatusClient
     {
         // Methods that a client listens for - connection.on(...)
         Task ReceiveMessage(string user, string message);
-        Task ReceiveUpdatedUser(User friend);
+        Task ReceiveUpdatedUser(Profile friend);
     }
 }
