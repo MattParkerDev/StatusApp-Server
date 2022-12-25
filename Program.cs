@@ -1,5 +1,9 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using StatusApp_Server.Application;
 using StatusApp_Server.Domain;
 using StatusApp_Server.Infrastructure;
@@ -33,7 +37,26 @@ builder.Services
         options.Password.RequireUppercase = false;
         options.Password.RequireLowercase = false;
     })
-    .AddEntityFrameworkStores<ChatContext>();
+    .AddEntityFrameworkStores<ChatContext>().AddSignInManager<SignInManager<User>>();
+
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+        options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
+        options.DefaultSignInScheme = IdentityConstants.ApplicationScheme;
+        options.DefaultScheme = IdentityConstants.ApplicationScheme;
+    }
+).AddIdentityCookies();
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Events.OnRedirectToLogin = context =>
+    {
+        context.Response.Clear();
+        context.Response.StatusCode = 401;
+        return Task.CompletedTask;
+    };
+});
+builder.Services.AddAuthorization();
 builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

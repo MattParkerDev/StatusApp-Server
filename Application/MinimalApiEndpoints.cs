@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using StatusApp_Server.Domain;
 using StatusApp_Server.Infrastructure;
 using System.Runtime.CompilerServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 
@@ -13,13 +14,13 @@ namespace StatusApp_Server.Application
         public static void RegisterMessageAPIs(this WebApplication app)
         {
             app.MapGet(
-                    "/getmessages",
-                    (ChatContext db, int ChatId) =>
+                    "/getmessages", (ChatContext db, int ChatId) =>
                     {
                         var messages = db.Messages.Where(s => s.ChatId == ChatId);
                         return messages.Count() != 0 ? Results.Ok(messages) : Results.NoContent();
                     }
                 )
+                .RequireAuthorization()
                 .WithName("GetMessages")
                 .WithOpenApi();
 
@@ -56,6 +57,7 @@ namespace StatusApp_Server.Application
                             : Results.Conflict(incomingMessage);
                     }
                 )
+                .RequireAuthorization()
                 .WithName("PushMessage")
                 .WithOpenApi();
             app.MapDelete(
@@ -68,6 +70,7 @@ namespace StatusApp_Server.Application
                         return Results.Ok(targetMessage);
                     }
                 )
+                .RequireAuthorization()
                 .WithName("DeleteMessage")
                 .WithOpenApi();
 
@@ -83,6 +86,7 @@ namespace StatusApp_Server.Application
                         return Results.Ok(targetMessage);
                     }
                 )
+                .RequireAuthorization()
                 .WithName("UpdateMessage")
                 .WithOpenApi();
         }
@@ -112,6 +116,7 @@ namespace StatusApp_Server.Application
                         //return Results.Ok(user);
                     }
                 )
+                .RequireAuthorization()
                 .WithName("GetUser")
                 .WithOpenApi();
 
@@ -120,6 +125,7 @@ namespace StatusApp_Server.Application
                     async (
                         ChatContext db,
                         UserManager<User> userManager,
+                        SignInManager<User> signInManager,
                         string userName,
                         string password
                     ) =>
@@ -139,18 +145,33 @@ namespace StatusApp_Server.Application
                             Online = user.Online
                         };
 
-                        var success = await userManager.CheckPasswordAsync(user, password);
-                        return success ? Results.Ok(profile) : Results.Unauthorized();
+                        var success = await signInManager.PasswordSignInAsync(user, password, true, false);
+                        return success.Succeeded ? Results.Ok(profile) : Results.Unauthorized();
                     }
                 )
-                .WithName("GetAccount")
+                .AllowAnonymous()
+                .WithName("SignIn")
                 .WithOpenApi();
+
+            app.MapGet(
+                    "/signOut",
+                    async (ChatContext db, UserManager<User> userManager, SignInManager<User> signInManager) =>
+                    {
+                        await signInManager.SignOutAsync();
+                        return Results.Ok();
+                    }
+                )
+                .RequireAuthorization()
+                .WithName("SignOut")
+                .WithOpenApi();
+
 
             app.MapPut(
                     "/createUser",
                     async (
                         ChatContext db,
                         UserManager<User> userManager,
+                        SignInManager<User> signInManager,
                         string userName,
                         string password,
                         string firstName,
@@ -158,39 +179,10 @@ namespace StatusApp_Server.Application
                         string email
                     ) =>
                     {
-                        // var user = new Profile();
-                        // var account = new Account();
-                        // var success = false;
-                        // user.FirstName = firstName;
-                        // user.LastName = lastName;
-                        // account.Email = email;
-                        //
-                        // db.Profiles.Add(user);
-                        // db.Accounts.Add(account);
-                        // try
-                        // {
-                        //     await db.SaveChangesAsync();
-                        //     success = true;
-                        // }
-                        // catch (Exception e)
-                        // {
-                        //     var errorString = $"Error: {e.Message}";
-                        //     throw;
-                        // }
-
-                        // Testing Identity
-
                         var newUser = new User
                         {
                             UserName = userName,
                             Email = email,
-                            FirstName = firstName,
-                            LastName = lastName
-                        };
-
-                        var newProfile = new Profile
-                        {
-                            UserName = userName,
                             FirstName = firstName,
                             LastName = lastName
                         };
@@ -201,33 +193,44 @@ namespace StatusApp_Server.Application
                         {
                             return Results.BadRequest(result.Errors);
                         }
-                        return Results.Ok(newProfile);
 
-                        //return success == true ? Results.Ok(user) : Results.Conflict(user);
+                        var newProfile = new Profile
+                        {
+                            UserName = userName,
+                            FirstName = firstName,
+                            LastName = lastName
+                        };
+                        await signInManager.SignInAsync(newUser, isPersistent: true);
+                        return Results.Ok(newProfile);
                     }
                 )
+                .AllowAnonymous()
                 .WithName("CreateUser")
                 .WithOpenApi();
 
             app.MapDelete(
                     "deleteUser",
-                    async (ChatContext db, UserManager<User> userManager, string userName) =>
+                    async (ChatContext db, UserManager<User> userManager, SignInManager<User> signInManager,
+                        string userName) =>
                     {
                         var targetUser = await userManager.FindByNameAsync(userName);
                         if (targetUser == null)
                         {
                             return Results.BadRequest();
                         }
+
+                        //TODO: Confirm Auth flow
+                        await signInManager.SignOutAsync();
                         await userManager.DeleteAsync(targetUser);
                         //TODO: Also delete Friendships
                         return Results.Ok();
                     }
                 )
+                .RequireAuthorization()
                 .WithName("DeleteUser")
                 .WithOpenApi();
 
             //TODO: Create separate route for updating Password
-
             app.MapPatch(
                     "updateUser",
                     async (
@@ -276,6 +279,7 @@ namespace StatusApp_Server.Application
                         return Results.Ok(updatedProfile);
                     }
                 )
+                .RequireAuthorization()
                 .WithName("UpdateUser")
                 .WithOpenApi();
         }
@@ -284,21 +288,25 @@ namespace StatusApp_Server.Application
         {
             app.MapGet(
                     "/getfriends",
-                    async (ChatContext db, UserManager<User> userManager, string userName) => // Pass your userName here to retrieve your associated friends
+                    async (ChatContext db, UserManager<User> userManager,
+                        string userName) => // Pass your userName here to retrieve your associated friends
                     {
                         var friends = await FriendMethods.GetFriends(db, userManager, userName);
                         return friends.Count() != 0 ? Results.Ok(friends) : Results.NoContent();
                     }
                 )
+                .RequireAuthorization()
                 .WithName("GetFriends")
                 .WithOpenApi();
 
             app.MapGet(
                     "/getfriendships",
-                    (ChatContext db, string userName, bool? areFriends) => // Pass your AccountId here to retrieve your associated friendships
+                    (ChatContext db, string userName,
+                        bool? areFriends) => // Pass your AccountId here to retrieve your associated friendships
                     {
                         var friendships =
-                            areFriends == null // Optional AreFriends returns all friendships regardless of status if not supplied in request
+                            areFriends ==
+                            null // Optional AreFriends returns all friendships regardless of status if not supplied in request
                                 ? db.Friendships.Where(s => s.UserName == userName)
                                 : db.Friendships.Where(
                                     s => s.UserName == userName && s.AreFriends == areFriends
@@ -308,6 +316,7 @@ namespace StatusApp_Server.Application
                             : Results.NoContent();
                     }
                 )
+                .RequireAuthorization()
                 .WithName("GetFriendships")
                 .WithOpenApi();
 
@@ -362,12 +371,14 @@ namespace StatusApp_Server.Application
                         return success ? Results.Ok(myFriendship) : Results.Conflict(myFriendship);
                     }
                 )
+                .RequireAuthorization()
                 .WithName("SendFriendRequest")
                 .WithOpenApi();
 
             app.MapPut(
                     "/actionfriendrequest",
-                    async (ChatContext db, string userName, string friendUserName, bool accepted) => // Pass AccountId of your friend
+                    async (ChatContext db, string userName, string friendUserName,
+                        bool accepted) => // Pass AccountId of your friend
                     {
                         var success = false;
                         var myFriendship = db.Friendships.FirstOrDefault(
@@ -407,6 +418,7 @@ namespace StatusApp_Server.Application
                         return success ? Results.Ok(myFriendship) : Results.Conflict(myFriendship);
                     }
                 )
+                .RequireAuthorization()
                 .WithName("ActionFriendRequest")
                 .WithOpenApi();
 
@@ -440,6 +452,7 @@ namespace StatusApp_Server.Application
                         return success ? Results.Ok() : Results.Conflict();
                     }
                 )
+                .RequireAuthorization()
                 .WithName("RemoveFriend")
                 .WithOpenApi();
         }
