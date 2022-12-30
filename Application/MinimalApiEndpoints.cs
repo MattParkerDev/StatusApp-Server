@@ -112,9 +112,9 @@ namespace StatusApp_Server.Application
         {
             app.MapGet(
                     "/getUser",
-                    async (ChatContext db, UserManager<User> userManager, string userName) =>
+                    async (ChatContext db, UserManager<User> userManager, HttpContext context) =>
                     {
-                        //var user = db.Profiles.First(s => s.AccountId == AccountId);
+                        var userName = context.User.Identity.Name;
                         User? user = await userManager.FindByNameAsync(userName);
                         if (user == null)
                         {
@@ -237,11 +237,12 @@ namespace StatusApp_Server.Application
                     "deleteUser",
                     async (
                         ChatContext db,
+                        HttpContext context,
                         UserManager<User> userManager,
-                        SignInManager<User> signInManager,
-                        string userName
+                        SignInManager<User> signInManager
                     ) =>
                     {
+                        var userName = context.User.Identity.Name;
                         var targetUser = await userManager.FindByNameAsync(userName);
                         if (targetUser == null)
                         {
@@ -267,17 +268,15 @@ namespace StatusApp_Server.Application
                         IHubContext<StatusHub, IStatusClient> hubContext,
                         HttpContext context,
                         UserManager<User> userManager,
-                        string userName,
                         string? firstName,
                         string? lastName,
                         string? status,
                         bool? online
                     ) =>
                     {
-                        var currentUser = context.User.Identity.Name;
-                        Console.WriteLine(currentUser);
+                        var userName = context.User.Identity.Name;
                         //TODO: Update Friendships too
-                        var targetUser = await userManager.FindByNameAsync(currentUser);
+                        var targetUser = await userManager.FindByNameAsync(userName);
                         if (targetUser == null)
                         {
                             return Results.BadRequest();
@@ -321,8 +320,9 @@ namespace StatusApp_Server.Application
         {
             app.MapGet(
                     "/getfriends",
-                    async (ChatContext db, UserManager<User> userManager, string userName) => // Pass your userName here to retrieve your associated friends
+                    async (ChatContext db, UserManager<User> userManager, HttpContext context) =>
                     {
+                        var userName = context.User.Identity.Name;
                         var friends = await FriendMethods.GetFriends(db, userManager, userName);
                         return friends.Count() != 0 ? Results.Ok(friends) : Results.NoContent();
                     }
@@ -333,8 +333,9 @@ namespace StatusApp_Server.Application
 
             app.MapGet(
                     "/getfriendships",
-                    (ChatContext db, string userName, bool? areFriends) => // Pass your AccountId here to retrieve your associated friendships
+                    (ChatContext db, HttpContext context, bool? areFriends) =>
                     {
+                        var userName = context.User.Identity.Name;
                         var friendships =
                             areFriends == null // Optional AreFriends returns all friendships regardless of status if not supplied in request
                                 ? db.Friendships.Where(s => s.UserName == userName)
@@ -355,14 +356,14 @@ namespace StatusApp_Server.Application
                     async (
                         ChatContext db,
                         UserManager<User> userManager,
-                        string userName,
+                        HttpContext context,
                         string friendUserName
                     ) =>
                     {
                         var success = false;
-
+                        var userName = context.User.Identity.Name;
                         User? friendUser = await userManager.FindByNameAsync(friendUserName);
-                        User? user = await userManager.FindByNameAsync(friendUserName);
+                        User? user = await userManager.FindByNameAsync(userName);
                         if (friendUser == null || user == null)
                         {
                             return Results.NotFound();
@@ -407,9 +408,15 @@ namespace StatusApp_Server.Application
 
             app.MapPut(
                     "/actionfriendrequest",
-                    async (ChatContext db, string userName, string friendUserName, bool accepted) => // Pass AccountId of your friend
+                    async (
+                        ChatContext db,
+                        HttpContext context,
+                        string friendUserName,
+                        bool accepted
+                    ) =>
                     {
                         var success = false;
+                        var userName = context.User.Identity.Name;
                         var myFriendship = db.Friendships.FirstOrDefault(
                             s => s.UserName == userName && s.FriendUserName == friendUserName
                         );
@@ -453,9 +460,10 @@ namespace StatusApp_Server.Application
 
             app.MapDelete(
                     "/removefriend",
-                    async (ChatContext db, string userName, string friendUserName) =>
+                    async (ChatContext db, HttpContext context, string friendUserName) =>
                     {
                         var success = false;
+                        var userName = context.User.Identity.Name;
                         var myFriendship = db.Friendships.FirstOrDefault(
                             s => s.UserName == userName && s.FriendUserName == friendUserName
                         );
