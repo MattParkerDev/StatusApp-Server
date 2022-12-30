@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -5,6 +6,7 @@ using StatusApp_Server.Domain;
 
 namespace StatusApp_Server.Infrastructure
 {
+    [Authorize]
     public class StatusHub : Hub<IStatusClient>
     {
         private readonly IServiceProvider _serviceProvider;
@@ -18,7 +20,13 @@ namespace StatusApp_Server.Infrastructure
         {
             var requestContext = Context.GetHttpContext();
             using var db = requestContext.RequestServices.GetRequiredService<ChatContext>();
-            var userName = requestContext.Request.Query["userName"].ToString();
+            //var userName = requestContext.Request.Query["userName"].ToString();
+            var userName = Context.UserIdentifier;
+            if (userName == null)
+            {
+                Context.Abort();
+                return base.OnConnectedAsync();
+            }
             var connectionPair = new Connection
             {
                 UserName = userName,
@@ -43,7 +51,11 @@ namespace StatusApp_Server.Infrastructure
         {
             using var scope = _serviceProvider.CreateScope();
             using var db = scope.ServiceProvider.GetRequiredService<ChatContext>();
-            var userName = Context.GetHttpContext().Request.Query["userName"].ToString();
+            var userName = Context.UserIdentifier;
+            if (userName == null)
+            {
+                return base.OnDisconnectedAsync(exception);
+            }
             var connectionPair = db.Connections.First(s => s.UserName == userName);
             db.Connections.Remove(connectionPair);
             db.SaveChanges();

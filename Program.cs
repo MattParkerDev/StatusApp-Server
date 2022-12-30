@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using StatusApp_Server.Application;
@@ -37,16 +38,18 @@ builder.Services
         options.Password.RequireUppercase = false;
         options.Password.RequireLowercase = false;
     })
-    .AddEntityFrameworkStores<ChatContext>().AddSignInManager<SignInManager<User>>();
+    .AddEntityFrameworkStores<ChatContext>()
+    .AddSignInManager<SignInManager<User>>();
 
-builder.Services.AddAuthentication(options =>
+builder.Services
+    .AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
         options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
         options.DefaultSignInScheme = IdentityConstants.ApplicationScheme;
         options.DefaultScheme = IdentityConstants.ApplicationScheme;
-    }
-).AddIdentityCookies();
+    })
+    .AddIdentityCookies();
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Events.OnRedirectToLogin = context =>
@@ -58,6 +61,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 builder.Services.AddAuthorization();
 builder.Services.AddSignalR();
+builder.Services.AddSingleton<IUserIdProvider, SignalRUserIdProvider>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -169,6 +173,7 @@ await db.SaveChangesAsync();
 app.RegisterMessageAPIs();
 app.RegisterUserAPIs();
 app.RegisterFriendAPIs();
+app.RegisterAuthAPIs();
 app.MapHub<StatusHub>("/statushub");
 
 app.Run();

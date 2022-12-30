@@ -7,7 +7,7 @@ namespace StatusApp_Server.Domain
     public class Connection
     {
         [Key]
-        public string? UserName { get; set; }
+        public string UserName { get; set; } = string.Empty;
         public string? ConnectionId { get; set; }
     }
 }

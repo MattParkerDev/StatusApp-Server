@@ -11,10 +11,27 @@ namespace StatusApp_Server.Application
 {
     public static class MinimalApiEndpoints
     {
-        public static void RegisterMessageAPIs(this WebApplication app)
+        public static void RegisterAuthAPIs(this WebApplication app)
         {
             app.MapGet(
-                    "/getmessages", (ChatContext db, int ChatId) =>
+                    "/checkAuth",
+                    (HttpContext context) =>
+                    {
+                        var user = context.User.Identity.Name;
+                        return user;
+                    }
+                )
+                .RequireAuthorization()
+                .WithName("CheckAuth")
+                .WithOpenApi();
+        }
+
+        public static void RegisterMessageAPIs(this WebApplication app)
+        {
+            //TODO: Overhaul messages
+            app.MapGet(
+                    "/getmessages",
+                    (ChatContext db, int ChatId) =>
                     {
                         var messages = db.Messages.Where(s => s.ChatId == ChatId);
                         return messages.Count() != 0 ? Results.Ok(messages) : Results.NoContent();
@@ -145,7 +162,12 @@ namespace StatusApp_Server.Application
                             Online = user.Online
                         };
 
-                        var success = await signInManager.PasswordSignInAsync(user, password, true, false);
+                        var success = await signInManager.PasswordSignInAsync(
+                            user,
+                            password,
+                            true,
+                            false
+                        );
                         return success.Succeeded ? Results.Ok(profile) : Results.Unauthorized();
                     }
                 )
@@ -155,7 +177,11 @@ namespace StatusApp_Server.Application
 
             app.MapGet(
                     "/signOut",
-                    async (ChatContext db, UserManager<User> userManager, SignInManager<User> signInManager) =>
+                    async (
+                        ChatContext db,
+                        UserManager<User> userManager,
+                        SignInManager<User> signInManager
+                    ) =>
                     {
                         await signInManager.SignOutAsync();
                         return Results.Ok();
@@ -164,7 +190,6 @@ namespace StatusApp_Server.Application
                 .RequireAuthorization()
                 .WithName("SignOut")
                 .WithOpenApi();
-
 
             app.MapPut(
                     "/createUser",
@@ -210,8 +235,12 @@ namespace StatusApp_Server.Application
 
             app.MapDelete(
                     "deleteUser",
-                    async (ChatContext db, UserManager<User> userManager, SignInManager<User> signInManager,
-                        string userName) =>
+                    async (
+                        ChatContext db,
+                        UserManager<User> userManager,
+                        SignInManager<User> signInManager,
+                        string userName
+                    ) =>
                     {
                         var targetUser = await userManager.FindByNameAsync(userName);
                         if (targetUser == null)
@@ -235,7 +264,8 @@ namespace StatusApp_Server.Application
                     "updateUser",
                     async (
                         ChatContext db,
-                        IHubContext<StatusHub, IStatusClient> context,
+                        IHubContext<StatusHub, IStatusClient> hubContext,
+                        HttpContext context,
                         UserManager<User> userManager,
                         string userName,
                         string? firstName,
@@ -244,8 +274,10 @@ namespace StatusApp_Server.Application
                         bool? online
                     ) =>
                     {
+                        var currentUser = context.User.Identity.Name;
+                        Console.WriteLine(currentUser);
                         //TODO: Update Friendships too
-                        var targetUser = await userManager.FindByNameAsync(userName);
+                        var targetUser = await userManager.FindByNameAsync(currentUser);
                         if (targetUser == null)
                         {
                             return Results.BadRequest();
@@ -271,11 +303,12 @@ namespace StatusApp_Server.Application
                         var friendUserNameList = FriendMethods.GetFriendUserNameList(friendships);
                         var usersToNotify = db.Connections
                             .Where(s => friendUserNameList.Contains(s.UserName))
-                            .Select(s => s.ConnectionId)
+                            .Select(s => s.UserName)
                             .ToList();
-                        //Fix sending to specific users
-                        //context.Clients.Clients(usersToNotify).ReceiveUpdatedUser(targetUser);
-                        await context.Clients.All.ReceiveUpdatedUser(updatedProfile);
+
+                        await hubContext.Clients
+                            .Users(usersToNotify)
+                            .ReceiveUpdatedUser(updatedProfile);
                         return Results.Ok(updatedProfile);
                     }
                 )
@@ -288,8 +321,7 @@ namespace StatusApp_Server.Application
         {
             app.MapGet(
                     "/getfriends",
-                    async (ChatContext db, UserManager<User> userManager,
-                        string userName) => // Pass your userName here to retrieve your associated friends
+                    async (ChatContext db, UserManager<User> userManager, string userName) => // Pass your userName here to retrieve your associated friends
                     {
                         var friends = await FriendMethods.GetFriends(db, userManager, userName);
                         return friends.Count() != 0 ? Results.Ok(friends) : Results.NoContent();
@@ -301,12 +333,10 @@ namespace StatusApp_Server.Application
 
             app.MapGet(
                     "/getfriendships",
-                    (ChatContext db, string userName,
-                        bool? areFriends) => // Pass your AccountId here to retrieve your associated friendships
+                    (ChatContext db, string userName, bool? areFriends) => // Pass your AccountId here to retrieve your associated friendships
                     {
                         var friendships =
-                            areFriends ==
-                            null // Optional AreFriends returns all friendships regardless of status if not supplied in request
+                            areFriends == null // Optional AreFriends returns all friendships regardless of status if not supplied in request
                                 ? db.Friendships.Where(s => s.UserName == userName)
                                 : db.Friendships.Where(
                                     s => s.UserName == userName && s.AreFriends == areFriends
@@ -377,8 +407,7 @@ namespace StatusApp_Server.Application
 
             app.MapPut(
                     "/actionfriendrequest",
-                    async (ChatContext db, string userName, string friendUserName,
-                        bool accepted) => // Pass AccountId of your friend
+                    async (ChatContext db, string userName, string friendUserName, bool accepted) => // Pass AccountId of your friend
                     {
                         var success = false;
                         var myFriendship = db.Friendships.FirstOrDefault(
