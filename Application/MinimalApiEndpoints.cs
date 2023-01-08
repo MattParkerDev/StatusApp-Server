@@ -362,8 +362,8 @@ namespace StatusApp_Server.Application
                     {
                         var success = false;
                         var userName = context.User.Identity.Name;
-                        User? friendUser = await userManager.FindByNameAsync(friendUserName);
                         User? user = await userManager.FindByNameAsync(userName);
+                        User? friendUser = await userManager.FindByNameAsync(friendUserName);
                         if (friendUser == null || user == null)
                         {
                             return Results.NotFound();
@@ -372,7 +372,7 @@ namespace StatusApp_Server.Application
                         var myFriendship = new Friendship
                         {
                             UserName = userName,
-                            FriendUserName = friendUserName,
+                            FriendUserName = friendUser.UserName,
                             Accepted = true,
                             AreFriends = false,
                             FriendFirstName = friendUser.FirstName,
@@ -380,7 +380,7 @@ namespace StatusApp_Server.Application
                         };
                         var theirFriendship = new Friendship
                         {
-                            UserName = friendUserName,
+                            UserName = friendUser.UserName,
                             FriendUserName = userName,
                             Accepted = false,
                             AreFriends = false,
