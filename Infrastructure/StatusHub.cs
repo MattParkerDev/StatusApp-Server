@@ -84,5 +84,6 @@ namespace StatusApp_Server.Infrastructure
         // Methods that a client listens for - connection.on(...)
         Task ReceiveMessage(string user, string message);
         Task ReceiveUpdatedUser(Profile friend);
+        Task DeleteFriend(string userName);
     }
 }

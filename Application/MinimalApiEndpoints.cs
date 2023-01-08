@@ -411,12 +411,16 @@ namespace StatusApp_Server.Application
                     async (
                         ChatContext db,
                         HttpContext context,
+                        UserManager<User> userManager,
+                        IHubContext<StatusHub, IStatusClient> hubContext,
                         string friendUserName,
                         bool accepted
                     ) =>
                     {
                         var success = false;
                         var userName = context.User.Identity.Name;
+                        var user = await userManager.FindByNameAsync(userName);
+                        var profile = user.ToProfile();
                         var myFriendship = db.Friendships.FirstOrDefault(
                             s => s.UserName == userName && s.FriendUserName == friendUserName
                         );
@@ -451,7 +455,14 @@ namespace StatusApp_Server.Application
                             var errorString = $"Error: {e.Message}";
                         }
 
-                        return success ? Results.Ok(myFriendship) : Results.Conflict(myFriendship);
+                        if (success != true)
+                        {
+                            return Results.Conflict();
+                        }
+
+                        // Push this user to the new friend
+                        await hubContext.Clients.User(friendUserName).ReceiveUpdatedUser(profile);
+                        return Results.Ok();
                     }
                 )
                 .RequireAuthorization()
@@ -460,7 +471,13 @@ namespace StatusApp_Server.Application
 
             app.MapDelete(
                     "/removefriend",
-                    async (ChatContext db, HttpContext context, string friendUserName) =>
+                    async (
+                        ChatContext db,
+                        HttpContext context,
+                        UserManager<User> userManager,
+                        IHubContext<StatusHub, IStatusClient> hubContext,
+                        string friendUserName
+                    ) =>
                     {
                         var success = false;
                         var userName = context.User.Identity.Name;
@@ -486,7 +503,14 @@ namespace StatusApp_Server.Application
                             var errorString = $"Error: {e.Message}";
                         }
 
-                        return success ? Results.Ok() : Results.Conflict();
+                        if (success != true)
+                        {
+                            return Results.Conflict();
+                        }
+
+                        // Delete this user from friend's list
+                        await hubContext.Clients.User(friendUserName).DeleteFriend(userName);
+                        return Results.Ok();
                     }
                 )
                 .RequireAuthorization()

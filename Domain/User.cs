@@ -9,4 +9,17 @@ public class User : IdentityUser
     public string? LastName { get; set; }
     public string Status { get; set; } = "";
     public bool Online { get; set; }
+
+    public Profile ToProfile()
+    {
+        var profile = new Profile
+        {
+            UserName = UserName,
+            FirstName = FirstName,
+            LastName = LastName,
+            Status = Status,
+            Online = Online
+        };
+        return profile;
+    }
 }
