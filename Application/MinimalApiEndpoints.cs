@@ -302,7 +302,8 @@ namespace StatusApp_Server.Application
                         var friendUserNameList = FriendMethods.GetFriendUserNameList(friendships);
                         var usersToNotify = db.Connections
                             .Where(s => friendUserNameList.Contains(s.UserName))
-                            .Select(s => s.UserName)
+                            .GroupBy(s => s.UserName)
+                            .Select(s => s.First().UserName)
                             .ToList();
 
                         await hubContext.Clients

@@ -20,30 +20,23 @@ namespace StatusApp_Server.Infrastructure
         {
             var requestContext = Context.GetHttpContext();
             using var db = requestContext.RequestServices.GetRequiredService<ChatContext>();
-            //var userName = requestContext.Request.Query["userName"].ToString();
             var userName = Context.UserIdentifier;
-            if (userName == null)
+            var identityUserName = Context.User.Identity.Name;
+            if (userName == null || identityUserName == null || userName != identityUserName)
             {
                 Context.Abort();
                 return base.OnConnectedAsync();
             }
+
             var connectionPair = new Connection
             {
                 UserName = userName,
                 ConnectionId = Context.ConnectionId
             };
-            var existingPair = db.Connections.FirstOrDefault(s => s.UserName == userName);
-            if (existingPair == null)
-            {
-                db.Connections.Add(connectionPair);
-            }
-            else
-            {
-                existingPair.ConnectionId = Context.ConnectionId;
-                db.Connections.Update(existingPair);
-            }
 
+            db.Connections.Add(connectionPair);
             db.SaveChanges();
+
             return base.OnConnectedAsync();
         }
 
@@ -52,11 +45,15 @@ namespace StatusApp_Server.Infrastructure
             using var scope = _serviceProvider.CreateScope();
             using var db = scope.ServiceProvider.GetRequiredService<ChatContext>();
             var userName = Context.UserIdentifier;
-            if (userName == null)
+            var identityUserName = Context.User.Identity.Name;
+            if (userName == null || identityUserName == null || userName != identityUserName)
             {
                 return base.OnDisconnectedAsync(exception);
             }
-            var connectionPair = db.Connections.First(s => s.UserName == userName);
+            var connectionId = Context.ConnectionId;
+            var connectionPair = db.Connections.First(
+                s => s.ConnectionId == connectionId && s.UserName == userName
+            );
             db.Connections.Remove(connectionPair);
             db.SaveChanges();
             return base.OnDisconnectedAsync(exception);
