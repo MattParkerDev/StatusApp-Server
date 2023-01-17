@@ -62,6 +62,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddAuthorization();
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<IUserIdProvider, SignalRUserIdProvider>();
+builder.Services.AddSingleton<GroupChatService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

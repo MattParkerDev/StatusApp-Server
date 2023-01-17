@@ -412,6 +412,7 @@ namespace StatusApp_Server.Application
                     async (
                         ChatContext db,
                         HttpContext context,
+                        GroupChatService groupChatService,
                         UserManager<User> userManager,
                         IHubContext<StatusHub, IStatusClient> hubContext,
                         string friendUserName,
@@ -438,6 +439,8 @@ namespace StatusApp_Server.Application
                                 myFriendship.BecameFriendsDate = datetime;
                                 theirFriendship.AreFriends = true;
                                 theirFriendship.BecameFriendsDate = datetime;
+
+                                await groupChatService.CreateGroupChat(userName, friendUserName);
                             }
                             else
                             {
