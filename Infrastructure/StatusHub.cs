@@ -60,9 +60,9 @@ namespace StatusApp_Server.Infrastructure
         }
 
         // Server methods that a client can invoke - connection.invoke(...)
-        public async Task SendMessage(string user, string message)
+        public async Task BroadcastMessage(string user, string message)
         {
-            await Clients.All.ReceiveMessage(user, message);
+            await Clients.All.ReceiveBroadcast(user, message);
         }
 
         public string GetConnectionId()
@@ -74,13 +74,56 @@ namespace StatusApp_Server.Infrastructure
         {
             return Context.UserIdentifier;
         }
+
+        public async Task<Message> SendMessage(
+            ChatContext db,
+            IHubContext<StatusHub, IStatusClient> hubContext,
+            Guid groupId,
+            string data
+        )
+        {
+            // TODO:Consider checking if are a member of this groupId?
+            var userName = Context.UserIdentifier;
+            var message = new Message
+            {
+                GroupId = groupId,
+                Data = data,
+                AuthorUserName = userName
+            };
+            db.Messages.Add(message);
+            try
+            {
+                await db.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                return new Message();
+            }
+            Console.WriteLine(message);
+            Console.WriteLine(message.MessageId);
+            // TODO:Consider checking if they are friends
+            var friendUserName = db.Friendships
+                .FirstOrDefault(s => s.UserName == userName && s.GroupId == groupId)
+                .FriendUserName;
+
+            var userToNotify = db.Connections
+                .Where(s => s.UserName == friendUserName)
+                .GroupBy(s => s.UserName)
+                .Select(s => s.First().UserName)
+                .ToList();
+
+            await hubContext.Clients.Users(userToNotify).ReceiveMessage(message);
+            return message;
+        }
     }
 
     public interface IStatusClient
     {
         // Methods that a client listens for - connection.on(...)
-        Task ReceiveMessage(string user, string message);
+        Task ReceiveBroadcast(string user, string message);
+        Task ReceiveMessage(Message message);
         Task ReceiveUpdatedUser(Profile friend);
+        Task ReceiveUpdatedFriendship(Friendship friendship);
         Task DeleteFriend(string userName);
     }
 }

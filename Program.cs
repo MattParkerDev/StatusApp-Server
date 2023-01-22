@@ -62,7 +62,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddAuthorization();
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<IUserIdProvider, SignalRUserIdProvider>();
-builder.Services.AddSingleton<GroupChatService>();
+builder.Services.AddScoped<FriendshipService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -85,8 +85,9 @@ using var userManager = scope.ServiceProvider.GetRequiredService<UserManager<Use
 await db.Database.EnsureDeletedAsync();
 await db.Database.EnsureCreatedAsync();
 
-var newMessage = new Message { Data = "test2", ChatId = 2 };
+db.Connections.ExecuteDelete();
 
+var guid1 = Guid.NewGuid();
 var friendship1 = new Friendship
 {
     UserName = "BigMaurice",
@@ -96,6 +97,7 @@ var friendship1 = new Friendship
     BecameFriendsDate = DateTime.UtcNow,
     FriendFirstName = "Katie",
     FriendLastName = "Murray",
+    GroupId = guid1
 };
 
 var friendship2 = new Friendship
@@ -107,8 +109,10 @@ var friendship2 = new Friendship
     BecameFriendsDate = DateTime.UtcNow,
     FriendFirstName = "Maurice",
     FriendLastName = "Smith",
+    GroupId = guid1
 };
 
+var guid2 = Guid.NewGuid();
 var friendship3 = new Friendship
 {
     UserName = "BigMaurice",
@@ -118,6 +122,7 @@ var friendship3 = new Friendship
     BecameFriendsDate = DateTime.UtcNow,
     FriendFirstName = "Jarrod",
     FriendLastName = "Lee",
+    GroupId = guid2
 };
 
 var friendship4 = new Friendship
@@ -129,6 +134,7 @@ var friendship4 = new Friendship
     BecameFriendsDate = DateTime.UtcNow,
     FriendFirstName = "Maurice",
     FriendLastName = "Smith",
+    GroupId = guid2
 };
 
 var newIdentityUser = new User
@@ -167,8 +173,7 @@ db.Friendships.Add(friendship1);
 db.Friendships.Add(friendship2);
 db.Friendships.Add(friendship3);
 db.Friendships.Add(friendship4);
-db.Messages.Add(new Message() { Data = "Test", ChatId = 1 });
-db.Messages.Add(newMessage);
+
 await db.SaveChangesAsync();
 
 app.RegisterMessageAPIs();

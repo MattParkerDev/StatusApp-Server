@@ -10,7 +10,6 @@ namespace StatusApp_Server.Infrastructure
         public ChatContext(DbContextOptions<ChatContext> options) : base(options) { }
 
         public DbSet<Message> Messages { get; set; }
-        public DbSet<GroupChat> GroupChatRegistry { get; set; }
         public DbSet<Profile> Profiles { get; set; }
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Friendship> Friendships { get; set; }

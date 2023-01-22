@@ -1,15 +1,18 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace StatusApp_Server.Domain
 {
+    [PrimaryKey(nameof(GroupId), nameof(MessageId))]
     public class Message
     {
-        [Key]
-        public int MessageId { get; set; }
-        public int ChatId { get; set; }
-        public string? Data { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int? MessageId { get; set; }
+        public Guid GroupId { get; set; }
+        public string AuthorUserName { get; set; } = string.Empty;
+        public string Data { get; set; } = string.Empty;
         public DateTime Created { get; set; } = DateTime.UtcNow;
         public DateTime LastUpdated { get; set; }
-        public string? AuthorId { get; set; }
     }
 }

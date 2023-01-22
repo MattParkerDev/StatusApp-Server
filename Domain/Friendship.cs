@@ -12,5 +12,6 @@ namespace StatusApp_Server.Domain
         public DateTime BecameFriendsDate { get; set; }
         public string? FriendFirstName { get; set; }
         public string? FriendLastName { get; set; }
+        public Guid GroupId { get; set; }
     }
 }

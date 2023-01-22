@@ -31,9 +31,17 @@ namespace StatusApp_Server.Application
             //TODO: Overhaul messages
             app.MapGet(
                     "/getmessages",
-                    (ChatContext db, int ChatId) =>
+                    (ChatContext db, HttpContext context, Guid groupId) =>
                     {
-                        var messages = db.Messages.Where(s => s.ChatId == ChatId);
+                        var userName = context.User.Identity.Name;
+                        var friendship = db.Friendships.FirstOrDefault(
+                            s => s.GroupId == groupId && s.UserName == userName
+                        );
+                        if (friendship is null)
+                        {
+                            return Results.NoContent();
+                        }
+                        var messages = db.Messages.Where(s => s.GroupId == groupId);
                         return messages.Count() != 0 ? Results.Ok(messages) : Results.NoContent();
                     }
                 )
@@ -47,16 +55,16 @@ namespace StatusApp_Server.Application
                         ChatContext db,
                         DateTime Created,
                         string Data,
-                        int ChatId,
+                        Guid GroupId,
                         string Author
                     ) =>
                     {
                         var incomingMessage = new Message();
                         var success = false;
                         incomingMessage.Data = Data;
-                        incomingMessage.ChatId = ChatId;
+                        incomingMessage.GroupId = GroupId;
                         incomingMessage.Created = Created;
-                        incomingMessage.AuthorId = Author;
+                        incomingMessage.AuthorUserName = Author;
                         db.Messages.Add(incomingMessage);
                         try
                         {
@@ -412,14 +420,13 @@ namespace StatusApp_Server.Application
                     async (
                         ChatContext db,
                         HttpContext context,
-                        GroupChatService groupChatService,
+                        FriendshipService friendshipService,
                         UserManager<User> userManager,
                         IHubContext<StatusHub, IStatusClient> hubContext,
                         string friendUserName,
                         bool accepted
                     ) =>
                     {
-                        var success = false;
                         var userName = context.User.Identity.Name;
                         var user = await userManager.FindByNameAsync(userName);
                         var profile = user.ToProfile();
@@ -433,40 +440,35 @@ namespace StatusApp_Server.Application
                         {
                             if (accepted)
                             {
-                                var datetime = DateTime.UtcNow;
-                                myFriendship.Accepted = true;
-                                myFriendship.AreFriends = true;
-                                myFriendship.BecameFriendsDate = datetime;
-                                theirFriendship.AreFriends = true;
-                                theirFriendship.BecameFriendsDate = datetime;
-
-                                await groupChatService.CreateGroupChat(userName, friendUserName);
+                                await friendshipService.AcceptFriendRequest(
+                                    myFriendship,
+                                    theirFriendship
+                                );
                             }
                             else
                             {
                                 db.Friendships.Remove(myFriendship);
                                 db.Friendships.Remove(theirFriendship);
+                                await db.SaveChangesAsync();
+                                return Results.Ok();
                             }
                         }
-
                         try
                         {
                             await db.SaveChangesAsync();
-                            success = true;
                         }
                         catch (Exception e)
                         {
                             var errorString = $"Error: {e.Message}";
-                        }
-
-                        if (success != true)
-                        {
                             return Results.Conflict();
                         }
 
-                        // Push this user to the new friend
+                        // Push this user and friendship to the new friend
+                        await hubContext.Clients
+                            .User(friendUserName)
+                            .ReceiveUpdatedFriendship(theirFriendship);
                         await hubContext.Clients.User(friendUserName).ReceiveUpdatedUser(profile);
-                        return Results.Ok();
+                        return Results.Ok(myFriendship);
                     }
                 )
                 .RequireAuthorization()
