@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using StatusApp_Server.Domain;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace StatusApp_Server.Infrastructure

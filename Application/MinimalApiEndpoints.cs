@@ -1,10 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
 using StatusApp_Server.Domain;
 using StatusApp_Server.Infrastructure;
-using System.Runtime.CompilerServices;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 
 namespace StatusApp_Server.Application
@@ -106,7 +102,6 @@ namespace StatusApp_Server.Application
                         var targetMessage = db.Messages.First(s => s.MessageId == MessageId);
                         targetMessage.LastUpdated = LastUpdated;
                         targetMessage.Data = Data;
-                        db.Messages.Update(targetMessage);
                         await db.SaveChangesAsync();
                         return Results.Ok(targetMessage);
                     }
