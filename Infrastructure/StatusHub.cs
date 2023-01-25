@@ -7,19 +7,17 @@ namespace StatusApp_Server.Infrastructure;
 [Authorize]
 public class StatusHub : Hub<IStatusClient>
 {
-    private readonly IServiceProvider _serviceProvider;
+    private readonly ChatContext _db;
 
-    public StatusHub(IServiceProvider serviceProvider)
+    public StatusHub(ChatContext db)
     {
-        _serviceProvider = serviceProvider;
+        _db = db;
     }
 
     public override Task OnConnectedAsync()
     {
-        var requestContext = Context.GetHttpContext();
-        using var db = requestContext.RequestServices.GetRequiredService<ChatContext>();
         var userName = Context.UserIdentifier;
-        var identityUserName = Context.User.Identity.Name;
+        var identityUserName = Context.User?.Identity?.Name;
         if (userName == null || identityUserName == null || userName != identityUserName)
         {
             Context.Abort();
@@ -32,28 +30,26 @@ public class StatusHub : Hub<IStatusClient>
             ConnectionId = Context.ConnectionId
         };
 
-        db.Connections.Add(connectionPair);
-        db.SaveChanges();
+        _db.Connections.Add(connectionPair);
+        _db.SaveChanges();
 
         return base.OnConnectedAsync();
     }
 
     public override Task OnDisconnectedAsync(Exception? exception)
     {
-        using var scope = _serviceProvider.CreateScope();
-        using var db = scope.ServiceProvider.GetRequiredService<ChatContext>();
         var userName = Context.UserIdentifier;
-        var identityUserName = Context.User.Identity.Name;
+        var identityUserName = Context.User?.Identity?.Name;
         if (userName == null || identityUserName == null || userName != identityUserName)
         {
             return base.OnDisconnectedAsync(exception);
         }
         var connectionId = Context.ConnectionId;
-        var connectionPair = db.Connections.First(
+        var connectionPair = _db.Connections.First(
             s => s.ConnectionId == connectionId && s.UserName == userName
         );
-        db.Connections.Remove(connectionPair);
-        db.SaveChanges();
+        _db.Connections.Remove(connectionPair);
+        _db.SaveChanges();
         return base.OnDisconnectedAsync(exception);
     }
 
@@ -70,41 +66,40 @@ public class StatusHub : Hub<IStatusClient>
 
     public string GetConnectionUserName()
     {
-        return Context.UserIdentifier;
+        return Context.UserIdentifier!;
     }
 
     public async Task<Message> SendMessage(
-        ChatContext db,
         IHubContext<StatusHub, IStatusClient> hubContext,
         Guid groupId,
         string data
     )
     {
         // TODO:Consider checking if are a member of this groupId?
-        var userName = Context.UserIdentifier;
+        var userName = Context.UserIdentifier!;
         var message = new Message
         {
             GroupId = groupId,
             Data = data,
             AuthorUserName = userName
         };
-        db.Messages.Add(message);
+        _db.Messages.Add(message);
         try
         {
-            await db.SaveChangesAsync();
+            await _db.SaveChangesAsync();
         }
-        catch (Exception e)
+        catch
         {
             return new Message();
         }
         Console.WriteLine(message);
         Console.WriteLine(message.MessageId);
         // TODO:Consider checking if they are friends
-        var friendUserName = db.Friendships
+        var friendUserName = _db.Friendships
             .FirstOrDefault(s => s.UserName == userName && s.GroupId == groupId)
-            .FriendUserName;
+            ?.FriendUserName;
 
-        var userToNotify = db.Connections
+        var userToNotify = _db.Connections
             .Where(s => s.UserName == friendUserName)
             .GroupBy(s => s.UserName)
             .Select(s => s.First().UserName)
