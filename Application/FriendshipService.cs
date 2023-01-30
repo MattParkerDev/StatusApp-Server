@@ -28,4 +28,12 @@ public class FriendshipService
 
         await db.SaveChangesAsync();
     }
+
+    public Friendship? GetFriendship(Guid groupId, string userName)
+    {
+        var friendship = _db.Friendships.FirstOrDefault(
+            s => s.GroupId == groupId && s.UserName == userName
+        );
+        return friendship;
+    }
 }

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using StatusApp_Server.Application;
+using StatusApp_Server.Application.Contracts;
 using StatusApp_Server.Domain;
 using StatusApp_Server.Infrastructure;
 
@@ -57,8 +58,11 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 builder.Services.AddAuthorization();
 builder.Services.AddSignalR();
+
 builder.Services.AddSingleton<IUserIdProvider, SignalRUserIdProvider>();
+builder.Services.AddScoped<IMessagingService, MessagingService>();
 builder.Services.AddScoped<FriendshipService>();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

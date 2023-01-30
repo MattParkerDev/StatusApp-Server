@@ -2,6 +2,7 @@
 using StatusApp_Server.Domain;
 using StatusApp_Server.Infrastructure;
 using Microsoft.AspNetCore.Identity;
+using StatusApp_Server.Application.Contracts;
 
 namespace StatusApp_Server.Application;
 
@@ -24,91 +25,94 @@ public static class MinimalApiEndpoints
 
     public static void RegisterMessageAPIs(this WebApplication app)
     {
-        //TODO: Overhaul messages
         app.MapGet(
                 "/getmessages",
-                (ChatContext db, HttpContext context, Guid groupId) =>
+                (
+                    IMessagingService messagingService,
+                    FriendshipService friendshipService,
+                    HttpContext context,
+                    Guid groupId
+                ) =>
                 {
-                    var userName = context.User.Identity.Name;
-                    var friendship = db.Friendships.FirstOrDefault(
-                        s => s.GroupId == groupId && s.UserName == userName
-                    );
+                    var userName =
+                        context.User.Identity?.Name ?? throw new NullReferenceException();
+
+                    var friendship = friendshipService.GetFriendship(groupId, userName);
                     if (friendship is null)
-                    {
                         return Results.NoContent();
-                    }
-                    var messages = db.Messages.Where(s => s.GroupId == groupId);
-                    return messages.Count() != 0 ? Results.Ok(messages) : Results.NoContent();
+
+                    var messages = messagingService.GetAllMessages(groupId);
+                    return messages.Count != 0 ? Results.Ok(messages) : Results.NoContent();
                 }
             )
             .RequireAuthorization()
             .WithName("GetMessages")
             .WithOpenApi();
 
-        app.MapPut(
-                "/pushMessage",
-                async (
-                    ChatContext db,
-                    DateTime Created,
-                    string Data,
-                    Guid GroupId,
-                    string Author
-                ) =>
-                {
-                    var incomingMessage = new Message();
-                    var success = false;
-                    incomingMessage.Data = Data;
-                    incomingMessage.GroupId = GroupId;
-                    incomingMessage.Created = Created;
-                    incomingMessage.AuthorUserName = Author;
-                    db.Messages.Add(incomingMessage);
-                    try
-                    {
-                        await db.SaveChangesAsync();
-                        success = true;
-                    }
-                    catch (Exception e)
-                    {
-                        var errorString = $"Error: {e.Message}";
-                        throw;
-                    }
-
-                    return success == true
-                        ? Results.Ok(incomingMessage)
-                        : Results.Conflict(incomingMessage);
-                }
-            )
-            .RequireAuthorization()
-            .WithName("PushMessage")
-            .WithOpenApi();
-        app.MapDelete(
-                "deleteMessage",
-                async (ChatContext db, int MessageId) =>
-                {
-                    var targetMessage = db.Messages.First(s => s.MessageId == MessageId);
-                    db.Messages.Remove(targetMessage);
-                    await db.SaveChangesAsync();
-                    return Results.Ok(targetMessage);
-                }
-            )
-            .RequireAuthorization()
-            .WithName("DeleteMessage")
-            .WithOpenApi();
-
-        app.MapPatch(
-                "updateMessage",
-                async (ChatContext db, int MessageId, string Data, DateTime LastUpdated) =>
-                {
-                    var targetMessage = db.Messages.First(s => s.MessageId == MessageId);
-                    targetMessage.LastUpdated = LastUpdated;
-                    targetMessage.Data = Data;
-                    await db.SaveChangesAsync();
-                    return Results.Ok(targetMessage);
-                }
-            )
-            .RequireAuthorization()
-            .WithName("UpdateMessage")
-            .WithOpenApi();
+        // app.MapPut(
+        //         "/pushMessage",
+        //         async (
+        //             ChatContext db,
+        //             DateTime Created,
+        //             string Data,
+        //             Guid GroupId,
+        //             string Author
+        //         ) =>
+        //         {
+        //             var incomingMessage = new Message();
+        //             var success = false;
+        //             incomingMessage.Data = Data;
+        //             incomingMessage.GroupId = GroupId;
+        //             incomingMessage.Created = Created;
+        //             incomingMessage.AuthorUserName = Author;
+        //             db.Messages.Add(incomingMessage);
+        //             try
+        //             {
+        //                 await db.SaveChangesAsync();
+        //                 success = true;
+        //             }
+        //             catch (Exception e)
+        //             {
+        //                 var errorString = $"Error: {e.Message}";
+        //                 throw;
+        //             }
+        //
+        //             return success == true
+        //                 ? Results.Ok(incomingMessage)
+        //                 : Results.Conflict(incomingMessage);
+        //         }
+        //     )
+        //     .RequireAuthorization()
+        //     .WithName("PushMessage")
+        //     .WithOpenApi();
+        // app.MapDelete(
+        //         "deleteMessage",
+        //         async (ChatContext db, int MessageId) =>
+        //         {
+        //             var targetMessage = db.Messages.First(s => s.MessageId == MessageId);
+        //             db.Messages.Remove(targetMessage);
+        //             await db.SaveChangesAsync();
+        //             return Results.Ok(targetMessage);
+        //         }
+        //     )
+        //     .RequireAuthorization()
+        //     .WithName("DeleteMessage")
+        //     .WithOpenApi();
+        //
+        // app.MapPatch(
+        //         "updateMessage",
+        //         async (ChatContext db, int MessageId, string Data, DateTime LastUpdated) =>
+        //         {
+        //             var targetMessage = db.Messages.First(s => s.MessageId == MessageId);
+        //             targetMessage.LastUpdated = LastUpdated;
+        //             targetMessage.Data = Data;
+        //             await db.SaveChangesAsync();
+        //             return Results.Ok(targetMessage);
+        //         }
+        //     )
+        //     .RequireAuthorization()
+        //     .WithName("UpdateMessage")
+        //     .WithOpenApi();
     }
 
     public static void RegisterUserAPIs(this WebApplication app)
