@@ -14,8 +14,8 @@ public static class MinimalApiEndpoints
                 "/checkAuth",
                 (HttpContext context) =>
                 {
-                    var user = context.User.Identity.Name;
-                    return user;
+                    var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
+                    return userName;
                 }
             )
             .RequireAuthorization()
@@ -34,8 +34,7 @@ public static class MinimalApiEndpoints
                     Guid groupId
                 ) =>
                 {
-                    var userName =
-                        context.User.Identity?.Name ?? throw new NullReferenceException();
+                    var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
 
                     var friendship = friendshipService.GetFriendship(groupId, userName);
                     if (friendship is null)
@@ -121,9 +120,9 @@ public static class MinimalApiEndpoints
                 "/getUser",
                 async (ChatContext db, UserManager<User> userManager, HttpContext context) =>
                 {
-                    var userName = context.User.Identity.Name;
+                    var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
                     User? user = await userManager.FindByNameAsync(userName);
-                    if (user == null)
+                    if (user is null)
                     {
                         return Results.NotFound();
                     }
@@ -184,11 +183,7 @@ public static class MinimalApiEndpoints
 
         app.MapGet(
                 "/signOut",
-                async (
-                    ChatContext db,
-                    UserManager<User> userManager,
-                    SignInManager<User> signInManager
-                ) =>
+                async (SignInManager<User> signInManager) =>
                 {
                     await signInManager.SignOutAsync();
                     return Results.Ok();
@@ -201,7 +196,6 @@ public static class MinimalApiEndpoints
         app.MapPut(
                 "/createUser",
                 async (
-                    ChatContext db,
                     UserManager<User> userManager,
                     SignInManager<User> signInManager,
                     string userName,
@@ -243,15 +237,14 @@ public static class MinimalApiEndpoints
         app.MapDelete(
                 "deleteUser",
                 async (
-                    ChatContext db,
                     HttpContext context,
                     UserManager<User> userManager,
                     SignInManager<User> signInManager
                 ) =>
                 {
-                    var userName = context.User.Identity.Name;
+                    var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
                     var targetUser = await userManager.FindByNameAsync(userName);
-                    if (targetUser == null)
+                    if (targetUser is null)
                     {
                         return Results.BadRequest();
                     }
@@ -281,10 +274,10 @@ public static class MinimalApiEndpoints
                     bool? online
                 ) =>
                 {
-                    var userName = context.User.Identity.Name;
+                    var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
                     //TODO: Update Friendships too
                     var targetUser = await userManager.FindByNameAsync(userName);
-                    if (targetUser == null)
+                    if (targetUser is null)
                     {
                         return Results.BadRequest();
                     }
@@ -330,7 +323,7 @@ public static class MinimalApiEndpoints
                 "/getfriends",
                 async (ChatContext db, UserManager<User> userManager, HttpContext context) =>
                 {
-                    var userName = context.User.Identity.Name;
+                    var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
                     var friends = await FriendMethods.GetFriends(db, userManager, userName);
                     return friends.Count() != 0 ? Results.Ok(friends) : Results.NoContent();
                 }
@@ -343,7 +336,7 @@ public static class MinimalApiEndpoints
                 "/getfriendships",
                 (ChatContext db, HttpContext context, bool? areFriends) =>
                 {
-                    var userName = context.User.Identity.Name;
+                    var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
                     var friendships =
                         areFriends == null // Optional AreFriends returns all friendships regardless of status if not supplied in request
                             ? db.Friendships.Where(s => s.UserName == userName)
@@ -367,7 +360,7 @@ public static class MinimalApiEndpoints
                 ) =>
                 {
                     var success = false;
-                    var userName = context.User.Identity.Name;
+                    var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
                     User? user = await userManager.FindByNameAsync(userName);
                     User? friendUser = await userManager.FindByNameAsync(friendUserName);
                     if (friendUser == null || user == null)
@@ -424,7 +417,7 @@ public static class MinimalApiEndpoints
                     bool accepted
                 ) =>
                 {
-                    var userName = context.User.Identity.Name;
+                    var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
                     var user = await userManager.FindByNameAsync(userName);
                     var profile = user.ToProfile();
                     var myFriendship = db.Friendships.FirstOrDefault(
@@ -477,13 +470,12 @@ public static class MinimalApiEndpoints
                 async (
                     ChatContext db,
                     HttpContext context,
-                    UserManager<User> userManager,
                     IHubContext<StatusHub, IStatusClient> hubContext,
                     string friendUserName
                 ) =>
                 {
                     var success = false;
-                    var userName = context.User.Identity.Name;
+                    var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
                     var myFriendship = db.Friendships.FirstOrDefault(
                         s => s.UserName == userName && s.FriendUserName == friendUserName
                     );
