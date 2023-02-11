@@ -32,6 +32,18 @@ jobs:
 
       - name: dotnet publish
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        
+      - name: Bicep Build
+        uses: Azure/bicep-build-action@v1.0.0
+        with:
+          bicepFilePath: ./.github/bicep/main.bicep
+          outputFilePath: ./.github/bicep/azuredeploy.json
+          
+      - name: Upload bicep for deployment job
+        uses: actions/upload-artifact@v2
+        with:
+          name: bicep
+          path: ./.github/bicep
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
@@ -52,24 +64,23 @@ jobs:
         with:
           name: .net-app
           
+      - name: Download bicep from build job
+        uses: actions/download-artifact@v2
+        with:
+          name: bicep
+          
       - name: Azure Login
         uses: Azure/login@v1
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          
-      - name: Bicep Build
-        uses: Azure/bicep-build-action@v1.0.0
-        with:
-          bicepFilePath: ./.github/bicep/main.bicep
-          outputFilePath: ./azuredeploy.json
       
       - name: Deploy Azure Resource Manager (ARM) Template
         uses: Azure/arm-deploy@v1
         with:
           template: ./azuredeploy.json
-          parameters: ./.github/bicep/bicep.parameters.json
+          parameters: ./bicep.parameters.json
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
