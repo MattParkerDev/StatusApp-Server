@@ -79,6 +79,7 @@ jobs:
       - name: Deploy Azure Resource Manager (ARM) Template
         uses: Azure/arm-deploy@v1
         with:
+          resourceGroupName: StatusApp
           template: ./azuredeploy.json
           parameters: ./bicep.parameters.json
 
