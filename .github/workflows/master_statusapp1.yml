@@ -81,7 +81,7 @@ jobs:
         with:
           resourceGroupName: StatusApp
           template: ./azuredeploy.json
-          parameters: ./bicep.parameters.json
+          parameters: ./main.parameters.json
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
