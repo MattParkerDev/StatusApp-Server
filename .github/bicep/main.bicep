@@ -59,6 +59,7 @@ resource server_farm 'Microsoft.Web/serverfarms@2022-03-01' = {
     elasticScaleEnabled: false
     maximumElasticWorkerCount: 1
     isSpot: false
+    freeOfferExpirationTime: '2023-05-14T10:53:10.3633333'
     reserved: true
     isXenon: false
     hyperV: false
