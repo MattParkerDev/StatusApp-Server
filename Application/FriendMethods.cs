@@ -20,22 +20,11 @@ public static class FriendMethods
             User? friend = await userManager.FindByNameAsync(name);
             if (friend == null)
             {
-                return friendUsers;
+                //TODO: Review
+                throw new ArgumentNullException();
             }
-            else
-            {
-                var profile = new Profile
-                {
-                    UserName = friend.UserName,
-                    FirstName = friend.FirstName,
-                    LastName = friend.LastName,
-                    Status = friend.Status,
-                    Online = friend.Online,
-                };
-                friendUsers.Add(profile);
-            }
+            friendUsers.Add(friend.ToProfile());
         }
-        //db.Profiles.Where(s => friendUserNameList.Contains(s.UserName)).ToList();
         return friendUsers;
     }
 
