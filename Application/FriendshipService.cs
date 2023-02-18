@@ -12,7 +12,7 @@ public class FriendshipService
         _db = db;
     }
 
-    public async Task AcceptFriendRequest(Friendship myFriendship, Friendship theirFriendship)
+    public async Task<bool> AcceptFriendRequest(Friendship myFriendship, Friendship theirFriendship)
     {
         var db = _db;
         var datetime = DateTime.UtcNow;
@@ -25,8 +25,15 @@ public class FriendshipService
         theirFriendship.AreFriends = true;
         theirFriendship.BecameFriendsDate = datetime;
         theirFriendship.GroupId = guid;
-
-        await db.SaveChangesAsync();
+        try
+        {
+            await db.SaveChangesAsync();
+        }
+        catch
+        {
+            return false;
+        }
+        return true;
     }
 
     public Friendship? GetFriendship(Guid groupId, string userName)
@@ -35,5 +42,31 @@ public class FriendshipService
             s => s.GroupId == groupId && s.UserName == userName
         );
         return friendship;
+    }
+
+    public Friendship? GetFriendship(string userName, string friendUserName)
+    {
+        var friendship = _db.Friendships.FirstOrDefault(
+            s => s.UserName == userName && s.FriendUserName == friendUserName
+        );
+        return friendship;
+    }
+
+    public async Task<bool> RemoveFriendshipPair(
+        Friendship myFriendship,
+        Friendship theirFriendship
+    )
+    {
+        _db.Friendships.Remove(myFriendship);
+        _db.Friendships.Remove(theirFriendship);
+        try
+        {
+            await _db.SaveChangesAsync();
+        }
+        catch
+        {
+            return false;
+        }
+        return true;
     }
 }

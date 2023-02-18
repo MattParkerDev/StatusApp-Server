@@ -408,7 +408,6 @@ public static class MinimalApiEndpoints
         app.MapPut(
                 "/actionfriendrequest",
                 async (
-                    ChatContext db,
                     HttpContext context,
                     FriendshipService friendshipService,
                     UserManager<User> userManager,
@@ -420,37 +419,28 @@ public static class MinimalApiEndpoints
                     var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
                     var user = await userManager.FindByNameAsync(userName);
                     var profile = user.ToProfile();
-                    var myFriendship = db.Friendships.FirstOrDefault(
-                        s => s.UserName == userName && s.FriendUserName == friendUserName
-                    );
-                    var theirFriendship = db.Friendships.FirstOrDefault(
-                        s => s.UserName == friendUserName && s.FriendUserName == userName
-                    );
+                    var myFriendship = friendshipService.GetFriendship(userName, friendUserName);
+                    var theirFriendship = friendshipService.GetFriendship(friendUserName, userName);
                     if (myFriendship != null && theirFriendship != null)
                     {
                         if (accepted)
                         {
-                            await friendshipService.AcceptFriendRequest(
+                            var success = await friendshipService.AcceptFriendRequest(
                                 myFriendship,
                                 theirFriendship
                             );
+                            if (success is false)
+                                return Results.Conflict();
                         }
                         else
                         {
-                            db.Friendships.Remove(myFriendship);
-                            db.Friendships.Remove(theirFriendship);
-                            await db.SaveChangesAsync();
-                            return Results.Ok();
+                            var success = await friendshipService.RemoveFriendshipPair(
+                                myFriendship,
+                                theirFriendship
+                            );
+                            //TODO: Consider SignalR Push
+                            return success ? Results.Ok() : Results.Conflict();
                         }
-                    }
-                    try
-                    {
-                        await db.SaveChangesAsync();
-                    }
-                    catch (Exception e)
-                    {
-                        var errorString = $"Error: {e.Message}";
-                        return Results.Conflict();
                     }
 
                     // Push this user and friendship to the new friend
