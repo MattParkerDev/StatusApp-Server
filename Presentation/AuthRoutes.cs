@@ -1,4 +1,6 @@
-﻿namespace StatusApp_Server.Presentation;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+
+namespace StatusApp_Server.Presentation;
 
 public static class AuthRoutes
 {
@@ -6,10 +8,10 @@ public static class AuthRoutes
     {
         app.MapGet(
                 "/checkAuth",
-                (HttpContext context) =>
+                Ok<string> (HttpContext context) =>
                 {
                     var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
-                    return userName;
+                    return TypedResults.Ok(userName);
                 }
             )
             .RequireAuthorization()

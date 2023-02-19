@@ -14,7 +14,6 @@ public static class UserRoutes
         app.MapGet(
                 "/getUser",
                 async Task<Results<Ok<Profile>, NotFound>> (
-                    ChatContext db,
                     UserManager<User> userManager,
                     HttpContext context
                 ) =>
@@ -44,8 +43,7 @@ public static class UserRoutes
 
         app.MapGet(
                 "/signin",
-                async (
-                    ChatContext db,
+                async Task<Results<Ok<Profile>, BadRequest, UnauthorizedHttpResult>> (
                     UserManager<User> userManager,
                     SignInManager<User> signInManager,
                     string userName,
@@ -55,7 +53,7 @@ public static class UserRoutes
                     var user = await userManager.FindByNameAsync(userName);
                     if (user == null)
                     {
-                        return Results.BadRequest();
+                        return TypedResults.BadRequest();
                     }
 
                     var profile = new Profile
@@ -73,7 +71,9 @@ public static class UserRoutes
                         true,
                         false
                     );
-                    return success.Succeeded ? Results.Ok(profile) : Results.Unauthorized();
+                    return success.Succeeded
+                        ? TypedResults.Ok(profile)
+                        : TypedResults.Unauthorized();
                 }
             )
             .AllowAnonymous()
@@ -82,10 +82,10 @@ public static class UserRoutes
 
         app.MapGet(
                 "/signOut",
-                async (SignInManager<User> signInManager) =>
+                async Task<Ok> (SignInManager<User> signInManager) =>
                 {
                     await signInManager.SignOutAsync();
-                    return Results.Ok();
+                    return TypedResults.Ok();
                 }
             )
             .RequireAuthorization()
@@ -94,7 +94,7 @@ public static class UserRoutes
 
         app.MapPut(
                 "/createUser",
-                async (
+                async Task<Results<Ok<Profile>, BadRequest<IEnumerable<IdentityError>>>> (
                     UserManager<User> userManager,
                     SignInManager<User> signInManager,
                     string userName,
@@ -116,7 +116,7 @@ public static class UserRoutes
 
                     if (!result.Succeeded)
                     {
-                        return Results.BadRequest(result.Errors);
+                        return TypedResults.BadRequest(result.Errors);
                     }
 
                     var newProfile = new Profile
@@ -126,7 +126,7 @@ public static class UserRoutes
                         LastName = lastName
                     };
                     await signInManager.SignInAsync(newUser, isPersistent: true);
-                    return Results.Ok(newProfile);
+                    return TypedResults.Ok(newProfile);
                 }
             )
             .AllowAnonymous()
@@ -135,7 +135,7 @@ public static class UserRoutes
 
         app.MapDelete(
                 "deleteUser",
-                async (
+                async Task<Results<Ok, BadRequest>> (
                     HttpContext context,
                     UserManager<User> userManager,
                     SignInManager<User> signInManager
@@ -145,14 +145,14 @@ public static class UserRoutes
                     var targetUser = await userManager.FindByNameAsync(userName);
                     if (targetUser is null)
                     {
-                        return Results.BadRequest();
+                        return TypedResults.BadRequest();
                     }
 
                     //TODO: Confirm Auth flow
                     await signInManager.SignOutAsync();
                     await userManager.DeleteAsync(targetUser);
                     //TODO: Also delete Friendships
-                    return Results.Ok();
+                    return TypedResults.Ok();
                 }
             )
             .RequireAuthorization()
@@ -162,7 +162,7 @@ public static class UserRoutes
         //TODO: Create separate route for updating Password
         app.MapPatch(
                 "updateUser",
-                async (
+                async Task<Results<Ok<Profile>, BadRequest>> (
                     ChatContext db,
                     IHubContext<StatusHub, IStatusClient> hubContext,
                     HttpContext context,
@@ -179,7 +179,7 @@ public static class UserRoutes
                     var targetUser = await userManager.FindByNameAsync(userName);
                     if (targetUser is null)
                     {
-                        return Results.BadRequest();
+                        return TypedResults.BadRequest();
                     }
 
                     targetUser.FirstName = firstName ?? targetUser.FirstName;
@@ -208,7 +208,7 @@ public static class UserRoutes
                     await hubContext.Clients
                         .Users(usersToNotify)
                         .ReceiveUpdatedUser(updatedProfile);
-                    return Results.Ok(updatedProfile);
+                    return TypedResults.Ok(updatedProfile);
                 }
             )
             .RequireAuthorization()

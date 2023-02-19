@@ -177,10 +177,11 @@ db.Friendships.Add(friendship4);
 
 await db.SaveChangesAsync();
 
+app.MapAuthRoutes();
+app.MapFriendRoutes();
 app.MapMessageRoutes();
 app.MapUserRoutes();
-app.MapFriendRoutes();
-app.MapAuthRoutes();
+
 app.MapHub<StatusHub>("/statushub");
 
 app.Run();

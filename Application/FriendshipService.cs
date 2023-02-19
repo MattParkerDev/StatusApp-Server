@@ -76,7 +76,7 @@ public class FriendshipService
     public async Task<List<Profile>> GetFriendsProfileList(string userName)
     {
         var friendUserNameList = GetFriendsUserNameList(userName);
-        List<Profile> friendsProfileList = new List<Profile>();
+        var friendsProfileList = new List<Profile>();
         foreach (var name in friendUserNameList)
         {
             User? friend = await _userManager.FindByNameAsync(name);

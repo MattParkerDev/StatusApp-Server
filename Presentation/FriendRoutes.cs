@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using StatusApp_Server.Application;
 using StatusApp_Server.Domain;
@@ -12,15 +13,21 @@ public static class FriendRoutes
     {
         app.MapGet(
                 "/getfriends",
-                async (FriendshipService friendshipService, HttpContext context) =>
+                async Task<Results<Ok<List<Profile>>, NoContent>> (
+                    FriendshipService friendshipService,
+                    HttpContext context
+                ) =>
                 {
-                    var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
+                    var userName =
+                        context.User.Identity?.Name
+                        ?? throw new ArgumentNullException(nameof(context.User.Identity.Name));
+
                     var friendsProfileList = await friendshipService.GetFriendsProfileList(
                         userName
                     );
-                    return friendsProfileList.Count() != 0
-                        ? Results.Ok(friendsProfileList)
-                        : Results.NoContent();
+                    return friendsProfileList.Count != 0
+                        ? TypedResults.Ok(friendsProfileList)
+                        : TypedResults.NoContent();
                 }
             )
             .RequireAuthorization()
@@ -29,16 +36,22 @@ public static class FriendRoutes
 
         app.MapGet(
                 "/getfriendships",
-                (ChatContext db, HttpContext context, bool? areFriends) =>
+                Results<Ok<List<Friendship>>, NoContent> (
+                    ChatContext db,
+                    HttpContext context,
+                    bool? areFriends
+                ) =>
                 {
                     var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
                     var friendships =
                         areFriends == null // Optional AreFriends returns all friendships regardless of status if not supplied in request
-                            ? db.Friendships.Where(s => s.UserName == userName)
-                            : db.Friendships.Where(
-                                s => s.UserName == userName && s.AreFriends == areFriends
-                            );
-                    return friendships.Count() != 0 ? Results.Ok(friendships) : Results.NoContent();
+                            ? db.Friendships.Where(s => s.UserName == userName).ToList()
+                            : db.Friendships
+                                .Where(s => s.UserName == userName && s.AreFriends == areFriends)
+                                .ToList();
+                    return friendships.Count != 0
+                        ? TypedResults.Ok(friendships)
+                        : TypedResults.NoContent();
                 }
             )
             .RequireAuthorization()
@@ -47,7 +60,7 @@ public static class FriendRoutes
 
         app.MapPut(
                 "/sendfriendrequest",
-                async (
+                async Task<Results<Ok<Friendship>, NotFound, Conflict<Friendship>>> (
                     ChatContext db,
                     UserManager<User> userManager,
                     HttpContext context,
@@ -60,7 +73,7 @@ public static class FriendRoutes
                     User? friendUser = await userManager.FindByNameAsync(friendUserName);
                     if (friendUser == null || user == null)
                     {
-                        return Results.NotFound();
+                        return TypedResults.NotFound();
                     }
 
                     var myFriendship = new Friendship
@@ -93,7 +106,10 @@ public static class FriendRoutes
                         var errorString = $"Error: {e.Message}";
                     }
 
-                    return success ? Results.Ok(myFriendship) : Results.Conflict(myFriendship);
+                    return success
+                        ? TypedResults.Ok(myFriendship)
+                        //TODO: Review returning friendship on failure
+                        : TypedResults.Conflict(myFriendship);
                 }
             )
             .RequireAuthorization()
@@ -102,7 +118,7 @@ public static class FriendRoutes
 
         app.MapPut(
                 "/actionfriendrequest",
-                async (
+                async Task<Results<Ok<Friendship>, Ok, Conflict>> (
                     HttpContext context,
                     FriendshipService friendshipService,
                     UserManager<User> userManager,
@@ -128,7 +144,9 @@ public static class FriendRoutes
                                 theirFriendship
                             );
                         //TODO: Consider SignalR Push
-                        return removeFriendshipSucceeded ? Results.Ok() : Results.Conflict();
+                        return removeFriendshipSucceeded
+                            ? TypedResults.Ok()
+                            : TypedResults.Conflict();
                     }
 
                     var acceptSucceeded = await friendshipService.AcceptFriendRequest(
@@ -136,14 +154,14 @@ public static class FriendRoutes
                         theirFriendship
                     );
                     if (acceptSucceeded is false)
-                        return Results.Conflict();
+                        return TypedResults.Conflict();
 
                     // Push this user and friendship to the new friend
                     await hubContext.Clients
                         .User(friendUserName)
                         .ReceiveUpdatedFriendship(theirFriendship);
                     await hubContext.Clients.User(friendUserName).ReceiveUpdatedUser(profile);
-                    return Results.Ok(myFriendship);
+                    return TypedResults.Ok(myFriendship);
                 }
             )
             .RequireAuthorization()
@@ -152,7 +170,7 @@ public static class FriendRoutes
 
         app.MapDelete(
                 "/removefriend",
-                async (
+                async Task<Results<Ok, Conflict>> (
                     ChatContext db,
                     HttpContext context,
                     IHubContext<StatusHub, IStatusClient> hubContext,
@@ -185,12 +203,12 @@ public static class FriendRoutes
 
                     if (success != true)
                     {
-                        return Results.Conflict();
+                        return TypedResults.Conflict();
                     }
 
                     // Delete this user from friend's list
                     await hubContext.Clients.User(friendUserName).DeleteFriend(userName);
-                    return Results.Ok();
+                    return TypedResults.Ok();
                 }
             )
             .RequireAuthorization()
