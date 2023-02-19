@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using StatusApp_Server.Domain;
 using StatusApp_Server.Infrastructure;
 
@@ -6,10 +7,12 @@ namespace StatusApp_Server.Application;
 public class FriendshipService
 {
     private readonly ChatContext _db;
+    private readonly UserManager<User> _userManager;
 
-    public FriendshipService(ChatContext db)
+    public FriendshipService(ChatContext db, UserManager<User> userManager)
     {
         _db = db;
+        _userManager = userManager;
     }
 
     public async Task<bool> AcceptFriendRequest(Friendship myFriendship, Friendship theirFriendship)
@@ -50,6 +53,41 @@ public class FriendshipService
             s => s.UserName == userName && s.FriendUserName == friendUserName
         );
         return friendship;
+    }
+
+    public List<Friendship> GetAllFriendships(string userName)
+    {
+        var friendships = _db.Friendships
+            .Where(s => s.UserName == userName && s.AreFriends == true)
+            .ToList();
+        return friendships;
+    }
+
+    public List<string> GetFriendsUserNameList(string userName)
+    {
+        var friendUserNameList = _db.Friendships
+            .Where(s => s.UserName == userName && s.AreFriends == true)
+            .Select(x => x.FriendUserName)
+            .ToList();
+
+        return friendUserNameList;
+    }
+
+    public async Task<List<Profile>> GetFriendsProfileList(string userName)
+    {
+        var friendUserNameList = GetFriendsUserNameList(userName);
+        List<Profile> friendsProfileList = new List<Profile>();
+        foreach (var name in friendUserNameList)
+        {
+            User? friend = await _userManager.FindByNameAsync(name);
+            if (friend == null)
+            {
+                //TODO: Review
+                throw new ArgumentNullException();
+            }
+            friendsProfileList.Add(friend.ToProfile());
+        }
+        return friendsProfileList;
     }
 
     public async Task<bool> RemoveFriendshipPair(

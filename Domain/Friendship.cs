@@ -5,8 +5,8 @@ namespace StatusApp_Server.Domain;
 [PrimaryKey(nameof(UserName), nameof(FriendUserName))]
 public class Friendship
 {
-    public string? UserName { get; set; }
-    public string? FriendUserName { get; set; }
+    public string UserName { get; set; } = string.Empty;
+    public string FriendUserName { get; set; } = string.Empty;
     public bool Accepted { get; set; } = false;
     public bool AreFriends { get; set; } = false;
     public DateTime BecameFriendsDate { get; set; }

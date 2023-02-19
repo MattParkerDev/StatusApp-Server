@@ -268,6 +268,7 @@ public static class MinimalApiEndpoints
                     IHubContext<StatusHub, IStatusClient> hubContext,
                     HttpContext context,
                     UserManager<User> userManager,
+                    FriendshipService friendshipService,
                     string? firstName,
                     string? lastName,
                     string? status,
@@ -297,11 +298,10 @@ public static class MinimalApiEndpoints
                         Online = targetUser.Online,
                     };
 
-                    // Push changes to user to any of their friends
-                    var friendships = FriendMethods.GetFriendships(db, userName);
-                    var friendUserNameList = FriendMethods.GetFriendUserNameList(friendships);
+                    // Push changes to this user to any of their friends
+                    var friendsUserNameList = friendshipService.GetFriendsUserNameList(userName);
                     var usersToNotify = db.Connections
-                        .Where(s => friendUserNameList.Contains(s.UserName))
+                        .Where(s => friendsUserNameList.Contains(s.UserName))
                         .GroupBy(s => s.UserName)
                         .Select(s => s.First().UserName)
                         .ToList();
@@ -321,11 +321,20 @@ public static class MinimalApiEndpoints
     {
         app.MapGet(
                 "/getfriends",
-                async (ChatContext db, UserManager<User> userManager, HttpContext context) =>
+                async (
+                    ChatContext db,
+                    FriendshipService friendshipService,
+                    UserManager<User> userManager,
+                    HttpContext context
+                ) =>
                 {
                     var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
-                    var friends = await FriendMethods.GetFriends(db, userManager, userName);
-                    return friends.Count() != 0 ? Results.Ok(friends) : Results.NoContent();
+                    var friendsProfileList = await friendshipService.GetFriendsProfileList(
+                        userName
+                    );
+                    return friendsProfileList.Count() != 0
+                        ? Results.Ok(friendsProfileList)
+                        : Results.NoContent();
                 }
             )
             .RequireAuthorization()
