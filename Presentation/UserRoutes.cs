@@ -14,27 +14,20 @@ public static class UserRoutes
         app.MapGet(
                 "/getUser",
                 async Task<Results<Ok<Profile>, NotFound>> (
-                    UserManager<User> userManager,
+                    UserService userService,
                     HttpContext context
                 ) =>
                 {
                     var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
-                    User? user = await userManager.FindByNameAsync(userName);
+
+                    var user = await userService.GetUserByNameAsync(userName);
                     if (user is null)
                     {
                         return TypedResults.NotFound();
                     }
 
-                    var profile = new Profile
-                    {
-                        UserName = user.UserName,
-                        FirstName = user.FirstName,
-                        LastName = user.LastName,
-                        Status = user.Status,
-                        Online = user.Online
-                    };
+                    var profile = user.ToProfile();
                     return TypedResults.Ok(profile);
-                    //return Results.Ok(user);
                 }
             )
             .RequireAuthorization()
@@ -44,35 +37,20 @@ public static class UserRoutes
         app.MapGet(
                 "/signin",
                 async Task<Results<Ok<Profile>, BadRequest, UnauthorizedHttpResult>> (
-                    UserManager<User> userManager,
-                    SignInManager<User> signInManager,
+                    UserService userService,
                     string userName,
                     string password
                 ) =>
                 {
-                    var user = await userManager.FindByNameAsync(userName);
+                    var user = await userService.GetUserByNameAsync(userName);
                     if (user == null)
                     {
                         return TypedResults.BadRequest();
                     }
 
-                    var profile = new Profile
-                    {
-                        UserName = user.UserName,
-                        FirstName = user.FirstName,
-                        LastName = user.LastName,
-                        Status = user.Status,
-                        Online = user.Online
-                    };
-
-                    var success = await signInManager.PasswordSignInAsync(
-                        user,
-                        password,
-                        true,
-                        false
-                    );
-                    return success.Succeeded
-                        ? TypedResults.Ok(profile)
+                    var signInResult = await userService.PasswordSignInAsync(user, password);
+                    return signInResult.Succeeded
+                        ? TypedResults.Ok(user.ToProfile())
                         : TypedResults.Unauthorized();
                 }
             )
@@ -82,9 +60,9 @@ public static class UserRoutes
 
         app.MapGet(
                 "/signOut",
-                async Task<Ok> (SignInManager<User> signInManager) =>
+                async Task<Ok> (UserService userService) =>
                 {
-                    await signInManager.SignOutAsync();
+                    await userService.SignOutAsync();
                     return TypedResults.Ok();
                 }
             )
@@ -95,8 +73,7 @@ public static class UserRoutes
         app.MapPut(
                 "/createUser",
                 async Task<Results<Ok<Profile>, BadRequest<IEnumerable<IdentityError>>>> (
-                    UserManager<User> userManager,
-                    SignInManager<User> signInManager,
+                    UserService userService,
                     string userName,
                     string password,
                     string firstName,
@@ -112,21 +89,15 @@ public static class UserRoutes
                         LastName = lastName
                     };
 
-                    var result = await userManager.CreateAsync(newUser, password);
+                    var result = await userService.CreateUserAsync(newUser, password);
 
                     if (!result.Succeeded)
                     {
                         return TypedResults.BadRequest(result.Errors);
                     }
 
-                    var newProfile = new Profile
-                    {
-                        UserName = userName,
-                        FirstName = firstName,
-                        LastName = lastName
-                    };
-                    await signInManager.SignInAsync(newUser, isPersistent: true);
-                    return TypedResults.Ok(newProfile);
+                    await userService.SignInAsync(newUser);
+                    return TypedResults.Ok(newUser.ToProfile());
                 }
             )
             .AllowAnonymous()
@@ -137,20 +108,19 @@ public static class UserRoutes
                 "deleteUser",
                 async Task<Results<Ok, BadRequest>> (
                     HttpContext context,
-                    UserManager<User> userManager,
-                    SignInManager<User> signInManager
+                    UserService userService
                 ) =>
                 {
                     var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
-                    var targetUser = await userManager.FindByNameAsync(userName);
+                    var targetUser = await userService.GetUserByNameAsync(userName);
                     if (targetUser is null)
                     {
                         return TypedResults.BadRequest();
                     }
 
                     //TODO: Confirm Auth flow
-                    await signInManager.SignOutAsync();
-                    await userManager.DeleteAsync(targetUser);
+                    await userService.SignOutAsync();
+                    await userService.DeleteUserAsync(targetUser);
                     //TODO: Also delete Friendships
                     return TypedResults.Ok();
                 }
@@ -166,7 +136,7 @@ public static class UserRoutes
                     ChatContext db,
                     IHubContext<StatusHub, IStatusClient> hubContext,
                     HttpContext context,
-                    UserManager<User> userManager,
+                    UserService userService,
                     FriendshipService friendshipService,
                     string? firstName,
                     string? lastName,
@@ -176,7 +146,7 @@ public static class UserRoutes
                 {
                     var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
                     //TODO: Update Friendships too
-                    var targetUser = await userManager.FindByNameAsync(userName);
+                    var targetUser = await userService.GetUserByNameAsync(userName);
                     if (targetUser is null)
                     {
                         return TypedResults.BadRequest();
@@ -186,16 +156,9 @@ public static class UserRoutes
                     targetUser.LastName = lastName ?? targetUser.LastName;
                     targetUser.Status = status ?? targetUser.Status;
                     targetUser.Online = online ?? targetUser.Online;
-                    await userManager.UpdateAsync(targetUser);
+                    await userService.UpdateUserAsync(targetUser);
 
-                    var updatedProfile = new Profile
-                    {
-                        UserName = targetUser.UserName,
-                        FirstName = targetUser.FirstName,
-                        LastName = targetUser.LastName,
-                        Status = targetUser.Status,
-                        Online = targetUser.Online,
-                    };
+                    var updatedProfile = targetUser.ToProfile();
 
                     // Push changes to this user to any of their friends
                     var friendsUserNameList = friendshipService.GetFriendsUserNameList(userName);
