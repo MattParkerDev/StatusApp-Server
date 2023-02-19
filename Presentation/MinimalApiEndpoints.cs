@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
+using StatusApp_Server.Application;
+using StatusApp_Server.Application.Contracts;
 using StatusApp_Server.Domain;
 using StatusApp_Server.Infrastructure;
-using Microsoft.AspNetCore.Identity;
-using StatusApp_Server.Application.Contracts;
 
-namespace StatusApp_Server.Application;
+namespace StatusApp_Server.Presentation;
 
 public static class MinimalApiEndpoints
 {

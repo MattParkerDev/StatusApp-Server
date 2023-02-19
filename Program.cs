@@ -5,6 +5,7 @@ using StatusApp_Server.Application;
 using StatusApp_Server.Application.Contracts;
 using StatusApp_Server.Domain;
 using StatusApp_Server.Infrastructure;
+using StatusApp_Server.Presentation;
 
 var builder = WebApplication.CreateBuilder(args);
 
