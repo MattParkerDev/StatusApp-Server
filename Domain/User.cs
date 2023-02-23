@@ -4,8 +4,8 @@ namespace StatusApp_Server.Domain;
 
 public class User : IdentityUser
 {
-    public string? FirstName { get; set; }
-    public string? LastName { get; set; }
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
     public string Status { get; set; } = "";
     public bool Online { get; set; }
 

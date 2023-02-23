@@ -20,7 +20,7 @@ public static class MessageRoutes
                 {
                     var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
 
-                    var friendship = friendshipService.GetFriendship(groupId, userName);
+                    var friendship = friendshipService.GetFriendship(userName, groupId);
                     if (friendship is null)
                         return TypedResults.NoContent();
 

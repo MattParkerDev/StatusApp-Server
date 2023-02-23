@@ -39,7 +39,7 @@ public class FriendshipService
         return true;
     }
 
-    public Friendship? GetFriendship(Guid groupId, string userName)
+    public Friendship? GetFriendship(string userName, Guid groupId)
     {
         var friendship = _db.Friendships.FirstOrDefault(
             s => s.GroupId == groupId && s.UserName == userName
@@ -55,10 +55,17 @@ public class FriendshipService
         return friendship;
     }
 
-    public List<Friendship> GetAllFriendships(string userName)
+    public List<Friendship> GetAllFriendships(string userName, bool? areFriends)
     {
-        var friendships = _db.Friendships
-            .Where(s => s.UserName == userName && s.AreFriends == true)
+        List<Friendship> friendships;
+        if (areFriends is null)
+        {
+            friendships = _db.Friendships.Where(s => s.UserName == userName).ToList();
+            return friendships;
+        }
+
+        friendships = _db.Friendships
+            .Where(s => s.UserName == userName && s.AreFriends == areFriends)
             .ToList();
         return friendships;
     }
@@ -88,6 +95,40 @@ public class FriendshipService
             friendsProfileList.Add(friend.ToProfile());
         }
         return friendsProfileList;
+    }
+
+    public async Task<Friendship?> CreateFriendshipPair(User user, User friendUser)
+    {
+        var myFriendship = new Friendship
+        {
+            UserName = user.UserName!,
+            FriendUserName = friendUser.UserName!,
+            Accepted = true,
+            AreFriends = false,
+            FriendFirstName = friendUser.FirstName,
+            FriendLastName = friendUser.LastName,
+        };
+        var theirFriendship = new Friendship
+        {
+            UserName = friendUser.UserName!,
+            FriendUserName = user.UserName!,
+            Accepted = false,
+            AreFriends = false,
+            FriendFirstName = user.FirstName,
+            FriendLastName = user.LastName,
+        };
+        _db.Friendships.Add(myFriendship);
+        _db.Friendships.Add(theirFriendship);
+        try
+        {
+            await _db.SaveChangesAsync();
+        }
+        catch
+        {
+            return null;
+        }
+
+        return myFriendship;
     }
 
     public async Task<bool> RemoveFriendshipPair(

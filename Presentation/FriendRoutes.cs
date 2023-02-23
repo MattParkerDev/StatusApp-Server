@@ -37,18 +37,13 @@ public static class FriendRoutes
         app.MapGet(
                 "/getfriendships",
                 Results<Ok<List<Friendship>>, NoContent> (
-                    ChatContext db,
                     HttpContext context,
+                    FriendshipService friendshipService,
                     bool? areFriends
                 ) =>
                 {
                     var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
-                    var friendships =
-                        areFriends == null // Optional AreFriends returns all friendships regardless of status if not supplied in request
-                            ? db.Friendships.Where(s => s.UserName == userName).ToList()
-                            : db.Friendships
-                                .Where(s => s.UserName == userName && s.AreFriends == areFriends)
-                                .ToList();
+                    var friendships = friendshipService.GetAllFriendships(userName, areFriends);
                     return friendships.Count != 0
                         ? TypedResults.Ok(friendships)
                         : TypedResults.NoContent();
@@ -60,56 +55,32 @@ public static class FriendRoutes
 
         app.MapPut(
                 "/sendfriendrequest",
-                async Task<Results<Ok<Friendship>, NotFound, Conflict<Friendship>>> (
-                    ChatContext db,
+                async Task<Results<Ok<Friendship>, NotFound, Conflict>> (
+                    FriendshipService friendshipService,
                     UserManager<User> userManager,
                     HttpContext context,
                     string friendUserName
                 ) =>
                 {
-                    var success = false;
                     var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
-                    User? user = await userManager.FindByNameAsync(userName);
-                    User? friendUser = await userManager.FindByNameAsync(friendUserName);
+                    var user = await userManager.FindByNameAsync(userName);
+                    var friendUser = await userManager.FindByNameAsync(friendUserName);
                     if (friendUser == null || user == null)
                     {
                         return TypedResults.NotFound();
                     }
 
-                    var myFriendship = new Friendship
+                    var myFriendship = await friendshipService.CreateFriendshipPair(
+                        user,
+                        friendUser
+                    );
+
+                    if (myFriendship is null)
                     {
-                        UserName = userName,
-                        FriendUserName = friendUser.UserName,
-                        Accepted = true,
-                        AreFriends = false,
-                        FriendFirstName = friendUser.FirstName,
-                        FriendLastName = friendUser.LastName,
-                    };
-                    var theirFriendship = new Friendship
-                    {
-                        UserName = friendUser.UserName,
-                        FriendUserName = userName,
-                        Accepted = false,
-                        AreFriends = false,
-                        FriendFirstName = user.FirstName,
-                        FriendLastName = user.LastName,
-                    };
-                    db.Friendships.Add(myFriendship);
-                    db.Friendships.Add(theirFriendship);
-                    try
-                    {
-                        await db.SaveChangesAsync();
-                        success = true;
-                    }
-                    catch (Exception e)
-                    {
-                        var errorString = $"Error: {e.Message}";
+                        return TypedResults.Conflict();
                     }
 
-                    return success
-                        ? TypedResults.Ok(myFriendship)
-                        //TODO: Review returning friendship on failure
-                        : TypedResults.Conflict(myFriendship);
+                    return TypedResults.Ok(myFriendship);
                 }
             )
             .RequireAuthorization()
@@ -129,7 +100,7 @@ public static class FriendRoutes
                 {
                     var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
                     var user = await userManager.FindByNameAsync(userName);
-                    var profile = user.ToProfile();
+                    var profile = user!.ToProfile();
                     var myFriendship = friendshipService.GetFriendship(userName, friendUserName);
                     var theirFriendship = friendshipService.GetFriendship(friendUserName, userName);
 
@@ -171,7 +142,7 @@ public static class FriendRoutes
         app.MapDelete(
                 "/removefriend",
                 async Task<Results<Ok, Conflict>> (
-                    ChatContext db,
+                    FriendshipService friendshipService,
                     HttpContext context,
                     IHubContext<StatusHub, IStatusClient> hubContext,
                     string friendUserName
@@ -179,29 +150,18 @@ public static class FriendRoutes
                 {
                     var success = false;
                     var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
-                    var myFriendship = db.Friendships.FirstOrDefault(
-                        s => s.UserName == userName && s.FriendUserName == friendUserName
-                    );
-                    var theirFriendship = db.Friendships.FirstOrDefault(
-                        s => s.UserName == friendUserName && s.FriendUserName == userName
-                    );
+                    var myFriendship = friendshipService.GetFriendship(userName, friendUserName);
+                    var theirFriendship = friendshipService.GetFriendship(friendUserName, userName);
+
                     if (myFriendship != null && theirFriendship != null)
                     {
-                        db.Friendships.Remove(myFriendship);
-                        db.Friendships.Remove(theirFriendship);
+                        success = await friendshipService.RemoveFriendshipPair(
+                            myFriendship,
+                            theirFriendship
+                        );
                     }
 
-                    try
-                    {
-                        await db.SaveChangesAsync();
-                        success = true;
-                    }
-                    catch (Exception e)
-                    {
-                        var errorString = $"Error: {e.Message}";
-                    }
-
-                    if (success != true)
+                    if (success is not true)
                     {
                         return TypedResults.Conflict();
                     }
