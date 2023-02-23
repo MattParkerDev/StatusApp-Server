@@ -131,6 +131,46 @@ public class FriendshipService
         return myFriendship;
     }
 
+    public async Task<Friendship?> CreateAcceptedFriendshipPair(User user, User friendUser)
+    {
+        var guid = Guid.NewGuid();
+        var time = DateTime.UtcNow;
+        var myFriendship = new Friendship
+        {
+            UserName = user.UserName!,
+            FriendUserName = friendUser.UserName!,
+            Accepted = true,
+            AreFriends = true,
+            BecameFriendsDate = time,
+            FriendFirstName = friendUser.FirstName,
+            FriendLastName = friendUser.LastName,
+            GroupId = guid
+        };
+        var theirFriendship = new Friendship
+        {
+            UserName = friendUser.UserName!,
+            FriendUserName = user.UserName!,
+            Accepted = true,
+            AreFriends = true,
+            BecameFriendsDate = time,
+            FriendFirstName = user.FirstName,
+            FriendLastName = user.LastName,
+            GroupId = guid
+        };
+        _db.Friendships.Add(myFriendship);
+        _db.Friendships.Add(theirFriendship);
+        try
+        {
+            await _db.SaveChangesAsync();
+        }
+        catch
+        {
+            return null;
+        }
+
+        return myFriendship;
+    }
+
     public async Task<bool> RemoveFriendshipPair(
         Friendship myFriendship,
         Friendship theirFriendship

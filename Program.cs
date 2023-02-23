@@ -9,9 +9,6 @@ using StatusApp_Server.Presentation;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-
 var connectionString = "";
 if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
 {
@@ -64,6 +61,7 @@ builder.Services.AddSingleton<IUserIdProvider, SignalRUserIdProvider>();
 builder.Services.AddScoped<IMessagingService, MessagingService>();
 builder.Services.AddScoped<FriendshipService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<TestDataGeneratorService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -81,102 +79,15 @@ app.UseHttpsRedirection();
 
 using var scope = app.Services.CreateScope();
 await using var db = scope.ServiceProvider.GetRequiredService<ChatContext>();
-using var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+var testDataGeneratorService = scope.ServiceProvider.GetRequiredService<TestDataGeneratorService>();
 
 //Only during development
 await db.Database.EnsureDeletedAsync();
 await db.Database.EnsureCreatedAsync();
 
-db.Connections.ExecuteDelete();
+await db.Connections.ExecuteDeleteAsync();
 
-var guid1 = Guid.NewGuid();
-var friendship1 = new Friendship
-{
-    UserName = "BigMaurice",
-    FriendUserName = "Katie11",
-    Accepted = true,
-    AreFriends = true,
-    BecameFriendsDate = DateTime.UtcNow,
-    FriendFirstName = "Katie",
-    FriendLastName = "Murray",
-    GroupId = guid1
-};
-
-var friendship2 = new Friendship
-{
-    UserName = "Katie11",
-    FriendUserName = "BigMaurice",
-    Accepted = true,
-    AreFriends = true,
-    BecameFriendsDate = DateTime.UtcNow,
-    FriendFirstName = "Maurice",
-    FriendLastName = "Smith",
-    GroupId = guid1
-};
-
-var guid2 = Guid.NewGuid();
-var friendship3 = new Friendship
-{
-    UserName = "BigMaurice",
-    FriendUserName = "Jrod1",
-    Accepted = true,
-    AreFriends = true,
-    BecameFriendsDate = DateTime.UtcNow,
-    FriendFirstName = "Jarrod",
-    FriendLastName = "Lee",
-    GroupId = guid2
-};
-
-var friendship4 = new Friendship
-{
-    UserName = "Jrod1",
-    FriendUserName = "BigMaurice",
-    Accepted = true,
-    AreFriends = true,
-    BecameFriendsDate = DateTime.UtcNow,
-    FriendFirstName = "Maurice",
-    FriendLastName = "Smith",
-    GroupId = guid2
-};
-
-var newIdentityUser = new User
-{
-    UserName = "BigMaurice",
-    Email = "Bigmaurice@gmail.com",
-    FirstName = "Maurice",
-    LastName = "Smith",
-    Status = "Open to Plans",
-    Online = true,
-};
-var newIdentityUser2 = new User
-{
-    UserName = "Katie11",
-    Email = "katie@hotmail.com",
-    FirstName = "Katie",
-    LastName = "Murray",
-    Status = "Keen for dinner",
-    Online = true,
-};
-var newIdentityUser3 = new User
-{
-    UserName = "Jrod1",
-    Email = "jrod1@hotmail.com",
-    FirstName = "Jarrod",
-    LastName = "Lee",
-    Status = "Quiet night in",
-    Online = false,
-};
-
-await userManager.CreateAsync(newIdentityUser, "password1");
-await userManager.CreateAsync(newIdentityUser2, "password1");
-await userManager.CreateAsync(newIdentityUser3, "password1");
-
-db.Friendships.Add(friendship1);
-db.Friendships.Add(friendship2);
-db.Friendships.Add(friendship3);
-db.Friendships.Add(friendship4);
-
-await db.SaveChangesAsync();
+await testDataGeneratorService.GenerateTestUsersAndFriendships();
 
 app.MapAuthRoutes();
 app.MapFriendRoutes();
