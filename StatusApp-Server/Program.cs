@@ -59,8 +59,8 @@ builder.Services.AddSignalR();
 
 builder.Services.AddSingleton<IUserIdProvider, SignalRUserIdProvider>();
 builder.Services.AddScoped<IMessagingService, MessagingService>();
-builder.Services.AddScoped<FriendshipService>();
-builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<IFriendshipService, FriendshipService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<TestDataGeneratorService>();
 
 builder.Services.AddEndpointsApiExplorer();

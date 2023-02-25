@@ -1,18 +1,19 @@
 using Microsoft.AspNetCore.Identity;
+using StatusApp_Server.Application.Contracts;
 using StatusApp_Server.Domain;
 using StatusApp_Server.Infrastructure;
 
 namespace StatusApp_Server.Application;
 
-public class FriendshipService
+public class FriendshipService : IFriendshipService
 {
     private readonly ChatContext _db;
-    private readonly UserManager<User> _userManager;
+    private readonly IUserService _userService;
 
-    public FriendshipService(ChatContext db, UserManager<User> userManager)
+    public FriendshipService(ChatContext db, IUserService userService)
     {
         _db = db;
-        _userManager = userManager;
+        _userService = userService;
     }
 
     public async Task<bool> AcceptFriendRequest(Friendship myFriendship, Friendship theirFriendship)
@@ -86,7 +87,7 @@ public class FriendshipService
         var friendsProfileList = new List<Profile>();
         foreach (var name in friendUserNameList)
         {
-            User? friend = await _userManager.FindByNameAsync(name);
+            User? friend = await _userService.GetUserByNameAsync(name);
             if (friend == null)
             {
                 //TODO: Review

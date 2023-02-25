@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using StatusApp_Server.Application;
+using StatusApp_Server.Application.Contracts;
 using StatusApp_Server.Domain;
 using StatusApp_Server.Infrastructure;
 
@@ -14,7 +15,7 @@ public static class FriendRoutes
         app.MapGet(
                 "/getfriends",
                 async Task<Results<Ok<List<Profile>>, NoContent>> (
-                    FriendshipService friendshipService,
+                    IFriendshipService friendshipService,
                     HttpContext context
                 ) =>
                 {
@@ -38,7 +39,7 @@ public static class FriendRoutes
                 "/getfriendships",
                 Results<Ok<List<Friendship>>, NoContent> (
                     HttpContext context,
-                    FriendshipService friendshipService,
+                    IFriendshipService friendshipService,
                     bool? areFriends
                 ) =>
                 {
@@ -56,7 +57,7 @@ public static class FriendRoutes
         app.MapPut(
                 "/sendfriendrequest",
                 async Task<Results<Ok<Friendship>, NotFound, Conflict>> (
-                    FriendshipService friendshipService,
+                    IFriendshipService friendshipService,
                     UserManager<User> userManager,
                     HttpContext context,
                     string friendUserName
@@ -91,7 +92,7 @@ public static class FriendRoutes
                 "/actionfriendrequest",
                 async Task<Results<Ok<Friendship>, Ok, Conflict>> (
                     HttpContext context,
-                    FriendshipService friendshipService,
+                    IFriendshipService friendshipService,
                     UserManager<User> userManager,
                     IHubContext<StatusHub, IStatusClient> hubContext,
                     string friendUserName,
@@ -142,7 +143,7 @@ public static class FriendRoutes
         app.MapDelete(
                 "/removefriend",
                 async Task<Results<Ok, Conflict>> (
-                    FriendshipService friendshipService,
+                    IFriendshipService friendshipService,
                     HttpContext context,
                     IHubContext<StatusHub, IStatusClient> hubContext,
                     string friendUserName

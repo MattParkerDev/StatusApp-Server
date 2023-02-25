@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using StatusApp_Server.Application.Contracts;
 using StatusApp_Server.Domain;
 using StatusApp_Server.Infrastructure;
 
@@ -6,10 +7,10 @@ namespace StatusApp_Server.Application;
 
 public class TestDataGeneratorService
 {
-    private readonly UserService _userService;
-    private readonly FriendshipService _friendshipService;
+    private readonly IUserService _userService;
+    private readonly IFriendshipService _friendshipService;
 
-    public TestDataGeneratorService(UserService userService, FriendshipService friendshipService)
+    public TestDataGeneratorService(IUserService userService, IFriendshipService friendshipService)
     {
         _userService = userService;
         _friendshipService = friendshipService;

@@ -3,7 +3,7 @@ using StatusApp_Server.Domain;
 
 namespace StatusApp_Server.Application;
 
-public class UserService
+public class UserService : IUserService
 {
     private readonly UserManager<User> _userManager;
     private readonly SignInManager<User> _signInManager;

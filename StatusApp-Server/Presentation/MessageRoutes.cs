@@ -13,7 +13,7 @@ public static class MessageRoutes
                 "/getmessages",
                 Results<Ok<List<Message>>, NoContent> (
                     IMessagingService messagingService,
-                    FriendshipService friendshipService,
+                    IFriendshipService friendshipService,
                     HttpContext context,
                     Guid groupId
                 ) =>

@@ -8,12 +8,12 @@ public class ChatContext : IdentityUserContext<User>
 {
     public ChatContext(DbContextOptions<ChatContext> options) : base(options) { }
 
-    public DbSet<Message> Messages { get; set; }
+    public virtual DbSet<Message> Messages { get; set; }
 
     //public DbSet<Profile> Profiles { get; set; }
     //public DbSet<Account> Accounts { get; set; }
-    public DbSet<Friendship> Friendships { get; set; }
-    public DbSet<Connection> Connections { get; set; }
+    public virtual DbSet<Friendship> Friendships { get; set; }
+    public virtual DbSet<Connection> Connections { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

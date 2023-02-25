@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using StatusApp_Server.Application;
+using StatusApp_Server.Application.Contracts;
 using StatusApp_Server.Domain;
 using StatusApp_Server.Infrastructure;
 
@@ -14,7 +15,7 @@ public static class UserRoutes
         app.MapGet(
                 "/getUser",
                 async Task<Results<Ok<Profile>, NotFound>> (
-                    UserService userService,
+                    IUserService userService,
                     HttpContext context
                 ) =>
                 {
@@ -37,7 +38,7 @@ public static class UserRoutes
         app.MapGet(
                 "/signin",
                 async Task<Results<Ok<Profile>, BadRequest, UnauthorizedHttpResult>> (
-                    UserService userService,
+                    IUserService userService,
                     string userName,
                     string password
                 ) =>
@@ -60,7 +61,7 @@ public static class UserRoutes
 
         app.MapGet(
                 "/signOut",
-                async Task<Ok> (UserService userService) =>
+                async Task<Ok> (IUserService userService) =>
                 {
                     await userService.SignOutAsync();
                     return TypedResults.Ok();
@@ -73,7 +74,7 @@ public static class UserRoutes
         app.MapPut(
                 "/createUser",
                 async Task<Results<Ok<Profile>, BadRequest<IEnumerable<IdentityError>>>> (
-                    UserService userService,
+                    IUserService userService,
                     string userName,
                     string password,
                     string firstName,
@@ -108,7 +109,7 @@ public static class UserRoutes
                 "deleteUser",
                 async Task<Results<Ok, BadRequest>> (
                     HttpContext context,
-                    UserService userService
+                    IUserService userService
                 ) =>
                 {
                     var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
@@ -136,8 +137,8 @@ public static class UserRoutes
                     ChatContext db,
                     IHubContext<StatusHub, IStatusClient> hubContext,
                     HttpContext context,
-                    UserService userService,
-                    FriendshipService friendshipService,
+                    IUserService userService,
+                    IFriendshipService friendshipService,
                     string? firstName,
                     string? lastName,
                     string? status,
