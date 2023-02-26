@@ -13,7 +13,7 @@ public class User : IdentityUser
     {
         var profile = new Profile
         {
-            UserName = UserName,
+            UserName = UserName!,
             FirstName = FirstName,
             LastName = LastName,
             Status = Status,
