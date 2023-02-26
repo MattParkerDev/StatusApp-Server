@@ -28,12 +28,36 @@ public class FriendshipServiceTests
             chatContextMock.Object,
             userServiceMock.Object
         );
-
         // Act
         var result = await friendshipService.AcceptFriendRequest(myFriendship, theirFriendship);
 
         // Assert
         result.Should().BeTrue();
+        chatContextMock.Verify();
+    }
+    
+    [Fact]
+    public async Task WhenAcceptFriendRequestIsCalled_ReturnsFalse()
+    {
+        //Arrange
+        var myFriendship = new Friendship { Accepted = false, AreFriends = false };
+        var theirFriendship = new Friendship { Accepted = true, AreFriends = false };
+
+        var options = new DbContextOptions<ChatContext>();
+        var chatContextMock = new Mock<ChatContext>(options);
+        chatContextMock.Setup(db => db.SaveChangesAsync(default)).ThrowsAsync(new DbUpdateException());
+
+        var userServiceMock = new Mock<IUserService>();
+
+        var friendshipService = new FriendshipService(
+            chatContextMock.Object,
+            userServiceMock.Object
+        );
+        // Act
+        var result = await friendshipService.AcceptFriendRequest(myFriendship, theirFriendship);
+
+        // Assert
+        result.Should().BeFalse();
         chatContextMock.Verify();
     }
 }
