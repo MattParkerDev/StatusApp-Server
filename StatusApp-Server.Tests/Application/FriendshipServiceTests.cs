@@ -2,7 +2,6 @@ using Xunit;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using Moq.EntityFrameworkCore;
 using StatusApp_Server.Application;
 using StatusApp_Server.Application.Contracts;
 using StatusApp_Server.Domain;

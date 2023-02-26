@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Identity;
 using StatusApp_Server.Application.Contracts;
 using StatusApp_Server.Domain;
 using StatusApp_Server.Infrastructure;

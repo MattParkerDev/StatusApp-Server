@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using StatusApp_Server.Application.Contracts;
 using StatusApp_Server.Domain;
 
 namespace StatusApp_Server.Application;

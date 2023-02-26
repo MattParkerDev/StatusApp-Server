@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
-using StatusApp_Server.Application;
 using StatusApp_Server.Application.Contracts;
 using StatusApp_Server.Domain;
 

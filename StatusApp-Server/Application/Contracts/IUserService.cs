@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using StatusApp_Server.Domain;
 
-namespace StatusApp_Server.Application;
+namespace StatusApp_Server.Application.Contracts;
 
 public interface IUserService
 {
