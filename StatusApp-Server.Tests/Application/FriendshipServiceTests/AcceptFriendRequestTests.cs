@@ -1,15 +1,15 @@
-using Xunit;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using Xunit;
 using StatusApp_Server.Application;
 using StatusApp_Server.Application.Contracts;
 using StatusApp_Server.Domain;
 using StatusApp_Server.Infrastructure;
 
-namespace StatusApp_Server.Tests.Application;
+namespace StatusApp_Server.Tests.Application.FriendshipServiceTests;
 
-public class FriendshipServiceTests
+public partial class FriendshipServiceTests
 {
     [Fact]
     public async Task WhenAcceptFriendRequestIsCalled_ReturnsTrue()
@@ -35,7 +35,7 @@ public class FriendshipServiceTests
         result.Should().BeTrue();
         chatContextMock.Verify();
     }
-    
+
     [Fact]
     public async Task WhenAcceptFriendRequestIsCalled_ReturnsFalse()
     {
@@ -45,7 +45,9 @@ public class FriendshipServiceTests
 
         var options = new DbContextOptions<ChatContext>();
         var chatContextMock = new Mock<ChatContext>(options);
-        chatContextMock.Setup(db => db.SaveChangesAsync(default)).ThrowsAsync(new DbUpdateException());
+        chatContextMock
+            .Setup(db => db.SaveChangesAsync(default))
+            .ThrowsAsync(new DbUpdateException());
 
         var userServiceMock = new Mock<IUserService>();
 
