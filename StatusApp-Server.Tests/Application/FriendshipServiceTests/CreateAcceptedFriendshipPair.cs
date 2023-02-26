@@ -19,8 +19,6 @@ public partial class FriendshipServiceTests
         var userName = "TestUserName";
         var friendUserName = "AnotherUserName";
 
-        List<Friendship> friendshipList = new List<Friendship>();
-
         var user = new User
         {
             UserName = userName,
@@ -53,7 +51,7 @@ public partial class FriendshipServiceTests
 
         var options = new DbContextOptions<ChatContext>();
         var chatContextMock = new Mock<ChatContext>(options);
-        chatContextMock.Setup(db => db.Friendships).ReturnsDbSet(friendshipList);
+        chatContextMock.Setup(db => db.Friendships).ReturnsDbSet(new List<Friendship>());
 
         var userServiceMock = new Mock<IUserService>();
 
