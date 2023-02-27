@@ -13,7 +13,7 @@ namespace StatusApp_Server.Tests.Application.FriendshipServiceTests;
 public partial class FriendshipServiceTests
 {
     [Fact]
-    public async Task WhenRemoveFriendshipPairIsCalled_ReturnsUsernameList()
+    public async Task WhenRemoveFriendshipPairIsCalled_ReturnsTrueAsync()
     {
         //Arrange
         var userName = "TestUserName";
