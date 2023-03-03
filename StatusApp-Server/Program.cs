@@ -9,7 +9,7 @@ using StatusApp_Server.Presentation;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = "";
+var connectionString = string.Empty;
 if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
 {
     connectionString = builder.Configuration.GetConnectionString("LocalConnection");
