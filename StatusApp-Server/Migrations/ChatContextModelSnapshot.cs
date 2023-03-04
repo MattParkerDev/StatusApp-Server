@@ -10,7 +10,7 @@ using StatusApp_Server.Infrastructure;
 
 namespace StatusAppServer.Migrations
 {
-    [DbContext(typeof(ChatContext))]
+    [DbContext(typeof(StatusContext))]
     partial class ChatContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

@@ -18,8 +18,8 @@ public partial class FriendshipServiceTests
         var myFriendship = new Friendship { Accepted = false, AreFriends = false };
         var theirFriendship = new Friendship { Accepted = true, AreFriends = false };
 
-        var options = new DbContextOptions<ChatContext>();
-        var chatContextMock = new Mock<ChatContext>(options);
+        var options = new DbContextOptions<StatusContext>();
+        var chatContextMock = new Mock<StatusContext>(options);
         chatContextMock.Setup(db => db.SaveChangesAsync(default)).ReturnsAsync(1).Verifiable();
 
         var userServiceMock = new Mock<IUserService>();
@@ -43,8 +43,8 @@ public partial class FriendshipServiceTests
         var myFriendship = new Friendship { Accepted = false, AreFriends = false };
         var theirFriendship = new Friendship { Accepted = true, AreFriends = false };
 
-        var options = new DbContextOptions<ChatContext>();
-        var chatContextMock = new Mock<ChatContext>(options);
+        var options = new DbContextOptions<StatusContext>();
+        var chatContextMock = new Mock<StatusContext>(options);
         chatContextMock
             .Setup(db => db.SaveChangesAsync(default))
             .ThrowsAsync(new DbUpdateException());

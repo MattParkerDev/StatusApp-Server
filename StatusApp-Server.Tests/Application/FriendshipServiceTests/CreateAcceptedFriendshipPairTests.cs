@@ -49,8 +49,8 @@ public partial class FriendshipServiceTests
             GroupId = It.IsAny<Guid>()
         };
 
-        var options = new DbContextOptions<ChatContext>();
-        var chatContextMock = new Mock<ChatContext>(options);
+        var options = new DbContextOptions<StatusContext>();
+        var chatContextMock = new Mock<StatusContext>(options);
         chatContextMock.Setup(db => db.Friendships).ReturnsDbSet(new List<Friendship>());
 
         var userServiceMock = new Mock<IUserService>();

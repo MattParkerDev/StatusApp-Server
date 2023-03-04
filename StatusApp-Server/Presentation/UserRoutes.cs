@@ -133,7 +133,7 @@ public static class UserRoutes
         app.MapPatch(
                 "updateUser",
                 async Task<Results<Ok<Profile>, BadRequest>> (
-                    ChatContext db,
+                    StatusContext db,
                     IHubContext<StatusHub, IStatusClient> hubContext,
                     HttpContext context,
                     IUserService userService,

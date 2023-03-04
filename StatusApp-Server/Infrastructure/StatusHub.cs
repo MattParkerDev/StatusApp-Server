@@ -7,9 +7,9 @@ namespace StatusApp_Server.Infrastructure;
 [Authorize]
 public class StatusHub : Hub<IStatusClient>
 {
-    private readonly ChatContext _db;
+    private readonly StatusContext _db;
 
-    public StatusHub(ChatContext db)
+    public StatusHub(StatusContext db)
     {
         _db = db;
     }

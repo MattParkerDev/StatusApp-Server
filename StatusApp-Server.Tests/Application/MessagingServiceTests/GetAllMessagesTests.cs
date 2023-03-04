@@ -19,8 +19,8 @@ public class MessagingServiceTests
 
         var messageList = new List<Message> { new Message { GroupId = groupId } };
 
-        var options = new DbContextOptions<ChatContext>();
-        var chatContextMock = new Mock<ChatContext>(options);
+        var options = new DbContextOptions<StatusContext>();
+        var chatContextMock = new Mock<StatusContext>(options);
         chatContextMock.Setup(db => db.Messages).ReturnsDbSet(messageList);
 
         var messagingService = new MessagingService(chatContextMock.Object);

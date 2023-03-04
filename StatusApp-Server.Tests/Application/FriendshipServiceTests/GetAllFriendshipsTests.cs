@@ -23,8 +23,8 @@ public partial class FriendshipServiceTests
         var friendship = new Friendship { UserName = userName, AreFriends = areFriends ?? false };
         var friendships = new List<Friendship> { friendship };
 
-        var options = new DbContextOptions<ChatContext>();
-        var chatContextMock = new Mock<ChatContext>(options);
+        var options = new DbContextOptions<StatusContext>();
+        var chatContextMock = new Mock<StatusContext>(options);
         chatContextMock.Setup(db => db.Friendships).ReturnsDbSet(friendships).Verifiable();
 
         var userServiceMock = new Mock<IUserService>();

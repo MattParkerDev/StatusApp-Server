@@ -9,6 +9,7 @@ using StatusApp_Server.Presentation;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ReSharper disable once RedundantAssignment
 var connectionString = string.Empty;
 if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
 {
@@ -19,7 +20,7 @@ else
     connectionString = Environment.GetEnvironmentVariable("ConnectionString");
 }
 
-builder.Services.AddDbContext<ChatContext>(
+builder.Services.AddDbContext<StatusContext>(
     options => options.UseNpgsql(connectionString).EnableSensitiveDataLogging()
 );
 builder.Services
@@ -33,7 +34,7 @@ builder.Services
         options.Password.RequireUppercase = false;
         options.Password.RequireLowercase = false;
     })
-    .AddEntityFrameworkStores<ChatContext>()
+    .AddEntityFrameworkStores<StatusContext>()
     .AddSignInManager<SignInManager<User>>();
 
 builder.Services
@@ -78,7 +79,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 using var scope = app.Services.CreateScope();
-await using var db = scope.ServiceProvider.GetRequiredService<ChatContext>();
+await using var db = scope.ServiceProvider.GetRequiredService<StatusContext>();
 var testDataGeneratorService = scope.ServiceProvider.GetRequiredService<TestDataGeneratorService>();
 
 //Only during development

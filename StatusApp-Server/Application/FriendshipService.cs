@@ -6,10 +6,10 @@ namespace StatusApp_Server.Application;
 
 public class FriendshipService : IFriendshipService
 {
-    private readonly ChatContext _db;
+    private readonly StatusContext _db;
     private readonly IUserService _userService;
 
-    public FriendshipService(ChatContext db, IUserService userService)
+    public FriendshipService(StatusContext db, IUserService userService)
     {
         _db = db;
         _userService = userService;

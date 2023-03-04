@@ -6,9 +6,9 @@ namespace StatusApp_Server.Application;
 
 public class MessagingService : IMessagingService
 {
-    private readonly ChatContext _db;
+    private readonly StatusContext _db;
 
-    public MessagingService(ChatContext db)
+    public MessagingService(StatusContext db)
     {
         _db = db;
     }
