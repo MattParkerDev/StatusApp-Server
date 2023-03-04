@@ -11,7 +11,7 @@ using StatusApp_Server.Infrastructure;
 
 namespace StatusAppServer.Migrations
 {
-    [DbContext(typeof(ChatContext))]
+    [DbContext(typeof(StatusContext))]
     [Migration("20221113053744_InitialCreate")]
     partial class InitialCreate
     {
