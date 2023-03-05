@@ -29,10 +29,6 @@
     <Folder Include="Migrations\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\StatusApp.WebUI\StatusApp.WebUI.csproj" />
-  </ItemGroup>
-
   <PropertyGroup>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>

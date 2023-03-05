@@ -10,7 +10,7 @@ public class CookieHandler : DelegatingHandler
         CancellationToken cancellationToken
     )
     {
-        // Send request and get response
+        // This is required for ASP.NET Core Identity Cookie Auth as cookie headers aren't sent otherwise
         request.SetBrowserRequestCredentials(BrowserRequestCredentials.Include);
         return await base.SendAsync(request, cancellationToken);
     }
