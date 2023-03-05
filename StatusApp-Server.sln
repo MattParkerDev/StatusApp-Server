@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusApp-Server", "StatusA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusApp-Server.Tests", "StatusApp-Server.Tests\StatusApp-Server.Tests.csproj", "{3560ADA8-9356-404A-AC31-CBA25E953A7D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusApp.WebUI", "StatusApp.WebUI\StatusApp.WebUI.csproj", "{41B0E355-1BAC-4762-836A-D6870F1A4DEA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{3560ADA8-9356-404A-AC31-CBA25E953A7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3560ADA8-9356-404A-AC31-CBA25E953A7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3560ADA8-9356-404A-AC31-CBA25E953A7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41B0E355-1BAC-4762-836A-D6870F1A4DEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41B0E355-1BAC-4762-836A-D6870F1A4DEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41B0E355-1BAC-4762-836A-D6870F1A4DEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41B0E355-1BAC-4762-836A-D6870F1A4DEA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

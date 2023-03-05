@@ -65,18 +65,38 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<TestDataGeneratorService>();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+//builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerDocument();
+
+builder.Services.AddCors();
 
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    // CORS
+    app.UseCors(
+        builder =>
+            builder
+                .WithOrigins("https://localhost:5001")
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials()
+    );
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseOpenApi();
+    app.UseSwaggerUi3();
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 using var scope = app.Services.CreateScope();
 await using var db = scope.ServiceProvider.GetRequiredService<StatusContext>();

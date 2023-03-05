@@ -364,3 +364,9 @@ MigrationBackup/
 FodyWeavers.xsd
 .vscode/launch.json
 .vscode/tasks.json
+
+# Rider
+.idea/
+
+# Git
+.git/

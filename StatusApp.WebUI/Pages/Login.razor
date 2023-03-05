@@ -1,0 +1,62 @@
+﻿@page "/Login"
+@inject Client HttpClient
+<h3>Login</h3>
+<span>@displayText</span>
+<MudButton OnClick="CheckAuthAsync">Check Auth</MudButton>
+
+<MudTextField @bind-Value="loginUserName" Label="Username" Variant="Variant.Text"></MudTextField>
+<MudTextField @bind-Value="loginPassword" Label="Password" Variant="Variant.Text"></MudTextField>
+<MudButton OnClick="SignInAsync">Login</MudButton>
+<MudButton OnClick="SignOutAsync">Logout</MudButton>
+
+
+@code {
+    public string displayText = "Auth status unknown";
+
+    public string loginUserName = string.Empty;
+    public string loginPassword = string.Empty;
+
+
+    private async Task CheckAuthAsync()
+    {
+        try
+        {
+            var response = await HttpClient.CheckAuthAsync();
+            displayText = $"Welcome, {response}!";
+        }
+        catch(ApiException e)
+        {
+            var statusCode = e.StatusCode;
+            displayText = $"caught exception: {statusCode}";
+        }
+    }
+
+    private async Task SignInAsync()
+    {
+        try
+        {
+            var profile = await HttpClient.SignInAsync(loginUserName, loginPassword);
+            displayText = "Successfully logged in";
+        }
+        catch (ApiException e)
+        {
+            var statusCode = e.StatusCode;
+            displayText = $"caught exception: {statusCode}";
+        }
+    }
+    
+    private async Task SignOutAsync()
+    {
+        try
+        {
+            await HttpClient.SignOutAsync();
+            displayText = "Successfully logged out";
+        }
+        catch (ApiException e)
+        {
+            var statusCode = e.StatusCode;
+            displayText = $"caught exception: {statusCode}";
+        }
+    }
+
+}
