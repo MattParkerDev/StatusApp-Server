@@ -68,11 +68,6 @@ jobs:
         uses: actions/download-artifact@v3.0.2
         with:
           name: bicep
-
-      - name: Deploy WebUI to Static Web App
-        id: deploy-to-static-webapp
-        uses: ./.github/workflows/azure-static-web-apps-red-ground-0805be400.yml
-        secrets: inherit
   
       - name: Azure Login
         uses: Azure/login@v1
@@ -96,3 +91,8 @@ jobs:
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_EFFE800C8A5645BB9635F12C24CA380D }}
           package: .
+  
+  deploy-webui:
+    needs: build
+    uses: ./.github/workflows/azure-static-web-apps-red-ground-0805be400.yml
+    secrets: inherit
