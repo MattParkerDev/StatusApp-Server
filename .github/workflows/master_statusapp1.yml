@@ -91,3 +91,9 @@ jobs:
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_EFFE800C8A5645BB9635F12C24CA380D }}
           package: .
+          
+  deploy-webui:
+    runs-on: ubuntu-latest
+    # ensure project builds before deploying WebUI
+    needs: build
+    uses: ./.github/workflows/azure-static-web-apps-red-ground-0805be400.yml
