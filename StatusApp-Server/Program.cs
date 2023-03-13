@@ -73,19 +73,20 @@ builder.Services.AddCors();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    // CORS
-    app.UseCors(
-        builder =>
-            builder
-                .WithOrigins("https://localhost:5001")
-                .WithOrigins("https://red-ground-0805be400.2.azurestaticapps.net")
-                .AllowAnyMethod()
-                .AllowAnyHeader()
-                .AllowCredentials()
-    );
-}
+//if (app.Environment.IsDevelopment())
+//{
+// CORS
+app.UseCors(
+    builder =>
+        builder
+            .WithOrigins("https://localhost:5001")
+            .WithOrigins("https://red-ground-0805be400.2.azurestaticapps.net")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials()
+);
+
+//}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
