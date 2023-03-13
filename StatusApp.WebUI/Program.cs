@@ -18,7 +18,9 @@ builder.Services.AddMudServices();
 
 const string ApiClient = nameof(ApiClient);
 
-var apiBaseUrl = builder.HostEnvironment.IsDevelopment() ? "https://localhost:7104" : "fix this";
+var apiBaseUrl = !builder.HostEnvironment.IsDevelopment()
+    ? "https://localhost:7104"
+    : "https://statusapp1.azurewebsites.net";
 
 builder.Services
     .AddHttpClient(

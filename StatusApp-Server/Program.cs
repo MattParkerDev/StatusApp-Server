@@ -80,6 +80,7 @@ if (app.Environment.IsDevelopment())
         builder =>
             builder
                 .WithOrigins("https://localhost:5001")
+                .WithOrigins("https://red-ground-0805be400.2.azurestaticapps.net")
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials()
