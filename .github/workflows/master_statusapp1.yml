@@ -32,13 +32,13 @@ jobs:
 
       - name: dotnet publish
         run: dotnet publish StatusApp-Server -c Release --property PublishDir=${{env.DOTNET_ROOT}}/myapp
-        
+  
       - name: Bicep Build
         uses: Azure/bicep-build-action@v1.0.0
         with:
           bicepFilePath: ./.github/bicep/main.bicep
           outputFilePath: ./.github/bicep/azuredeploy.json
-          
+  
       - name: Upload bicep for deployment job
         uses: actions/upload-artifact@v3.1.2
         with:
@@ -63,19 +63,19 @@ jobs:
         uses: actions/download-artifact@v3.0.2
         with:
           name: .net-app
-          
+  
       - name: Download bicep from build job
         uses: actions/download-artifact@v3.0.2
         with:
           name: bicep
-          
+  
       - name: Azure Login
         uses: Azure/login@v1
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      
+
       - name: Deploy Azure Resource Manager (ARM) Template
         uses: Azure/arm-deploy@v1
         with:
@@ -91,9 +91,7 @@ jobs:
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_EFFE800C8A5645BB9635F12C24CA380D }}
           package: .
-          
-  deploy-webui:
-    runs-on: ubuntu-latest
-    # ensure project builds before deploying WebUI
-    needs: build
-    uses: ./.github/workflows/azure-static-web-apps-red-ground-0805be400.yml
+
+      - name: Deploy WebUI to Static Web App
+        id: deploy-to-static-webapp
+        uses: ./.github/workflows/azure-static-web-apps-red-ground-0805be400.yml
