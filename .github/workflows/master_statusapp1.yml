@@ -34,7 +34,7 @@ jobs:
         run: dotnet publish StatusApp-Server -c Release --property PublishDir=${{env.DOTNET_ROOT}}/myapp/api
 
       - name: dotnet publish WebUI
-        run: dotnet publish StatusApp-Server -c Release --property PublishDir=${{env.DOTNET_ROOT}}/myapp/webui
+        run: dotnet publish StatusApp.WebUI -c Release --property PublishDir=${{env.DOTNET_ROOT}}/myapp/webui
 
       - name: Bicep Build
         uses: Azure/bicep-build-action@v1.0.0
