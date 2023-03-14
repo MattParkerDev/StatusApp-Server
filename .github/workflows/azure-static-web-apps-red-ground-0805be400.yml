@@ -1,5 +1,5 @@
 name: Azure Static Web Apps CI/CD
-
+# Not used, kept to keep azure happy
 on:
   workflow_call:
   workflow_dispatch:
