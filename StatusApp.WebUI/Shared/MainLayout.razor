@@ -1,4 +1,8 @@
-﻿@inherits LayoutComponentBase
+﻿@using StatusApp.WebUI.Components
+@inherits LayoutComponentBase
+@inject Client HttpClient
+@inject IDialogService DialogService
+
 
 <MudThemeProvider />
 <MudDialogProvider />
@@ -27,9 +31,34 @@
 
 @code {
     bool _drawerOpen = true;
+    bool authorized = false;
 
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        authorized = await CheckAuthAsync();
+        if (authorized is false)
+        {
+            var options = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, DisableBackdropClick = true};
+            DialogService.Show<LoginDialog>("Login", options);
+        }
+    }
+    
+    private async Task<bool> CheckAuthAsync()
+    {
+        try
+        {
+            var response = await HttpClient.CheckAuthAsync();
+            return true;
+        }
+        catch(ApiException e)
+        {
+            var statusCode = e.StatusCode;
+            return false;
+        }
     }
 }

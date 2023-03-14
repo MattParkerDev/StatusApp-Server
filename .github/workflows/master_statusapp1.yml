@@ -114,7 +114,7 @@ jobs:
     needs: build
     environment:
       name: 'Production'
-      url: ${{ steps.deploy-to-staticwebapp.outputs.webapp-url }}
+      url: ${{ steps.deploy-to-staticwebapp.outputs.static_web_app_url }}
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v3.0.2

@@ -1,0 +1,64 @@
+﻿@inject Client HttpClient
+@inject DataState DataState
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField @bind-Value="loginUserName" Label="Username" Variant="Variant.Text"></MudTextField>
+        <MudTextField @bind-Value="loginPassword" Label="Password" Variant="Variant.Text"></MudTextField>
+        @if (loginState == LoginState.Error)
+        {
+            <MudAlert Severity="Severity.Error" Dense="true" Class="my-2">@errorMessage</MudAlert>
+        }
+    </DialogContent>
+    <DialogActions>
+        @*<MudButton OnClick="Cancel">Cancel</MudButton>*@
+        <MudButton Color="Color.Primary" OnClick="SignInAsync">Login</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    public enum LoginState
+    {
+        Initial,
+        Sending,
+        Error
+    }
+    
+    public string loginUserName = string.Empty;
+    public string loginPassword = string.Empty;
+    
+    public string errorMessage = string.Empty;
+    public LoginState loginState = LoginState.Initial;
+
+    void Submit()
+    {
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+        
+    void Cancel() => MudDialog.Cancel();
+    
+    private async Task SignInAsync()
+    {
+        try
+        {
+            loginState = LoginState.Sending;
+            var profile = await HttpClient.SignInAsync(loginUserName, loginPassword);
+            DataState.userProfile = profile;
+            MudDialog.Close(DialogResult.Ok(true));
+            
+        }
+        catch (ApiException e)
+        {
+            var statusCode = e.StatusCode;
+            errorMessage = statusCode switch 
+            {
+                400 => "Incorrect username or password",
+                _ => "An error occurred"
+            };
+            loginState = LoginState.Error;
+        }
+    }
+}
+
