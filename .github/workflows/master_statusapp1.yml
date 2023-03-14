@@ -30,8 +30,11 @@ jobs:
       - name: Build with dotnet
         run: dotnet build --configuration Release
 
-      - name: dotnet publish
-        run: dotnet publish StatusApp-Server -c Release --property PublishDir=${{env.DOTNET_ROOT}}/myapp
+      - name: dotnet publish API
+        run: dotnet publish StatusApp-Server -c Release --property PublishDir=${{env.DOTNET_ROOT}}/myapp/api
+
+      - name: dotnet publish WebUI
+        run: dotnet publish StatusApp-Server -c Release --property PublishDir=${{env.DOTNET_ROOT}}/myapp/webui
 
       - name: Bicep Build
         uses: Azure/bicep-build-action@v1.0.0
@@ -45,11 +48,17 @@ jobs:
           name: bicep
           path: ./.github/bicep
 
-      - name: Upload artifact for deployment job
+      - name: Upload API artifact for deployment job
         uses: actions/upload-artifact@v3.1.2
         with:
-          name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          name: .net-app-api
+          path: ${{env.DOTNET_ROOT}}/myapp/api
+
+      - name: Upload WebUI artifact for deployment job
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: .net-app-webui
+          path: ${{env.DOTNET_ROOT}}/myapp/webui
 
   deploy-bicep:
     runs-on: ubuntu-latest
@@ -89,7 +98,7 @@ jobs:
       - name: Download artifact from build job
         uses: actions/download-artifact@v3.0.2
         with:
-          name: .net-app
+          name: .net-app-api
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
