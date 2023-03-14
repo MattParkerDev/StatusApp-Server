@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_and_deploy_job:
+  deploy-webui:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     steps:
