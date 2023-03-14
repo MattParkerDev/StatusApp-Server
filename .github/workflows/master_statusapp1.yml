@@ -32,13 +32,13 @@ jobs:
 
       - name: dotnet publish
         run: dotnet publish StatusApp-Server -c Release --property PublishDir=${{env.DOTNET_ROOT}}/myapp
-  
+
       - name: Bicep Build
         uses: Azure/bicep-build-action@v1.0.0
         with:
           bicepFilePath: ./.github/bicep/main.bicep
           outputFilePath: ./.github/bicep/azuredeploy.json
-  
+
       - name: Upload bicep for deployment job
         uses: actions/upload-artifact@v3.1.2
         with:
@@ -51,7 +51,7 @@ jobs:
           name: .net-app
           path: ${{env.DOTNET_ROOT}}/myapp
 
-  deploy:
+  deploy-bicep:
     runs-on: ubuntu-latest
     needs: build
     environment:
@@ -59,16 +59,11 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v3.0.2
-        with:
-          name: .net-app
-  
       - name: Download bicep from build job
         uses: actions/download-artifact@v3.0.2
         with:
           name: bicep
-  
+
       - name: Azure Login
         uses: Azure/login@v1
         with:
@@ -83,6 +78,19 @@ jobs:
           template: ./azuredeploy.json
           parameters: ./main.parameters.json
 
+  deploy-api:
+    runs-on: ubuntu-latest
+    needs: [build, deploy-bicep]
+    environment:
+      name: 'Production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v3.0.2
+        with:
+          name: .net-app
+
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
@@ -91,8 +99,8 @@ jobs:
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_EFFE800C8A5645BB9635F12C24CA380D }}
           package: .
-  
+
   deploy-webui:
-    needs: build
+    needs: [build, deploy-bicep]
     uses: ./.github/workflows/azure-static-web-apps-red-ground-0805be400.yml
     secrets: inherit
