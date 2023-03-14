@@ -91,7 +91,7 @@ jobs:
 
   deploy-api:
     runs-on: ubuntu-latest
-    needs: [build, deploy-bicep]
+    needs: build
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
@@ -112,6 +112,6 @@ jobs:
           package: .
 
   deploy-webui:
-    needs: [build, deploy-bicep]
+    needs: build
     uses: ./.github/workflows/azure-static-web-apps-red-ground-0805be400.yml
     secrets: inherit
