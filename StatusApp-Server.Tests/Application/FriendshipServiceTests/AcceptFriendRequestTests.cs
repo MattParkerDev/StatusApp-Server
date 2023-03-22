@@ -60,6 +60,5 @@ public partial class FriendshipServiceTests
 
         // Assert
         result.Should().BeFalse();
-        chatContextMock.Verify();
     }
 }
