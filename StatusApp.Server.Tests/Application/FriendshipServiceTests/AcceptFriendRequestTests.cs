@@ -1,11 +1,8 @@
-using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Moq;
 using StatusApp.Server.Application;
 using StatusApp.Server.Application.Contracts;
 using StatusApp.Server.Domain;
 using StatusApp.Server.Infrastructure;
-using Xunit;
 
 namespace StatusApp.Server.Tests.Application.FriendshipServiceTests;
 
