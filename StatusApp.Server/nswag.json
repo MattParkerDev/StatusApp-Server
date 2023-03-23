@@ -3,7 +3,7 @@
   "defaultVariables": null,
   "documentGenerator": {
     "aspNetCoreToOpenApi": {
-      "project": "StatusApp-Server.csproj",
+      "project": "StatusApp.Server.csproj",
       "msBuildProjectExtensionsPath": null,
       "configuration": null,
       "runtime": null,
