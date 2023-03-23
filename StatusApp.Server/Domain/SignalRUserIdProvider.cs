@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
 
-namespace StatusApp_Server.Domain;
+namespace StatusApp.Server.Domain;
 
 public class SignalRUserIdProvider : IUserIdProvider
 {

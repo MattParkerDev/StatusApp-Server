@@ -25,7 +25,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\StatusApp-Server\StatusApp-Server.csproj" />
+      <ProjectReference Include="..\StatusApp.Server\StatusApp.Server.csproj" />
     </ItemGroup>
 
 </Project>

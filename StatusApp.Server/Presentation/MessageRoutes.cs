@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
-using StatusApp_Server.Application.Contracts;
-using StatusApp_Server.Domain;
+using StatusApp.Server.Application.Contracts;
+using StatusApp.Server.Domain;
 
-namespace StatusApp_Server.Presentation;
+namespace StatusApp.Server.Presentation;
 
 public static class MessageRoutes
 {

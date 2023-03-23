@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace StatusApp_Server.Domain;
+namespace StatusApp.Server.Domain;
 
 public class Profile
 {

@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
-using StatusApp_Server.Domain;
+using StatusApp.Server.Domain;
 
-namespace StatusApp_Server.Infrastructure;
+namespace StatusApp.Server.Infrastructure;
 
 [Authorize]
 public class StatusHub : Hub<IStatusClient>

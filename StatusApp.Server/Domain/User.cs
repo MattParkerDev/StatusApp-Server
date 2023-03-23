@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace StatusApp_Server.Domain;
+namespace StatusApp.Server.Domain;
 
 public class User : IdentityUser
 {

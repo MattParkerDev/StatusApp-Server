@@ -1,8 +1,8 @@
-﻿using StatusApp_Server.Application.Contracts;
-using StatusApp_Server.Domain;
-using StatusApp_Server.Infrastructure;
+﻿using StatusApp.Server.Application.Contracts;
+using StatusApp.Server.Domain;
+using StatusApp.Server.Infrastructure;
 
-namespace StatusApp_Server.Application;
+namespace StatusApp.Server.Application;
 
 public class MessagingService : IMessagingService
 {

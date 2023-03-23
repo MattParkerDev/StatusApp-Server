@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace StatusApp_Server.Domain;
+namespace StatusApp.Server.Domain;
 
 [PrimaryKey(nameof(GroupId), nameof(MessageId))]
 public class Message

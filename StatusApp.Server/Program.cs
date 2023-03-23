@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using StatusApp_Server.Application;
-using StatusApp_Server.Application.Contracts;
-using StatusApp_Server.Domain;
-using StatusApp_Server.Infrastructure;
-using StatusApp_Server.Presentation;
+using StatusApp.Server.Application;
+using StatusApp.Server.Application.Contracts;
+using StatusApp.Server.Domain;
+using StatusApp.Server.Infrastructure;
+using StatusApp.Server.Presentation;
 
 var builder = WebApplication.CreateBuilder(args);
 

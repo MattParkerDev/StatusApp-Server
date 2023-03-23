@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace StatusApp_Server.Domain;
+namespace StatusApp.Server.Domain;
 
 [PrimaryKey(nameof(UserName), nameof(FriendUserName))]
 public class Friendship

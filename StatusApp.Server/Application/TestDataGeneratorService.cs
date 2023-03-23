@@ -1,7 +1,7 @@
-﻿using StatusApp_Server.Application.Contracts;
-using StatusApp_Server.Domain;
+﻿using StatusApp.Server.Application.Contracts;
+using StatusApp.Server.Domain;
 
-namespace StatusApp_Server.Application;
+namespace StatusApp.Server.Application;
 
 public class TestDataGeneratorService
 {

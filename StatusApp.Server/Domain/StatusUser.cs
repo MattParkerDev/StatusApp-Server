@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore;
 
-namespace StatusApp_Server.Domain;
+namespace StatusApp.Server.Domain;
 
 public class StatusUser
 {

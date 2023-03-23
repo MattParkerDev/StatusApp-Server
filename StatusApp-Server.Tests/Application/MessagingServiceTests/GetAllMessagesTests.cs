@@ -2,9 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Moq.EntityFrameworkCore;
-using StatusApp_Server.Application;
-using StatusApp_Server.Domain;
-using StatusApp_Server.Infrastructure;
+using StatusApp.Server.Application;
+using StatusApp.Server.Domain;
+using StatusApp.Server.Infrastructure;
 using Xunit;
 
 namespace StatusApp_Server.Tests.Application.MessagingServiceTests;

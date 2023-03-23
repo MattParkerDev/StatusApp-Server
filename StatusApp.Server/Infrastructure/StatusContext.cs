@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using StatusApp_Server.Domain;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using StatusApp.Server.Domain;
 
-namespace StatusApp_Server.Infrastructure;
+namespace StatusApp.Server.Infrastructure;
 
 public class StatusContext : IdentityUserContext<User>
 {

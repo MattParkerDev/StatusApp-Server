@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace StatusApp_Server.Presentation;
+namespace StatusApp.Server.Presentation;
 
 public static class AuthRoutes
 {
