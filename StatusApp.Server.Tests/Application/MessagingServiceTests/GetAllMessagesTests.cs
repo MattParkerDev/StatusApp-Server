@@ -7,7 +7,7 @@ using StatusApp.Server.Domain;
 using StatusApp.Server.Infrastructure;
 using Xunit;
 
-namespace StatusApp_Server.Tests.Application.MessagingServiceTests;
+namespace StatusApp.Server.Tests.Application.MessagingServiceTests;
 
 public class MessagingServiceTests
 {

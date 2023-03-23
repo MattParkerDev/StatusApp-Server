@@ -2,13 +2,13 @@
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Moq.EntityFrameworkCore;
+using StatusApp.Server.Application;
 using StatusApp.Server.Application.Contracts;
 using StatusApp.Server.Domain;
 using StatusApp.Server.Infrastructure;
-using StatusApp.Server.Application;
 using Xunit;
 
-namespace StatusApp_Server.Tests.Application.FriendshipServiceTests;
+namespace StatusApp.Server.Tests.Application.FriendshipServiceTests;
 
 public partial class FriendshipServiceTests
 {

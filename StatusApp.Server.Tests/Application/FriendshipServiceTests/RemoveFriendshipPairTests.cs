@@ -8,7 +8,7 @@ using StatusApp.Server.Domain;
 using StatusApp.Server.Infrastructure;
 using Xunit;
 
-namespace StatusApp_Server.Tests.Application.FriendshipServiceTests;
+namespace StatusApp.Server.Tests.Application.FriendshipServiceTests;
 
 public partial class FriendshipServiceTests
 {
