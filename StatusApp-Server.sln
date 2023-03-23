@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33103.201
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusApp-Server", "StatusApp-Server/StatusApp-Server.csproj", "{2FD2A225-B2E8-4EE9-92AF-7FFADCF6B549}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusApp.Server", "StatusApp.Server/StatusApp.Server.csproj", "{2FD2A225-B2E8-4EE9-92AF-7FFADCF6B549}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusApp-Server.Tests", "StatusApp-Server.Tests\StatusApp-Server.Tests.csproj", "{3560ADA8-9356-404A-AC31-CBA25E953A7D}"
 EndProject
