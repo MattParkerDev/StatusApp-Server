@@ -64,10 +64,12 @@ builder.Services.AddScoped<IFriendshipService, FriendshipService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<TestDataGeneratorService>();
 
-builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddOpenApiDocument(configure =>
+{
+    configure.Title = "StatusApp Api";
+});
 
-//builder.Services.AddSwaggerGen();
-builder.Services.AddSwaggerDocument();
+builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddCors();
 
@@ -87,7 +89,6 @@ app.UseCors(
             .AllowCredentials()
 );
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseOpenApi();

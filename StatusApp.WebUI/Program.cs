@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
 using StatusApp.WebUI;
-using System.Net;
 using StatusApp.WebUI.Models;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -31,6 +29,6 @@ builder.Services
     )
     .AddHttpMessageHandler(sp => sp.GetRequiredService<CookieHandler>());
 
-builder.Services.AddHttpClient<Client>(ApiClient);
+builder.Services.AddHttpClient<StatusAppClient>(ApiClient);
 
 await builder.Build().RunAsync();
