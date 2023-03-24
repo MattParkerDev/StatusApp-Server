@@ -9,6 +9,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusApp.Server.Tests", "S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusApp.WebUI", "StatusApp.WebUI\StatusApp.WebUI.csproj", "{41B0E355-1BAC-4762-836A-D6870F1A4DEA}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{23A8B2E2-B2A0-4E13-9C1B-41DFD0CF5463}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+		.gitignore = .gitignore
+		.csharpierrc = .csharpierrc
+		.github\bicep\main.bicep = .github\bicep\main.bicep
+		.github\bicep\main.parameters.json = .github\bicep\main.parameters.json
+		.github\workflows\azure-static-web-apps-red-ground-0805be400.yml = .github\workflows\azure-static-web-apps-red-ground-0805be400.yml
+		.github\workflows\master_statusapp1.yml = .github\workflows\master_statusapp1.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
