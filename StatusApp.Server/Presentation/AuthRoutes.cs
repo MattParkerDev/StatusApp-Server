@@ -6,16 +6,17 @@ public static class AuthRoutes
 {
     public static void MapAuthRoutes(this WebApplication app)
     {
-        app.MapGet(
-                "/checkAuth",
+        var group = app.MapGroup("").WithTags("Auth").RequireAuthorization().WithOpenApi();
+
+        group
+            .MapGet(
+                "/checkauth",
                 Ok<string> (HttpContext context) =>
                 {
                     var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
                     return TypedResults.Ok(userName);
                 }
             )
-            .RequireAuthorization()
-            .WithName("CheckAuth")
-            .WithOpenApi();
+            .WithName("CheckAuth");
     }
 }

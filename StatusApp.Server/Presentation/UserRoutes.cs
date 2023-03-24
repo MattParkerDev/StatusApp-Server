@@ -11,8 +11,11 @@ public static class UserRoutes
 {
     public static void MapUserRoutes(this WebApplication app)
     {
-        app.MapGet(
-                "/getUser",
+        var group = app.MapGroup("").WithTags("User").RequireAuthorization().WithOpenApi();
+
+        group
+            .MapGet(
+                "/getuser",
                 async Task<Results<Ok<Profile>, NotFound>> (
                     IUserService userService,
                     HttpContext context
@@ -30,11 +33,10 @@ public static class UserRoutes
                     return TypedResults.Ok(profile);
                 }
             )
-            .RequireAuthorization()
-            .WithName("GetUser")
-            .WithOpenApi();
+            .WithName("GetUser");
 
-        app.MapGet(
+        group
+            .MapGet(
                 "/signin",
                 async Task<Results<Ok<Profile>, BadRequest, UnauthorizedHttpResult>> (
                     IUserService userService,
@@ -55,23 +57,22 @@ public static class UserRoutes
                 }
             )
             .AllowAnonymous()
-            .WithName("SignIn")
-            .WithOpenApi();
+            .WithName("SignIn");
 
-        app.MapGet(
-                "/signOut",
+        group
+            .MapGet(
+                "/signout",
                 async Task<Ok> (IUserService userService) =>
                 {
                     await userService.SignOutAsync();
                     return TypedResults.Ok();
                 }
             )
-            .RequireAuthorization()
-            .WithName("SignOut")
-            .WithOpenApi();
+            .WithName("SignOut");
 
-        app.MapPut(
-                "/createUser",
+        group
+            .MapPut(
+                "/createuser",
                 async Task<Results<Ok<Profile>, BadRequest<IEnumerable<IdentityError>>>> (
                     IUserService userService,
                     string userName,
@@ -101,11 +102,11 @@ public static class UserRoutes
                 }
             )
             .AllowAnonymous()
-            .WithName("CreateUser")
-            .WithOpenApi();
+            .WithName("CreateUser");
 
-        app.MapDelete(
-                "deleteUser",
+        group
+            .MapDelete(
+                "deleteuser",
                 async Task<Results<Ok, BadRequest>> (
                     HttpContext context,
                     IUserService userService
@@ -125,13 +126,12 @@ public static class UserRoutes
                     return TypedResults.Ok();
                 }
             )
-            .RequireAuthorization()
-            .WithName("DeleteUser")
-            .WithOpenApi();
+            .WithName("DeleteUser");
 
         //TODO: Create separate route for updating Password
-        app.MapPatch(
-                "updateUser",
+        group
+            .MapPatch(
+                "updateuser",
                 async Task<Results<Ok<Profile>, BadRequest>> (
                     StatusContext db,
                     IHubContext<StatusHub, IStatusClient> hubContext,
@@ -174,8 +174,6 @@ public static class UserRoutes
                     return TypedResults.Ok(updatedProfile);
                 }
             )
-            .RequireAuthorization()
-            .WithName("UpdateUser")
-            .WithOpenApi();
+            .WithName("UpdateUser");
     }
 }

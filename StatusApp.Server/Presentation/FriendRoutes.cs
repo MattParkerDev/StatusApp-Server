@@ -11,7 +11,10 @@ public static class FriendRoutes
 {
     public static void MapFriendRoutes(this WebApplication app)
     {
-        app.MapGet(
+        var group = app.MapGroup("").WithTags("Friends").RequireAuthorization().WithOpenApi();
+
+        group
+            .MapGet(
                 "/getfriends",
                 async Task<Results<Ok<List<Profile>>, NoContent>> (
                     IFriendshipService friendshipService,
@@ -30,11 +33,10 @@ public static class FriendRoutes
                         : TypedResults.NoContent();
                 }
             )
-            .RequireAuthorization()
-            .WithName("GetFriends")
-            .WithOpenApi();
+            .WithName("GetFriends");
 
-        app.MapGet(
+        group
+            .MapGet(
                 "/getfriendships",
                 Results<Ok<List<Friendship>>, NoContent> (
                     HttpContext context,
@@ -49,11 +51,10 @@ public static class FriendRoutes
                         : TypedResults.NoContent();
                 }
             )
-            .RequireAuthorization()
-            .WithName("GetFriendships")
-            .WithOpenApi();
+            .WithName("GetFriendships");
 
-        app.MapPut(
+        group
+            .MapPut(
                 "/sendfriendrequest",
                 async Task<Results<Ok<Friendship>, NotFound, Conflict>> (
                     IFriendshipService friendshipService,
@@ -83,11 +84,10 @@ public static class FriendRoutes
                     return TypedResults.Ok(myFriendship);
                 }
             )
-            .RequireAuthorization()
-            .WithName("SendFriendRequest")
-            .WithOpenApi();
+            .WithName("SendFriendRequest");
 
-        app.MapPut(
+        group
+            .MapPut(
                 "/actionfriendrequest",
                 async Task<Results<Ok<Friendship>, Ok, Conflict>> (
                     HttpContext context,
@@ -135,11 +135,10 @@ public static class FriendRoutes
                     return TypedResults.Ok(myFriendship);
                 }
             )
-            .RequireAuthorization()
-            .WithName("ActionFriendRequest")
-            .WithOpenApi();
+            .WithName("ActionFriendRequest");
 
-        app.MapDelete(
+        group
+            .MapDelete(
                 "/removefriend",
                 async Task<Results<Ok, Conflict>> (
                     IFriendshipService friendshipService,
@@ -171,8 +170,6 @@ public static class FriendRoutes
                     return TypedResults.Ok();
                 }
             )
-            .RequireAuthorization()
-            .WithName("RemoveFriend")
-            .WithOpenApi();
+            .WithName("RemoveFriend");
     }
 }

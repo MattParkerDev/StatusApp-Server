@@ -55,7 +55,7 @@ namespace StatusApp.WebUI
         public virtual async System.Threading.Tasks.Task<string> CheckAuthAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("checkAuth");
+            urlBuilder_.Append("checkauth");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -611,7 +611,7 @@ namespace StatusApp.WebUI
         public virtual async System.Threading.Tasks.Task<Profile> GetUserAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("getUser");
+            urlBuilder_.Append("getuser");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -770,7 +770,7 @@ namespace StatusApp.WebUI
         public virtual async System.Threading.Tasks.Task SignOutAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("signOut");
+            urlBuilder_.Append("signout");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -836,7 +836,7 @@ namespace StatusApp.WebUI
         public virtual async System.Threading.Tasks.Task<Profile> CreateUserAsync(string userName, string password, string firstName, string lastName, string email, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("createUser?");
+            urlBuilder_.Append("createuser?");
             urlBuilder_.Append(System.Uri.EscapeDataString("userName") + "=").Append(System.Uri.EscapeDataString(userName != null ? ConvertToString(userName, System.Globalization.CultureInfo.InvariantCulture) : "")).Append("&");
             urlBuilder_.Append(System.Uri.EscapeDataString("password") + "=").Append(System.Uri.EscapeDataString(password != null ? ConvertToString(password, System.Globalization.CultureInfo.InvariantCulture) : "")).Append("&");
             urlBuilder_.Append(System.Uri.EscapeDataString("firstName") + "=").Append(System.Uri.EscapeDataString(firstName != null ? ConvertToString(firstName, System.Globalization.CultureInfo.InvariantCulture) : "")).Append("&");
@@ -925,7 +925,7 @@ namespace StatusApp.WebUI
         public virtual async System.Threading.Tasks.Task DeleteUserAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("deleteUser");
+            urlBuilder_.Append("deleteuser");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -997,7 +997,7 @@ namespace StatusApp.WebUI
         public virtual async System.Threading.Tasks.Task<Profile> UpdateUserAsync(string firstName, string lastName, string status, bool? online, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("updateUser?");
+            urlBuilder_.Append("updateuser?");
             if (firstName != null)
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("firstName") + "=").Append(System.Uri.EscapeDataString(ConvertToString(firstName, System.Globalization.CultureInfo.InvariantCulture))).Append("&");

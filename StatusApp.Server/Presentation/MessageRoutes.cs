@@ -8,7 +8,10 @@ public static class MessageRoutes
 {
     public static void MapMessageRoutes(this WebApplication app)
     {
-        app.MapGet(
+        var group = app.MapGroup("").WithTags("Messages").RequireAuthorization().WithOpenApi();
+
+        group
+            .MapGet(
                 "/getmessages",
                 Results<Ok<List<Message>>, NoContent> (
                     IMessagingService messagingService,
@@ -29,8 +32,6 @@ public static class MessageRoutes
                         : TypedResults.NoContent();
                 }
             )
-            .RequireAuthorization()
-            .WithName("GetMessages")
-            .WithOpenApi();
+            .WithName("GetMessages");
     }
 }
