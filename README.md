@@ -19,3 +19,6 @@ An ASP.NET Core Web Api Backend for my StatusApp-iOS application, and a WIP Blaz
 - XUnit, Moq, FluentAssertions, [Moq.EntityFrameworkCore](https://github.com/MichalJankowskii/Moq.EntityFrameworkCore)
 - NSwag for Web Api Client code generation for Blazor
 - MudBlazor UI Framework
+
+### Todo
+- Properly manage DTOs
