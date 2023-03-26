@@ -2,5 +2,5 @@
 
 public class DataState
 {
-    public Profile? userProfile { get; set; }
+    public Profile? UserProfile { get; set; }
 }

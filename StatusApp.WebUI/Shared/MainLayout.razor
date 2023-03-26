@@ -1,10 +1,9 @@
-﻿@using StatusApp.WebUI.Components
-@inherits LayoutComponentBase
+﻿@inherits LayoutComponentBase
 @inject StatusAppClient HttpClient
 @inject IDialogService DialogService
 
 
-<MudThemeProvider />
+<MudThemeProvider @bind-IsDarkMode="@_isDarkMode"/>
 <MudDialogProvider />
 <MudSnackbarProvider />
 
@@ -12,6 +11,9 @@
     <MudAppBar Elevation="0">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudSpacer />
+        <MudTooltip Duration="1000" Text="@( _isDarkMode == true ? "Switch to Light Theme" : "Switch to Dark Theme")">
+            <MudIconButton Icon="@( _isDarkMode == true ? @Icons.Material.Rounded.LightMode : @Icons.Material.Outlined.DarkMode)" Color="Color.Inherit" OnClick="@ToggleDarkMode"/>
+        </MudTooltip>
         <MudIconButton Icon="@Icons.Custom.Brands.MudBlazor" Color="Color.Inherit" Href="https://mudblazor.com/" Target="_blank" />
         <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Href="https://github.com/MudBlazor/MudBlazor/" Target="_blank" />
     </MudAppBar>
@@ -32,6 +34,7 @@
 @code {
     bool _drawerOpen = true;
     bool authorized = false;
+    bool _isDarkMode = false;
 
     void DrawerToggle()
     {
@@ -60,5 +63,10 @@
             var statusCode = e.StatusCode;
             return false;
         }
+    }
+
+    private void ToggleDarkMode()
+    {
+        _isDarkMode = !_isDarkMode;
     }
 }
