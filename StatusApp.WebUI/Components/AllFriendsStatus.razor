@@ -1,15 +1,31 @@
+@inject StatusAppClient HttpClient
+@inject DataState DataState
 
-<MudCard>
-    <MudCardContent>
-        <MudText>Story of the day</MudText>
-        <MudText Typo="Typo.body2">The quick, brown fox jumps over a lazy dog.</MudText>
-    </MudCardContent>
-    <MudCardActions>
-        <MudButton Variant="Variant.Text" Color="Color.Primary">Learn More</MudButton>
-    </MudCardActions>
-</MudCard>
+@if (DataState.FriendList != null)
+{
+    @foreach (var friend in DataState.FriendList)
+    {
+        <MudCard>
+            <MudCardContent>
+                <MudText>@friend.FirstName @friend.LastName</MudText>
+                <MudText Typo="Typo.body2">@friend.Status</MudText>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Variant="Variant.Text" Color="Color.Primary">Chat</MudButton>
+            </MudCardActions>
+        </MudCard>
+    }
+}
+
+<MudButton Color="Color.Primary" OnClick="StateHasChanged">Update State</MudButton>
+
 
 
 @code {
     
+    protected override async Task OnInitializedAsync()
+    {
+        DataState.FriendList = new List<Profile>(await HttpClient.GetFriendsAsync());
+            StateHasChanged();
+    }
 }

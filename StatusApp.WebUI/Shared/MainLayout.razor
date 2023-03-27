@@ -1,6 +1,7 @@
 ﻿@inherits LayoutComponentBase
 @inject StatusAppClient HttpClient
 @inject IDialogService DialogService
+@inject DataState DataState
 
 
 <MudThemeProvider @bind-IsDarkMode="@_isDarkMode"/>
@@ -41,13 +42,20 @@
         _drawerOpen = !_drawerOpen;
     }
     
-    protected override async Task OnInitializedAsync()
+    protected override async void OnInitialized()
     {
         authorized = await CheckAuthAsync();
         if (authorized is false)
         {
             var options = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, DisableBackdropClick = true};
-            DialogService.Show<LoginDialog>("Login", options);
+            var dialog = DialogService.Show<LoginDialog>("Login", options);
+            var result = await dialog.Result;
+            DataState.Authorized = true;
+            StateHasChanged();
+        }
+        else
+        {
+            DataState.Authorized = true;
         }
     }
     
