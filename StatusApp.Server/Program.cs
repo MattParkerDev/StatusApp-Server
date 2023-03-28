@@ -48,6 +48,7 @@ builder.Services
     .AddIdentityCookies();
 builder.Services.ConfigureApplicationCookie(options =>
 {
+    options.Cookie.SameSite = SameSiteMode.None;
     options.Events.OnRedirectToLogin = context =>
     {
         context.Response.Clear();
