@@ -1,62 +1,69 @@
 ﻿@page "/Login"
-@inject StatusAppClient HttpClient
-<h3>Login</h3>
-<span>@displayText</span>
-<MudButton OnClick="CheckAuthAsync">Check Auth</MudButton>
+@inject AuthService AuthService
+@inject DataState DataState
+@inject IDialogService DialogService
 
-<MudTextField @bind-Value="loginUserName" Label="Username" Variant="Variant.Text"></MudTextField>
-<MudTextField @bind-Value="loginPassword" Label="Password" Variant="Variant.Text"></MudTextField>
-<MudButton OnClick="SignInAsync">Login</MudButton>
-<MudButton OnClick="SignOutAsync">Logout</MudButton>
+<PageTitle>Login</PageTitle>
 
+
+<MudText Typo="Typo.h4" GutterBottom="true">Login</MudText>
+
+
+<MudText Typo="Typo.body1" GutterBottom="true">@displayText</MudText>
+<MudStack Row="true">
+    @if (DataState.Authorized is false)
+    {
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="width:90px" OnClick="OpenLoginDialog">Login</MudButton>
+    }
+    else
+    {
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="width:90px" OnClick="SignOutAsync">Logout</MudButton>
+    }
+    <MudButton Style="width:110px" OnClick="CheckAuthAsync">Check Auth</MudButton>
+</MudStack>
 
 @code {
-    public string displayText = "Auth status unknown";
+    public string displayText = string.Empty;
 
     public string loginUserName = string.Empty;
     public string loginPassword = string.Empty;
 
+    protected override async Task OnInitializedAsync()
+    {
+        displayText = DataState.Authorized ? "You are signed in!" : "You are unauthorized!";
+    }
 
     private async Task CheckAuthAsync()
     {
-        try
-        {
-            var response = await HttpClient.CheckAuthAsync();
-            displayText = $"Welcome, {response}!";
-        }
-        catch(ApiException e)
-        {
-            var statusCode = e.StatusCode;
-            displayText = $"caught exception: {statusCode}";
-        }
-    }
-
-    private async Task SignInAsync()
-    {
-        try
-        {
-            var profile = await HttpClient.SignInAsync(loginUserName, loginPassword);
-            displayText = "Successfully logged in";
-        }
-        catch (ApiException e)
-        {
-            var statusCode = e.StatusCode;
-            displayText = $"caught exception: {statusCode}";
-        }
+        var success = await AuthService.CheckAuthAsync();
+        displayText = success ? "You are signed in!" : "You are unauthorized!";
     }
     
-    private async Task SignOutAsync()
+    private async Task OpenLoginDialog()
     {
-        try
+        var options = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, DisableBackdropClick = true};
+        var dialog = await DialogService.ShowAsync<LoginDialog>("Login", options);
+        var result = await dialog.Result;
+        var success = dialog.Result.IsCompletedSuccessfully;
+        if (success)
         {
-            await HttpClient.SignOutAsync();
-            displayText = "Successfully logged out";
-        }
-        catch (ApiException e)
-        {
-            var statusCode = e.StatusCode;
-            displayText = $"caught exception: {statusCode}";
+            displayText = "You are signed in!";
+            DataState.Authorized = true;
+            StateHasChanged();
         }
     }
 
+    private async Task SignOutAsync()
+    {
+        var success = await AuthService.SignOutAsync();
+        if (success)
+        {
+            displayText = "Successfully logged out";
+            DataState.Authorized = false;
+        }
+        else
+        {
+            displayText = "An error occurred";
+        }
+    }
 }

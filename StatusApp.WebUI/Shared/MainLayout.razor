@@ -1,6 +1,10 @@
-﻿@inherits LayoutComponentBase
+﻿@using StatusApp.WebUI.Services
+@inherits LayoutComponentBase
+
 @inject StatusAppClient HttpClient
 @inject IDialogService DialogService
+@inject DataState DataState
+@inject AuthService AuthService
 
 
 <MudThemeProvider @bind-IsDarkMode="@_isDarkMode"/>
@@ -24,49 +28,43 @@
         <NavMenu />
     </MudDrawer>
     <MudMainContent>
-        @* https://mudblazor.com/utilities/spacing *@
-        <MudContainer MaxWidth="MaxWidth.Large" Class="my-16 pt-16">
-            @Body
-        </MudContainer>
+        @if (DataState.Authorized)
+        {
+            <MudContainer MaxWidth="MaxWidth.Large" Class="my-16 pt-16">
+                @Body
+            </MudContainer>
+        }
     </MudMainContent>
 </MudLayout>
 
 @code {
     bool _drawerOpen = true;
-    bool authorized = false;
     bool _isDarkMode = false;
 
-    void DrawerToggle()
+    private void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
     }
     
-    protected override async Task OnInitializedAsync()
-    {
-        authorized = await CheckAuthAsync();
-        if (authorized is false)
-        {
-            var options = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, DisableBackdropClick = true};
-            DialogService.Show<LoginDialog>("Login", options);
-        }
-    }
-    
-    private async Task<bool> CheckAuthAsync()
-    {
-        try
-        {
-            var response = await HttpClient.CheckAuthAsync();
-            return true;
-        }
-        catch(ApiException e)
-        {
-            var statusCode = e.StatusCode;
-            return false;
-        }
-    }
-
     private void ToggleDarkMode()
     {
         _isDarkMode = !_isDarkMode;
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        DataState.Authorized = await AuthService.CheckAuthAsync();
+        if (DataState.Authorized is false)
+        {
+            var options = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, DisableBackdropClick = true};
+            var dialog = await DialogService.ShowAsync<LoginDialog>("Login", options);
+            var result = await dialog.Result;
+            var success = dialog.Result.IsCompletedSuccessfully;
+            if (success)
+            {
+                DataState.Authorized = true;
+                StateHasChanged();
+            }
+        }
     }
 }

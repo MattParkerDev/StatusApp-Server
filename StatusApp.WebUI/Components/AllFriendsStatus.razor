@@ -1,15 +1,39 @@
+@inject StatusAppClient HttpClient
+@inject DataState DataState
 
-<MudCard>
-    <MudCardContent>
-        <MudText>Story of the day</MudText>
-        <MudText Typo="Typo.body2">The quick, brown fox jumps over a lazy dog.</MudText>
-    </MudCardContent>
-    <MudCardActions>
-        <MudButton Variant="Variant.Text" Color="Color.Primary">Learn More</MudButton>
-    </MudCardActions>
-</MudCard>
+@if (DataState.FriendList != null)
+{
+    <MudStack Style="width: fit-content">
+        @foreach (var friend in DataState.FriendList)
+            {
+                <MudCard Elevation="2">
+                    <MudCardContent>
+                        <MudStack Row="true" Justify="Justify.SpaceBetween">
+                            <MudStack>
+                                <MudText Typo="Typo.h6">@friend.FirstName @friend.LastName</MudText>
+                                <MudText Typo="Typo.body2">@friend.Status</MudText>
+                            </MudStack>
+                            <MudAvatar Color="@(friend.Online ? Color.Success : Color.Error)"></MudAvatar>
+                        </MudStack>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton Variant="Variant.Text" Color="Color.Primary">Chat</MudButton>
+                    </MudCardActions>
+                </MudCard>
+            }
+    </MudStack>
+    
+}
+
+@*<MudButton Color="Color.Primary" OnClick="StateHasChanged">Update State</MudButton>*@
+
 
 
 @code {
     
+    protected override async Task OnInitializedAsync()
+    {
+        DataState.FriendList = new List<Profile>(await HttpClient.GetFriendsAsync());
+        StateHasChanged();
+    }
 }
