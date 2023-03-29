@@ -4,12 +4,8 @@
 <PageTitle>Status</PageTitle>
 
 <MudText Typo="Typo.h4" GutterBottom="true">Status</MudText>
-<MudText Class="mb-8">See your friends' statuses here!</MudText>
-<MudAlert Severity="Severity.Normal">Work in progress!</MudAlert>
-<MudText Typo="Typo.h4" GutterBottom="true">@DataState.Authorized</MudText>
+<MudText Class="mb-8" GutterBottom="true">See your friends' statuses here!</MudText>
 @if (DataState.Authorized)
 {
     <AllFriendsStatus/>
 }
-
-<MudButton Color="Color.Primary" OnClick="StateHasChanged">Update State From Index</MudButton>

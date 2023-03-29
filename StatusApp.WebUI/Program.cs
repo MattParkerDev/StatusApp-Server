@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
 using StatusApp.WebUI;
 using StatusApp.WebUI.Models;
+using StatusApp.WebUI.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -14,6 +15,7 @@ builder.Services.AddScoped(
 
 builder.Services.AddTransient<CookieHandler>();
 builder.Services.AddSingleton<DataState>();
+builder.Services.AddSingleton<AuthService>();
 builder.Services.AddMudServices();
 
 const string ApiClient = nameof(ApiClient);
