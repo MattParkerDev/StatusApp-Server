@@ -124,7 +124,6 @@ app.MapFriendRoutes();
 app.MapMessageRoutes();
 app.MapUserRoutes();
 
-// TODO: Fix Authorized access
-app.MapHub<StatusHub>("/statushub").AllowAnonymous();
+app.MapHub<StatusHub>("/statushub");
 
 app.Run();

@@ -1,5 +1,6 @@
 @inject StatusAppClient HttpClient
 @inject DataState DataState
+@inject NotifierService NotifierService
 
 @if (DataState.FriendList.Count > 0)
 {
@@ -33,6 +34,7 @@
     
     protected override async Task OnInitializedAsync()
     {
+        NotifierService.Notify += OnNotify;
         // While debugging
         if (DataState.AllFriendsSyncHasRun)
         {
@@ -42,5 +44,19 @@
         DataState.FriendList = new List<Profile>(await HttpClient.GetFriendsAsync());
         DataState.AllFriendsSyncHasRun = true;
         StateHasChanged();
+    }
+    
+    // https://learn.microsoft.com/en-us/aspnet/core/blazor/components/?view=aspnetcore-7.0#invoke-component-methods-externally-to-update-state
+    public async Task OnNotify()
+    {
+        await InvokeAsync(() =>
+        {
+            StateHasChanged();
+        });
+    }
+
+    public void Dispose()
+    {
+        NotifierService.Notify -= OnNotify;
     }
 }
