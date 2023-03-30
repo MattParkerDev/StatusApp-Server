@@ -33,7 +33,14 @@
     
     protected override async Task OnInitializedAsync()
     {
+        // While debugging
+        if (DataState.AllFriendsSyncHasRun)
+        {
+            StateHasChanged();
+            return;
+        }
         DataState.FriendList = new List<Profile>(await HttpClient.GetFriendsAsync());
+        DataState.AllFriendsSyncHasRun = true;
         StateHasChanged();
     }
 }

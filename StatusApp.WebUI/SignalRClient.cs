@@ -18,7 +18,7 @@ public class SignalRClient
             ? "https://localhost:7104"
             : "https://statusapp1.azurewebsites.net";
         var hubUrl = $"{hubeBaseUrl}/statushub";
-        _connection = new HubConnectionBuilder().WithUrl(hubUrl).Build();
+        _connection = new HubConnectionBuilder().WithUrl(hubUrl).WithAutomaticReconnect().Build();
         RegisterHandlers();
         _connection.Closed += async (exception) =>
         {
@@ -113,7 +113,8 @@ public class SignalRClient
                     _dataState.FriendList.Add(user);
                     return;
                 }
-                targetUser = user;
+                _dataState.FriendList.Remove(targetUser);
+                _dataState.FriendList.Add(user);
             }
         );
     }

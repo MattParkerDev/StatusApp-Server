@@ -1,7 +1,7 @@
 ﻿@using StatusApp.WebUI.Services
 @inherits LayoutComponentBase
 
-@inject StatusAppClient HttpClient
+@inject StatusAppClient StatusAppClient
 @inject IDialogService DialogService
 @inject DataState DataState
 @inject AuthService AuthService
@@ -40,7 +40,7 @@
 
 @code {
     bool _drawerOpen = true;
-    bool _isDarkMode = false;
+    bool _isDarkMode = true;
 
     private void DrawerToggle()
     {
@@ -64,12 +64,15 @@
             if (success)
             {
                 DataState.Authorized = true;
+                DataState.UserProfile = await StatusAppClient.GetUserAsync();
                 StateHasChanged();
                 await SignalRClient.StartAsync();
             }
         }
         else
         {
+            DataState.UserProfile = await StatusAppClient.GetUserAsync();
+            StateHasChanged();
             await SignalRClient.StartAsync();
         }
     }

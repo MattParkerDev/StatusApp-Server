@@ -44,6 +44,7 @@
         try
         {
             loginState = LoginState.Sending;
+            //TODO: This may not be ideal behaviour
             var profile = await HttpClient.SignInAsync(loginUserName, loginPassword);
             DataState.UserProfile = profile;
             MudDialog.Close(DialogResult.Ok(true));
