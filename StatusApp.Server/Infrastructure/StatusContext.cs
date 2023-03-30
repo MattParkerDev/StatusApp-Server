@@ -6,7 +6,8 @@ namespace StatusApp.Server.Infrastructure;
 
 public class StatusContext : IdentityUserContext<User>
 {
-    public StatusContext(DbContextOptions<StatusContext> options) : base(options) { }
+    public StatusContext(DbContextOptions<StatusContext> options)
+        : base(options) { }
 
     // https://learn.microsoft.com/en-us/ef/core/miscellaneous/nullable-reference-types#dbcontext-and-dbset
     public virtual DbSet<Message> Messages { get; set; } = null!;

@@ -1,5 +1,8 @@
 ﻿@page "/mystatus"
 
+@inject DataState DataState
+@inject SignalRClient SignalRClient
+
 <PageTitle>My Status</PageTitle>
 
 <MudText Typo="Typo.h3" GutterBottom="true">My Status</MudText>
@@ -10,8 +13,9 @@
 @code {
     private int currentCount = 0;
 
-    private void IncrementCount()
+    private async Task IncrementCount()
     {
         currentCount++;
+        await SignalRClient.BroadcastMessageAsync("TestUser", "Hello there!");
     }
 }

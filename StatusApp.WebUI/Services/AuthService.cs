@@ -8,7 +8,7 @@ public class AuthService
     {
         _statusAppClient = statusAppClient;
     }
-    
+
     public async Task<bool> CheckAuthAsync()
     {
         try
@@ -16,13 +16,13 @@ public class AuthService
             var response = await _statusAppClient.CheckAuthAsync();
             return true;
         }
-        catch(ApiException e)
+        catch (ApiException e)
         {
             var statusCode = e.StatusCode;
             return false;
         }
     }
-    
+
     public async Task<bool> SignOutAsync()
     {
         try

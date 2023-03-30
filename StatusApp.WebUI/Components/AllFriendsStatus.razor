@@ -1,7 +1,7 @@
 @inject StatusAppClient HttpClient
 @inject DataState DataState
 
-@if (DataState.FriendList != null)
+@if (DataState.FriendList.Count > 0)
 {
     <MudStack Style="width: fit-content">
         @foreach (var friend in DataState.FriendList)

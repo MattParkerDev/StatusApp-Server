@@ -72,23 +72,29 @@ builder.Services.AddOpenApiDocument(configure =>
 
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddCors();
+const string StatusAppCorsPolicy = nameof(StatusAppCorsPolicy);
+builder.Services.AddCors(
+    options =>
+        options.AddPolicy(
+            name: StatusAppCorsPolicy,
+            policy =>
+                policy
+                    .WithOrigins(
+                        Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
+                        == "Development"
+                            ? "https://localhost:5001"
+                            : "https://red-ground-0805be400.2.azurestaticapps.net"
+                    )
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials()
+        )
+);
 
 var app = builder.Build();
 
 // CORS
-app.UseCors(
-    builder =>
-        builder
-            .WithOrigins(
-                app.Environment.IsDevelopment()
-                    ? "https://localhost:5001"
-                    : "https://red-ground-0805be400.2.azurestaticapps.net"
-            )
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .AllowCredentials()
-);
+app.UseCors(StatusAppCorsPolicy);
 
 if (app.Environment.IsDevelopment())
 {
@@ -118,6 +124,7 @@ app.MapFriendRoutes();
 app.MapMessageRoutes();
 app.MapUserRoutes();
 
-app.MapHub<StatusHub>("/statushub");
+// TODO: Fix Authorized access
+app.MapHub<StatusHub>("/statushub").AllowAnonymous();
 
 app.Run();

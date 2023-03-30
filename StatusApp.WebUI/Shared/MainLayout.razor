@@ -5,6 +5,7 @@
 @inject IDialogService DialogService
 @inject DataState DataState
 @inject AuthService AuthService
+@inject SignalRClient SignalRClient
 
 
 <MudThemeProvider @bind-IsDarkMode="@_isDarkMode"/>
@@ -64,7 +65,12 @@
             {
                 DataState.Authorized = true;
                 StateHasChanged();
+                await SignalRClient.StartAsync();
             }
+        }
+        else
+        {
+            await SignalRClient.StartAsync();
         }
     }
 }
