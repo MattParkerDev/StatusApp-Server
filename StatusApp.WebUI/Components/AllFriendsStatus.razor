@@ -26,23 +26,12 @@
     
 }
 
-@*<MudButton Color="Color.Primary" OnClick="StateHasChanged">Update State</MudButton>*@
-
-
-
 @code {
     
     protected override async Task OnInitializedAsync()
     {
         NotifierService.Notify += OnNotify;
-        // While debugging
-        if (DataState.AllFriendsSyncHasRun)
-        {
-            StateHasChanged();
-            return;
-        }
         DataState.FriendList = new List<Profile>(await HttpClient.GetFriendsAsync());
-        DataState.AllFriendsSyncHasRun = true;
         StateHasChanged();
     }
     
