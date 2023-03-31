@@ -17,7 +17,7 @@ public static class UserRoutes
             .MapGet(
                 "/getuser",
                 async Task<Results<Ok<Profile>, NotFound>> (
-                    IUserService userService,
+                    IIdentityUserService userService,
                     HttpContext context
                 ) =>
                 {
@@ -39,7 +39,7 @@ public static class UserRoutes
             .MapGet(
                 "/signin",
                 async Task<Results<Ok<Profile>, BadRequest, UnauthorizedHttpResult>> (
-                    IUserService userService,
+                    IIdentityUserService userService,
                     string userName,
                     string password
                 ) =>
@@ -62,7 +62,7 @@ public static class UserRoutes
         group
             .MapGet(
                 "/signout",
-                async Task<Ok> (IUserService userService) =>
+                async Task<Ok> (IIdentityUserService userService) =>
                 {
                     await userService.SignOutAsync();
                     return TypedResults.Ok();
@@ -74,7 +74,7 @@ public static class UserRoutes
             .MapPut(
                 "/createuser",
                 async Task<Results<Ok<Profile>, BadRequest<IEnumerable<IdentityError>>>> (
-                    IUserService userService,
+                    IIdentityUserService userService,
                     string userName,
                     string password,
                     string firstName,
@@ -109,7 +109,7 @@ public static class UserRoutes
                 "deleteuser",
                 async Task<Results<Ok, BadRequest>> (
                     HttpContext context,
-                    IUserService userService
+                    IIdentityUserService userService
                 ) =>
                 {
                     var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
@@ -122,6 +122,7 @@ public static class UserRoutes
                     //TODO: Confirm Auth flow
                     await userService.SignOutAsync();
                     await userService.DeleteUserAsync(targetUser);
+                    //TODO: HERE - Delete StatusUser
                     //TODO: Also delete Friendships
                     return TypedResults.Ok();
                 }
@@ -136,7 +137,7 @@ public static class UserRoutes
                     StatusContext db,
                     IHubContext<StatusHub, IStatusClient> hubContext,
                     HttpContext context,
-                    IUserService userService,
+                    IIdentityUserService userService,
                     IFriendshipService friendshipService,
                     string? firstName,
                     string? lastName,
@@ -146,6 +147,7 @@ public static class UserRoutes
                 {
                     var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
                     //TODO: Update Friendships too
+                    //TODO: HERE - create /updatestatususer
                     var targetUser = await userService.GetUserByNameAsync(userName);
                     if (targetUser is null)
                     {
@@ -156,6 +158,7 @@ public static class UserRoutes
                     targetUser.LastName = lastName ?? targetUser.LastName;
                     targetUser.Status = status ?? targetUser.Status;
                     targetUser.Online = online ?? targetUser.Online;
+                    // TODO: HERE
                     await userService.UpdateUserAsync(targetUser);
 
                     var updatedProfile = targetUser.ToProfile();

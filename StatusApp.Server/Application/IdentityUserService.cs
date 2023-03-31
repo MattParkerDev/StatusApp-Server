@@ -4,12 +4,12 @@ using StatusApp.Server.Domain;
 
 namespace StatusApp.Server.Application;
 
-public class UserService : IUserService
+public class IdentityUserService : IIdentityUserService
 {
     private readonly UserManager<User> _userManager;
     private readonly SignInManager<User> _signInManager;
 
-    public UserService(UserManager<User> userManager, SignInManager<User> signInManager)
+    public IdentityUserService(UserManager<User> userManager, SignInManager<User> signInManager)
     {
         _userManager = userManager;
         _signInManager = signInManager;

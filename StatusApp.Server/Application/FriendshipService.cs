@@ -7,12 +7,12 @@ namespace StatusApp.Server.Application;
 public class FriendshipService : IFriendshipService
 {
     private readonly StatusContext _db;
-    private readonly IUserService _userService;
+    private readonly IIdentityUserService _identityUserService;
 
-    public FriendshipService(StatusContext db, IUserService userService)
+    public FriendshipService(StatusContext db, IIdentityUserService identityUserService)
     {
         _db = db;
-        _userService = userService;
+        _identityUserService = identityUserService;
     }
 
     public async Task<bool> AcceptFriendRequest(Friendship myFriendship, Friendship theirFriendship)
@@ -86,7 +86,8 @@ public class FriendshipService : IFriendshipService
         var friendsProfileList = new List<Profile>();
         foreach (var name in friendUserNameList)
         {
-            User? friend = await _userService.GetUserByNameAsync(name);
+            //TODO: HERE
+            User? friend = await _identityUserService.GetUserByNameAsync(name);
             if (friend == null)
             {
                 //TODO: Review

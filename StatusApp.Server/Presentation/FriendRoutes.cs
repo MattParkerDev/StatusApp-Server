@@ -64,6 +64,7 @@ public static class FriendRoutes
                 ) =>
                 {
                     var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
+                    // TODO: HERE
                     var user = await userManager.FindByNameAsync(userName);
                     var friendUser = await userManager.FindByNameAsync(friendUserName);
                     if (friendUser == null || user == null)

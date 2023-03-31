@@ -19,7 +19,7 @@ public partial class FriendshipServiceTests
         var chatContextMock = new Mock<StatusContext>(options);
         chatContextMock.Setup(db => db.SaveChangesAsync(default)).ReturnsAsync(1).Verifiable();
 
-        var userServiceMock = new Mock<IUserService>();
+        var userServiceMock = new Mock<IIdentityUserService>();
 
         var friendshipService = new FriendshipService(
             chatContextMock.Object,
@@ -46,7 +46,7 @@ public partial class FriendshipServiceTests
             .Setup(db => db.SaveChangesAsync(default))
             .ThrowsAsync(new DbUpdateException());
 
-        var userServiceMock = new Mock<IUserService>();
+        var userServiceMock = new Mock<IIdentityUserService>();
 
         var friendshipService = new FriendshipService(
             chatContextMock.Object,

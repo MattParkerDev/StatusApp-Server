@@ -5,12 +5,12 @@ namespace StatusApp.Server.Application;
 
 public class TestDataGeneratorService
 {
-    private readonly IUserService _userService;
+    private readonly IIdentityUserService _identityUserService;
     private readonly IFriendshipService _friendshipService;
 
-    public TestDataGeneratorService(IUserService userService, IFriendshipService friendshipService)
+    public TestDataGeneratorService(IIdentityUserService identityUserService, IFriendshipService friendshipService)
     {
-        _userService = userService;
+        _identityUserService = identityUserService;
         _friendshipService = friendshipService;
     }
 
@@ -44,9 +44,9 @@ public class TestDataGeneratorService
             Online = false,
         };
 
-        await _userService.CreateUserAsync(newIdentityUser, "password1");
-        await _userService.CreateUserAsync(newIdentityUser2, "password1");
-        await _userService.CreateUserAsync(newIdentityUser3, "password1");
+        await _identityUserService.CreateUserAsync(newIdentityUser, "password1");
+        await _identityUserService.CreateUserAsync(newIdentityUser2, "password1");
+        await _identityUserService.CreateUserAsync(newIdentityUser3, "password1");
 
         await _friendshipService.CreateAcceptedFriendshipPair(newIdentityUser, newIdentityUser2);
         await _friendshipService.CreateAcceptedFriendshipPair(newIdentityUser, newIdentityUser3);
