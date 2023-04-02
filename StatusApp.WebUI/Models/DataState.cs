@@ -2,9 +2,9 @@
 
 public class DataState
 {
-    public Profile? UserProfile { get; set; }
+    public StatusUserDto? StatusUser { get; set; }
     public bool Authorized { get; set; }
-    public List<Profile> FriendList { get; set; } = new List<Profile>();
+    public List<StatusUserDto> FriendList { get; set; } = new List<StatusUserDto>();
     public Dictionary<Guid, List<Message>> Messages { get; set; } = new();
     public bool AllFriendsSyncHasRun { get; set; } = false;
 }

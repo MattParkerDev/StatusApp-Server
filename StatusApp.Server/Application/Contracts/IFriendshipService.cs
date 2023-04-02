@@ -1,4 +1,5 @@
 ﻿using StatusApp.Server.Domain;
+using StatusApp.Server.Domain.DTOs;
 
 namespace StatusApp.Server.Application.Contracts;
 
@@ -9,9 +10,8 @@ public interface IFriendshipService
     Friendship? GetFriendship(string userName, string friendUserName);
     List<Friendship> GetAllFriendships(string userName, bool? areFriends);
     List<string> GetFriendsUserNameList(string userName);
-    Task<List<Profile>> GetFriendsProfileList(string userName);
-    Task<Friendship?> CreateFriendshipPair(User user, User friendUser);
-    Task<Friendship?> CreateAcceptedFriendshipPair(User user, User friendUser);
-
-    Task<bool> RemoveFriendshipPair(Friendship myFriendship, Friendship theirFriendship);
+    Task<List<StatusUserDto>> GetFriendsDtoList(string userName);
+    Task<Friendship?> CreateFriendshipPair(StatusUser user, StatusUser friendUser);
+    Task<Friendship?> CreateAcceptedFriendshipPair(StatusUser user, StatusUser friendUser);
+    Task<bool> DeleteFriendshipPair(Friendship myFriendship, Friendship theirFriendship);
 }

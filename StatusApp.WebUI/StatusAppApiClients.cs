@@ -117,14 +117,14 @@ namespace StatusApp.WebUI
         }
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Profile>> GetFriendsAsync()
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<StatusUserDto>> GetFriendsAsync()
         {
             return GetFriendsAsync(System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Profile>> GetFriendsAsync(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<StatusUserDto>> GetFriendsAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("getfriends");
@@ -161,7 +161,7 @@ namespace StatusApp.WebUI
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.IReadOnlyList<Profile>>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.IReadOnlyList<StatusUserDto>>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -601,14 +601,14 @@ namespace StatusApp.WebUI
         }
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<Profile> GetUserAsync()
+        public virtual System.Threading.Tasks.Task<StatusUserDto> GetUserAsync()
         {
             return GetUserAsync(System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Profile> GetUserAsync(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<StatusUserDto> GetUserAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("getuser");
@@ -645,7 +645,7 @@ namespace StatusApp.WebUI
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Profile>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<StatusUserDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -679,14 +679,14 @@ namespace StatusApp.WebUI
         }
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<Profile> SignInAsync(string userName, string password)
+        public virtual System.Threading.Tasks.Task<StatusUserDto> SignInAsync(string userName, string password)
         {
             return SignInAsync(userName, password, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Profile> SignInAsync(string userName, string password, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<StatusUserDto> SignInAsync(string userName, string password, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("signin?");
@@ -726,7 +726,7 @@ namespace StatusApp.WebUI
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Profile>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<StatusUserDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -826,14 +826,14 @@ namespace StatusApp.WebUI
         }
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<Profile> CreateUserAsync(string userName, string password, string firstName, string lastName, string email)
+        public virtual System.Threading.Tasks.Task<StatusUserDto> CreateUserAsync(string userName, string password, string firstName, string lastName, string email)
         {
             return CreateUserAsync(userName, password, firstName, lastName, email, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Profile> CreateUserAsync(string userName, string password, string firstName, string lastName, string email, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<StatusUserDto> CreateUserAsync(string userName, string password, string firstName, string lastName, string email, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("createuser?");
@@ -877,7 +877,7 @@ namespace StatusApp.WebUI
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Profile>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<StatusUserDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -987,34 +987,20 @@ namespace StatusApp.WebUI
         }
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<Profile> UpdateUserAsync(string firstName, string lastName, string status, bool? online)
+        public virtual System.Threading.Tasks.Task<StatusUserDto> UpdateUserAsync(StatusUserDto statusUserDto)
         {
-            return UpdateUserAsync(firstName, lastName, status, online, System.Threading.CancellationToken.None);
+            return UpdateUserAsync(statusUserDto, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Profile> UpdateUserAsync(string firstName, string lastName, string status, bool? online, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<StatusUserDto> UpdateUserAsync(StatusUserDto statusUserDto, System.Threading.CancellationToken cancellationToken)
         {
+            if (statusUserDto == null)
+                throw new System.ArgumentNullException("statusUserDto");
+
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("updateuser?");
-            if (firstName != null)
-            {
-                urlBuilder_.Append(System.Uri.EscapeDataString("firstName") + "=").Append(System.Uri.EscapeDataString(ConvertToString(firstName, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
-            }
-            if (lastName != null)
-            {
-                urlBuilder_.Append(System.Uri.EscapeDataString("lastName") + "=").Append(System.Uri.EscapeDataString(ConvertToString(lastName, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
-            }
-            if (status != null)
-            {
-                urlBuilder_.Append(System.Uri.EscapeDataString("status") + "=").Append(System.Uri.EscapeDataString(ConvertToString(status, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
-            }
-            if (online != null)
-            {
-                urlBuilder_.Append(System.Uri.EscapeDataString("online") + "=").Append(System.Uri.EscapeDataString(ConvertToString(online, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
-            }
-            urlBuilder_.Length--;
+            urlBuilder_.Append("updateuser");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -1022,7 +1008,10 @@ namespace StatusApp.WebUI
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
-                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
+                    var json_ = System.Text.Json.JsonSerializer.Serialize(statusUserDto, _settings.Value);
+                    var content_ = new System.Net.Http.StringContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("PATCH");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
@@ -1049,7 +1038,7 @@ namespace StatusApp.WebUI
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Profile>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<StatusUserDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -1183,7 +1172,7 @@ namespace StatusApp.WebUI
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Profile
+    public partial class StatusUserDto
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("userName")]

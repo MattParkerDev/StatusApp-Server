@@ -64,14 +64,14 @@
             if (success)
             {
                 DataState.Authorized = true;
-                DataState.UserProfile = await StatusAppClient.GetUserAsync();
+                DataState.StatusUser = await StatusAppClient.GetUserAsync();
                 StateHasChanged();
                 await SignalRClient.StartAsync();
             }
         }
         else
         {
-            DataState.UserProfile = await StatusAppClient.GetUserAsync();
+            DataState.StatusUser = await StatusAppClient.GetUserAsync();
             StateHasChanged();
             await SignalRClient.StartAsync();
         }

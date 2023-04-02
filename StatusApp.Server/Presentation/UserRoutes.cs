@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
+using StatusApp.Server.Application;
 using StatusApp.Server.Application.Contracts;
 using StatusApp.Server.Domain;
+using StatusApp.Server.Domain.DTOs;
 using StatusApp.Server.Infrastructure;
 
 namespace StatusApp.Server.Presentation;
@@ -16,21 +18,21 @@ public static class UserRoutes
         group
             .MapGet(
                 "/getuser",
-                async Task<Results<Ok<Profile>, NotFound>> (
-                    IUserService userService,
+                async Task<Results<Ok<StatusUserDto>, NotFound>> (
+                    IStatusUserService statusUserService,
                     HttpContext context
                 ) =>
                 {
                     var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
 
-                    var user = await userService.GetUserByNameAsync(userName);
-                    if (user is null)
+                    var statusUser = await statusUserService.GetUserByNameAsync(userName);
+                    if (statusUser is null)
                     {
                         return TypedResults.NotFound();
                     }
 
-                    var profile = user.ToProfile();
-                    return TypedResults.Ok(profile);
+                    var statusUserDto = statusUser.ToDto();
+                    return TypedResults.Ok(statusUserDto);
                 }
             )
             .WithName("GetUser");
@@ -38,21 +40,26 @@ public static class UserRoutes
         group
             .MapGet(
                 "/signin",
-                async Task<Results<Ok<Profile>, BadRequest, UnauthorizedHttpResult>> (
-                    IUserService userService,
+                async Task<Results<Ok<StatusUserDto>, BadRequest, UnauthorizedHttpResult>> (
+                    IIdentityUserService userService,
+                    IStatusUserService statusUserService,
                     string userName,
                     string password
                 ) =>
                 {
-                    var user = await userService.GetUserByNameAsync(userName);
-                    if (user == null)
+                    var identityUser = await userService.GetUserByNameAsync(userName);
+                    var statusUser = await statusUserService.GetUserByNameAsync(userName);
+                    if (identityUser is null || statusUser is null)
                     {
                         return TypedResults.BadRequest();
                     }
 
-                    var signInResult = await userService.PasswordSignInAsync(user, password);
+                    var signInResult = await userService.PasswordSignInAsync(
+                        identityUser,
+                        password
+                    );
                     return signInResult.Succeeded
-                        ? TypedResults.Ok(user.ToProfile())
+                        ? TypedResults.Ok(statusUser.ToDto())
                         : TypedResults.Unauthorized();
                 }
             )
@@ -62,7 +69,7 @@ public static class UserRoutes
         group
             .MapGet(
                 "/signout",
-                async Task<Ok> (IUserService userService) =>
+                async Task<Ok> (IIdentityUserService userService) =>
                 {
                     await userService.SignOutAsync();
                     return TypedResults.Ok();
@@ -73,8 +80,11 @@ public static class UserRoutes
         group
             .MapPut(
                 "/createuser",
-                async Task<Results<Ok<Profile>, BadRequest<IEnumerable<IdentityError>>>> (
-                    IUserService userService,
+                async Task<
+                    Results<Ok<StatusUserDto>, BadRequest, BadRequest<IEnumerable<IdentityError>>>
+                > (
+                    IIdentityUserService identityUserService,
+                    IStatusUserService statusUserService,
                     string userName,
                     string password,
                     string firstName,
@@ -82,23 +92,36 @@ public static class UserRoutes
                     string email
                 ) =>
                 {
-                    var newUser = new User
+                    var newIdentityUser = new User { UserName = userName, Email = email, };
+
+                    var newStatusUser = new StatusUser
                     {
                         UserName = userName,
-                        Email = email,
                         FirstName = firstName,
                         LastName = lastName
                     };
 
-                    var result = await userService.CreateUserAsync(newUser, password);
+                    var identityResult = await identityUserService.CreateUserAsync(
+                        newIdentityUser,
+                        password
+                    );
 
-                    if (!result.Succeeded)
+                    if (!identityResult.Succeeded)
                     {
-                        return TypedResults.BadRequest(result.Errors);
+                        return TypedResults.BadRequest(identityResult.Errors);
                     }
 
-                    await userService.SignInAsync(newUser);
-                    return TypedResults.Ok(newUser.ToProfile());
+                    var statusUserCreationSuccess = await statusUserService.CreateUserAsync(
+                        newStatusUser
+                    );
+
+                    if (statusUserCreationSuccess is false)
+                    {
+                        return TypedResults.BadRequest();
+                    }
+
+                    await identityUserService.SignInAsync(newIdentityUser);
+                    return TypedResults.Ok(newStatusUser.ToDto());
                 }
             )
             .AllowAnonymous()
@@ -109,19 +132,26 @@ public static class UserRoutes
                 "deleteuser",
                 async Task<Results<Ok, BadRequest>> (
                     HttpContext context,
-                    IUserService userService
+                    IIdentityUserService userService,
+                    IStatusUserService statusUserService
                 ) =>
                 {
                     var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
-                    var targetUser = await userService.GetUserByNameAsync(userName);
-                    if (targetUser is null)
+                    var identityUser = await userService.GetUserByNameAsync(userName);
+                    var statusUser = await statusUserService.GetUserByNameAsync(userName);
+                    if (identityUser is null)
                     {
                         return TypedResults.BadRequest();
                     }
 
                     //TODO: Confirm Auth flow
                     await userService.SignOutAsync();
-                    await userService.DeleteUserAsync(targetUser);
+                    await userService.DeleteUserAsync(identityUser);
+                    if (statusUser is not null)
+                    {
+                        await statusUserService.DeleteUserAsync(statusUser);
+                    }
+
                     //TODO: Also delete Friendships
                     return TypedResults.Ok();
                 }
@@ -132,33 +162,24 @@ public static class UserRoutes
         group
             .MapPatch(
                 "updateuser",
-                async Task<Results<Ok<Profile>, BadRequest>> (
+                async Task<Results<Ok<StatusUserDto>, BadRequest>> (
                     StatusContext db,
                     IHubContext<StatusHub, IStatusClient> hubContext,
                     HttpContext context,
-                    IUserService userService,
+                    IStatusUserService statusUserService,
                     IFriendshipService friendshipService,
-                    string? firstName,
-                    string? lastName,
-                    string? status,
-                    bool? online
+                    StatusUserDto statusUserDto
                 ) =>
                 {
                     var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
                     //TODO: Update Friendships too
-                    var targetUser = await userService.GetUserByNameAsync(userName);
-                    if (targetUser is null)
+                    var statusUser = statusUserDto.FromDto();
+                    var success = await statusUserService.UpdateUserAsync(statusUser);
+                    if (success is false)
                     {
+                        // TODO: Review status code
                         return TypedResults.BadRequest();
                     }
-
-                    targetUser.FirstName = firstName ?? targetUser.FirstName;
-                    targetUser.LastName = lastName ?? targetUser.LastName;
-                    targetUser.Status = status ?? targetUser.Status;
-                    targetUser.Online = online ?? targetUser.Online;
-                    await userService.UpdateUserAsync(targetUser);
-
-                    var updatedProfile = targetUser.ToProfile();
 
                     // Push changes to this user to any of their friends
                     var friendsUserNameList = friendshipService.GetFriendsUserNameList(userName);
@@ -168,10 +189,8 @@ public static class UserRoutes
                         .Select(s => s.First().UserName)
                         .ToList();
 
-                    await hubContext.Clients
-                        .Users(usersToNotify)
-                        .ReceiveUpdatedUser(updatedProfile);
-                    return TypedResults.Ok(updatedProfile);
+                    await hubContext.Clients.Users(usersToNotify).ReceiveUpdatedUser(statusUserDto);
+                    return TypedResults.Ok(statusUserDto);
                 }
             )
             .WithName("UpdateUser");

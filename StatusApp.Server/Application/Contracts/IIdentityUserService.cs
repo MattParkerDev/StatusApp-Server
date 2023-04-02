@@ -3,7 +3,7 @@ using StatusApp.Server.Domain;
 
 namespace StatusApp.Server.Application.Contracts;
 
-public interface IUserService
+public interface IIdentityUserService
 {
     Task<User?> GetUserByNameAsync(string userName);
     Task<IdentityResult> CreateUserAsync(User newUser, string password);

@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
+using StatusApp.Server.Application;
 using StatusApp.Server.Application.Contracts;
 using StatusApp.Server.Domain;
+using StatusApp.Server.Domain.DTOs;
 using StatusApp.Server.Infrastructure;
 
 namespace StatusApp.Server.Presentation;
@@ -16,7 +18,7 @@ public static class FriendRoutes
         group
             .MapGet(
                 "/getfriends",
-                async Task<Results<Ok<List<Profile>>, NoContent>> (
+                async Task<Results<Ok<List<StatusUserDto>>, NoContent>> (
                     IFriendshipService friendshipService,
                     HttpContext context
                 ) =>
@@ -25,11 +27,9 @@ public static class FriendRoutes
                         context.User.Identity?.Name
                         ?? throw new ArgumentNullException(nameof(context.User.Identity.Name));
 
-                    var friendsProfileList = await friendshipService.GetFriendsProfileList(
-                        userName
-                    );
-                    return friendsProfileList.Count != 0
-                        ? TypedResults.Ok(friendsProfileList)
+                    var friendsDtoList = await friendshipService.GetFriendsDtoList(userName);
+                    return friendsDtoList.Count != 0
+                        ? TypedResults.Ok(friendsDtoList)
                         : TypedResults.NoContent();
                 }
             )
@@ -58,14 +58,14 @@ public static class FriendRoutes
                 "/sendfriendrequest",
                 async Task<Results<Ok<Friendship>, NotFound, Conflict>> (
                     IFriendshipService friendshipService,
-                    UserManager<User> userManager,
+                    IStatusUserService statusUserService,
                     HttpContext context,
                     string friendUserName
                 ) =>
                 {
                     var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
-                    var user = await userManager.FindByNameAsync(userName);
-                    var friendUser = await userManager.FindByNameAsync(friendUserName);
+                    var user = await statusUserService.GetUserByNameAsync(userName);
+                    var friendUser = await statusUserService.GetUserByNameAsync(friendUserName);
                     if (friendUser == null || user == null)
                     {
                         return TypedResults.NotFound();
@@ -92,15 +92,15 @@ public static class FriendRoutes
                 async Task<Results<Ok<Friendship>, Ok, Conflict>> (
                     HttpContext context,
                     IFriendshipService friendshipService,
-                    UserManager<User> userManager,
+                    IStatusUserService statusUserService,
                     IHubContext<StatusHub, IStatusClient> hubContext,
                     string friendUserName,
                     bool accepted
                 ) =>
                 {
                     var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
-                    var user = await userManager.FindByNameAsync(userName);
-                    var profile = user!.ToProfile();
+                    var statusUser = await statusUserService.GetUserByNameAsync(userName);
+
                     var myFriendship = friendshipService.GetFriendship(userName, friendUserName);
                     var theirFriendship = friendshipService.GetFriendship(friendUserName, userName);
 
@@ -110,7 +110,7 @@ public static class FriendRoutes
                     if (!accepted)
                     {
                         var removeFriendshipSucceeded =
-                            await friendshipService.RemoveFriendshipPair(
+                            await friendshipService.DeleteFriendshipPair(
                                 myFriendship,
                                 theirFriendship
                             );
@@ -127,11 +127,13 @@ public static class FriendRoutes
                     if (acceptSucceeded is false)
                         return TypedResults.Conflict();
 
+                    var statusUserDto = statusUser!.ToDto();
+
                     // Push this user and friendship to the new friend
                     await hubContext.Clients
                         .User(friendUserName)
                         .ReceiveUpdatedFriendship(theirFriendship);
-                    await hubContext.Clients.User(friendUserName).ReceiveUpdatedUser(profile);
+                    await hubContext.Clients.User(friendUserName).ReceiveUpdatedUser(statusUserDto);
                     return TypedResults.Ok(myFriendship);
                 }
             )
@@ -154,7 +156,7 @@ public static class FriendRoutes
 
                     if (myFriendship != null && theirFriendship != null)
                     {
-                        success = await friendshipService.RemoveFriendshipPair(
+                        success = await friendshipService.DeleteFriendshipPair(
                             myFriendship,
                             theirFriendship
                         );

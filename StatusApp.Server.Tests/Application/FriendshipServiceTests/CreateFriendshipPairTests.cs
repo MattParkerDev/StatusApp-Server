@@ -15,7 +15,7 @@ public partial class FriendshipServiceTests
         var userName = "TestUserName";
         var friendUserName = "AnotherUserName";
 
-        var user = new User
+        var user = new StatusUser
         {
             UserName = userName,
             FirstName = "AName",
@@ -24,7 +24,7 @@ public partial class FriendshipServiceTests
             Online = false
         };
 
-        var friendUser = new User
+        var friendUser = new StatusUser
         {
             UserName = friendUserName,
             FirstName = "FriendsName",
@@ -47,11 +47,13 @@ public partial class FriendshipServiceTests
         var chatContextMock = new Mock<StatusContext>(options);
         chatContextMock.Setup(db => db.Friendships).ReturnsDbSet(new List<Friendship>());
 
-        var userServiceMock = new Mock<IUserService>();
+        var identityUserServiceMock = new Mock<IIdentityUserService>();
+        var statusUserServiceMock = new Mock<IStatusUserService>();
 
         var friendshipService = new FriendshipService(
             chatContextMock.Object,
-            userServiceMock.Object
+            identityUserServiceMock.Object,
+            statusUserServiceMock.Object
         );
         // Act
         var result = await friendshipService.CreateFriendshipPair(user, friendUser);
