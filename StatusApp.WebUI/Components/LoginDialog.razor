@@ -45,8 +45,8 @@
         {
             loginState = LoginState.Sending;
             //TODO: This may not be ideal behaviour
-            var profile = await HttpClient.SignInAsync(loginUserName, loginPassword);
-            DataState.UserProfile = profile;
+            var statusUser = await HttpClient.SignInAsync(loginUserName, loginPassword);
+            DataState.StatusUser = statusUser;
             MudDialog.Close(DialogResult.Ok(true));
             
         }

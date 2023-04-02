@@ -1,5 +1,6 @@
 using StatusApp.Server.Application.Contracts;
 using StatusApp.Server.Domain;
+using StatusApp.Server.Domain.DTOs;
 using StatusApp.Server.Infrastructure;
 
 namespace StatusApp.Server.Application;
@@ -8,11 +9,17 @@ public class FriendshipService : IFriendshipService
 {
     private readonly StatusContext _db;
     private readonly IIdentityUserService _identityUserService;
+    private readonly IStatusUserService _statusUserService;
 
-    public FriendshipService(StatusContext db, IIdentityUserService identityUserService)
+    public FriendshipService(
+        StatusContext db,
+        IIdentityUserService identityUserService,
+        IStatusUserService statusUserService
+    )
     {
         _db = db;
         _identityUserService = identityUserService;
+        _statusUserService = statusUserService;
     }
 
     public async Task<bool> AcceptFriendRequest(Friendship myFriendship, Friendship theirFriendship)
@@ -80,25 +87,24 @@ public class FriendshipService : IFriendshipService
         return friendUserNameList;
     }
 
-    public async Task<List<Profile>> GetFriendsProfileList(string userName)
+    public async Task<List<StatusUserDto>> GetFriendsDtoList(string userName)
     {
         var friendUserNameList = GetFriendsUserNameList(userName);
-        var friendsProfileList = new List<Profile>();
+        var friendsDtoList = new List<StatusUserDto>();
         foreach (var name in friendUserNameList)
         {
-            //TODO: HERE
-            User? friend = await _identityUserService.GetUserByNameAsync(name);
-            if (friend == null)
+            var statusUser = await _statusUserService.GetUserByNameAsync(name);
+            if (statusUser == null)
             {
                 //TODO: Review
                 throw new ArgumentNullException();
             }
-            friendsProfileList.Add(friend.ToProfile());
+            friendsDtoList.Add(statusUser.ToDto());
         }
-        return friendsProfileList;
+        return friendsDtoList;
     }
 
-    public async Task<Friendship?> CreateFriendshipPair(User user, User friendUser)
+    public async Task<Friendship?> CreateFriendshipPair(StatusUser user, StatusUser friendUser)
     {
         var myFriendship = new Friendship
         {
@@ -132,7 +138,10 @@ public class FriendshipService : IFriendshipService
         return myFriendship;
     }
 
-    public async Task<Friendship?> CreateAcceptedFriendshipPair(User user, User friendUser)
+    public async Task<Friendship?> CreateAcceptedFriendshipPair(
+        StatusUser user,
+        StatusUser friendUser
+    )
     {
         var guid = Guid.NewGuid();
         var time = DateTime.UtcNow;
@@ -172,7 +181,7 @@ public class FriendshipService : IFriendshipService
         return myFriendship;
     }
 
-    public async Task<bool> RemoveFriendshipPair(
+    public async Task<bool> DeleteFriendshipPair(
         Friendship myFriendship,
         Friendship theirFriendship
     )

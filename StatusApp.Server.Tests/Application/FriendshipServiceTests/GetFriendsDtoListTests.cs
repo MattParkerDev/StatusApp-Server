@@ -2,6 +2,7 @@
 using StatusApp.Server.Application;
 using StatusApp.Server.Application.Contracts;
 using StatusApp.Server.Domain;
+using StatusApp.Server.Domain.DTOs;
 using StatusApp.Server.Infrastructure;
 
 namespace StatusApp.Server.Tests.Application.FriendshipServiceTests;
@@ -9,7 +10,7 @@ namespace StatusApp.Server.Tests.Application.FriendshipServiceTests;
 public partial class FriendshipServiceTests
 {
     [Fact]
-    public async Task WhenGetFriendsProfileListIsCalled_ReturnsProfileListAsync()
+    public async Task WhenGetFriendsDtoListIsCalled_ReturnsDtoListAsync()
     {
         //Arrange
         var userName = "TestUserName";
@@ -22,7 +23,7 @@ public partial class FriendshipServiceTests
         };
         var friendships = new List<Friendship> { friendship };
 
-        var friendProfile = new Profile
+        var statusUserDto = new StatusUserDto
         {
             UserName = friendUserName,
             FirstName = "AName",
@@ -31,17 +32,19 @@ public partial class FriendshipServiceTests
             Online = false
         };
 
-        var friendProfileList = new List<Profile> { friendProfile };
+        var friendsDtoList = new List<StatusUserDto> { statusUserDto };
 
         var options = new DbContextOptions<StatusContext>();
         var chatContextMock = new Mock<StatusContext>(options);
         chatContextMock.Setup(db => db.Friendships).ReturnsDbSet(friendships).Verifiable();
 
-        var userServiceMock = new Mock<IIdentityUserService>();
-        userServiceMock
+        var identityUserServiceMock = new Mock<IIdentityUserService>();
+        var statusUserServiceMock = new Mock<IStatusUserService>();
+
+        statusUserServiceMock
             .Setup(x => x.GetUserByNameAsync(It.IsAny<string>()))
             .ReturnsAsync(
-                new User
+                new StatusUser
                 {
                     UserName = friendUserName,
                     FirstName = "AName",
@@ -60,13 +63,14 @@ public partial class FriendshipServiceTests
 
         var friendshipService = new FriendshipService(
             chatContextMock.Object,
-            userServiceMock.Object
+            identityUserServiceMock.Object,
+            statusUserServiceMock.Object
         );
         // Act
-        var result = await friendshipService.GetFriendsProfileList(userName);
+        var result = await friendshipService.GetFriendsDtoList(userName);
 
         // Assert
-        result.Should().BeEquivalentTo(friendProfileList);
+        result.Should().BeEquivalentTo(friendsDtoList);
         chatContextMock.Verify();
     }
 }

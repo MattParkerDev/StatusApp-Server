@@ -116,11 +116,11 @@ public class SignalRClient
             }
         );
 
-        _connection.On<Profile>(
+        _connection.On<StatusUserDto>(
             "ReceiveUpdatedUser",
             async (user) =>
             {
-                if (user.UserName == _dataState.UserProfile?.UserName)
+                if (user.UserName == _dataState.StatusUser?.UserName)
                     return;
                 var targetUser = _dataState.FriendList.FirstOrDefault(
                     s => s.UserName == user.UserName

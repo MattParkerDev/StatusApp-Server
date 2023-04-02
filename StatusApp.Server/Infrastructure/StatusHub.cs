@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using StatusApp.Server.Domain;
+using StatusApp.Server.Domain.DTOs;
 
 namespace StatusApp.Server.Infrastructure;
 
@@ -115,7 +116,7 @@ public interface IStatusClient
     // Methods that a client listens for - connection.on(...)
     Task ReceiveBroadcast(string user, string message);
     Task ReceiveMessage(Message message);
-    Task ReceiveUpdatedUser(Profile friend);
+    Task ReceiveUpdatedUser(StatusUserDto friend);
     Task ReceiveUpdatedFriendship(Friendship friendship);
     Task DeleteFriend(string userName);
 }

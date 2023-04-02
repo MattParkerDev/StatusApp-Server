@@ -6,33 +6,32 @@
 <PageTitle>My Status</PageTitle>
 
 <MudText Typo="Typo.h3" GutterBottom="true">My Status</MudText>
-@if (DataState.UserProfile is not null)
+@if (DataState.StatusUser is not null)
 {
     <MudStack Style="width: fit-content">
         <MudCard Elevation="2">
             <MudCardContent>
                 <MudStack Row="true" Justify="Justify.SpaceBetween">
                     <MudStack>
-                        <MudText Typo="Typo.h6">@DataState.UserProfile.FirstName @DataState.UserProfile.LastName</MudText>
-                        <MudText Typo="Typo.body2">@DataState.UserProfile.Status</MudText>
+                        <MudText Typo="Typo.h6">@DataState.StatusUser.FirstName @DataState.StatusUser.LastName</MudText>
+                        <MudText Typo="Typo.body2">@DataState.StatusUser.Status</MudText>
                     </MudStack>
-                    <MudAvatar Color="@(DataState.UserProfile.Online ? Color.Success : Color.Error)"></MudAvatar>
+                    <MudAvatar Color="@(DataState.StatusUser.Online ? Color.Success : Color.Error)"></MudAvatar>
                 </MudStack>
             </MudCardContent>
         </MudCard>
     </MudStack>
 }
-<MudButton Color="Color.Primary" Variant="Variant.Filled" @onclick="UpdateUserProfile">Click me</MudButton>
+<MudButton Color="Color.Primary" Variant="Variant.Filled" @onclick="UpdateStatusUser">Click me</MudButton>
 
 
 @code {
 
-    private async Task UpdateUserProfile()
+    private async Task UpdateStatusUser()
     {
-        var user = DataState.UserProfile;
+        var user = DataState.StatusUser;
         
         user.Online = !user.Online;
-        // Convert to DTO
-        await StatusAppClient.UpdateUserAsync(user.FirstName, user.LastName, user.Status, user.Online);
+        await StatusAppClient.UpdateUserAsync(user);
     }
 }

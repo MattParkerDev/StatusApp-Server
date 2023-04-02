@@ -63,6 +63,7 @@ builder.Services.AddSingleton<IUserIdProvider, SignalRUserIdProvider>();
 builder.Services.AddScoped<IMessagingService, MessagingService>();
 builder.Services.AddScoped<IFriendshipService, FriendshipService>();
 builder.Services.AddScoped<IIdentityUserService, IdentityUserService>();
+builder.Services.AddScoped<IStatusUserService, StatusUserService>();
 builder.Services.AddScoped<TestDataGeneratorService>();
 
 builder.Services.AddOpenApiDocument(configure =>

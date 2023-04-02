@@ -31,7 +31,7 @@
     protected override async Task OnInitializedAsync()
     {
         NotifierService.Notify += OnNotify;
-        DataState.FriendList = new List<Profile>(await HttpClient.GetFriendsAsync());
+        DataState.FriendList = new List<StatusUserDto>(await HttpClient.GetFriendsAsync());
         StateHasChanged();
     }
     

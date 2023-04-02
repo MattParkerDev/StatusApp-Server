@@ -1,20 +1,17 @@
-﻿using System.ComponentModel.DataAnnotations;
-using StatusApp.Server.Domain.DTOs;
+﻿namespace StatusApp.Server.Domain.DTOs;
 
-namespace StatusApp.Server.Domain;
-
-public class StatusUser
+public class StatusUserDto
 {
-    [Key]
     public string UserName { get; set; } = string.Empty;
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
     public bool Online { get; set; }
 
-    public StatusUserDto ToDto()
+    // TODO: Review, not best practice?
+    public StatusUser FromDto()
     {
-        var dto = new StatusUserDto
+        var statusUser = new StatusUser
         {
             UserName = UserName,
             FirstName = FirstName,
@@ -22,6 +19,6 @@ public class StatusUser
             Status = Status,
             Online = Online
         };
-        return dto;
+        return statusUser;
     }
 }
