@@ -2,29 +2,36 @@
 @inject DataState DataState
 @inject NotifierService NotifierService
 
+
+<MudText Class="mb-8" GutterBottom="true">
+    @(DataState.FriendList.Count == 0
+        ? "Add some friends to see their statuses here!"
+        : "See your friends' statuses here!")
+</MudText>
+
+<MudStack Style="width: fit-content">
 @if (DataState.FriendList.Count > 0)
 {
-    <MudStack Style="width: fit-content">
-        @foreach (var friend in DataState.FriendList)
-            {
-                <MudCard Elevation="2">
-                    <MudCardContent>
-                        <MudStack Row="true" Justify="Justify.SpaceBetween">
-                            <MudStack>
-                                <MudText Typo="Typo.h6">@friend.FirstName @friend.LastName</MudText>
-                                <MudText Typo="Typo.body2">@friend.Status</MudText>
-                            </MudStack>
-                            <MudAvatar Color="@(friend.Online ? Color.Success : Color.Error)"></MudAvatar>
+    @foreach (var friend in DataState.FriendList)
+        {
+            <MudCard Elevation="2">
+                <MudCardContent>
+                    <MudStack Row="true" Justify="Justify.SpaceBetween">
+                        <MudStack>
+                            <MudText Typo="Typo.h6">@friend.FirstName @friend.LastName</MudText>
+                            <MudText Typo="Typo.body2">@friend.Status</MudText>
                         </MudStack>
-                    </MudCardContent>
-                    <MudCardActions>
-                        <MudButton Variant="Variant.Text" Color="Color.Primary">Chat</MudButton>
-                    </MudCardActions>
-                </MudCard>
-            }
-    </MudStack>
-    
+                        <MudAvatar Color="@(friend.Online ? Color.Success : Color.Error)"></MudAvatar>
+                    </MudStack>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Variant="Variant.Text" Color="Color.Primary">Chat</MudButton>
+                </MudCardActions>
+            </MudCard>
+        }
 }
+    <MudButton Color="Color.Primary" Variant="Variant.Filled">Add Friends</MudButton>
+</MudStack>
 
 @code {
     
@@ -34,7 +41,7 @@
         DataState.FriendList = new List<StatusUserDto>(await HttpClient.GetFriendsAsync());
         StateHasChanged();
     }
-    
+
     // https://learn.microsoft.com/en-us/aspnet/core/blazor/components/?view=aspnetcore-7.0#invoke-component-methods-externally-to-update-state
     public async Task OnNotify()
     {

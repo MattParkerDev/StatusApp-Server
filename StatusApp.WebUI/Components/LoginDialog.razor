@@ -3,16 +3,41 @@
 
 <MudDialog>
     <DialogContent>
-        <MudTextField @bind-Value="loginUserName" Label="Username" Variant="Variant.Text"></MudTextField>
-        <MudTextField @bind-Value="loginPassword" Label="Password" Variant="Variant.Text"></MudTextField>
-        @if (loginState == LoginState.Error)
+        <MudButtonGroup Class="pt-5" Style="width: 100%" Color="Color.Primary" Variant="Variant.Outlined" OverrideStyles="false">
+            <MudButton Color="Color.Primary" FullWidth="true" Variant="!registerPageSelected ? Variant.Filled : Variant.Outlined" OnClick="SelectLoginPage">Login</MudButton>
+            <MudButton Color="Color.Primary" FullWidth="true" Variant="registerPageSelected ? Variant.Filled : Variant.Outlined" OnClick="SelectRegisterPage">Register</MudButton>
+        </MudButtonGroup>
+        @if (registerPageSelected == false)
         {
-            <MudAlert Severity="Severity.Error" Dense="true" Class="my-2">@errorMessage</MudAlert>
+            <MudTextField @bind-Value="loginUserName" Label="Username" Variant="Variant.Text"></MudTextField>
+            <MudTextField @bind-Value="loginPassword" Label="Password" Variant="Variant.Text"></MudTextField>
+            @if (loginState == LoginState.Error)
+            {
+                <MudAlert Severity="Severity.Error" Dense="true" Class="my-2">@loginErrorMessage</MudAlert>
+            }
+        }
+        else
+        {
+            <MudTextField @bind-Value="CreateUserDto.UserName" Label="Username" Variant="Variant.Text"></MudTextField>
+            <MudTextField @bind-Value="CreateUserDto.Email" Label="Email" Variant="Variant.Text"></MudTextField>
+            <MudTextField @bind-Value="CreateUserDto.FirstName" Label="FirstName" Variant="Variant.Text"></MudTextField>
+            <MudTextField @bind-Value="CreateUserDto.LastName" Label="LastName" Variant="Variant.Text"></MudTextField>
+            <MudTextField @bind-Value="CreateUserDto.Password" Label="Password" Variant="Variant.Text"></MudTextField>
+            @if (registerState == RegisterState.Error)
+            {
+                <MudAlert Severity="Severity.Error" Dense="true" Class="my-2">@registerErrorMessage</MudAlert>
+            }
         }
     </DialogContent>
     <DialogActions>
-        @*<MudButton OnClick="Cancel">Cancel</MudButton>*@
-        <MudButton Color="Color.Primary" OnClick="SignInAsync">Login</MudButton>
+        @if (registerPageSelected == false)
+        {
+            <MudButton Color="Color.Primary" OnClick="SignInAsync">Login</MudButton>
+        }
+        else
+        {
+            <MudButton Color="Color.Primary" OnClick="RegisterAsync">Register</MudButton>
+        }
     </DialogActions>
 </MudDialog>
 
@@ -25,19 +50,47 @@
         Sending,
         Error
     }
-    
+    public enum RegisterState
+    {
+        Initial,
+        Sending,
+        Error
+    }
+
     public string loginUserName = string.Empty;
     public string loginPassword = string.Empty;
     
-    public string errorMessage = string.Empty;
+    public string loginErrorMessage = string.Empty;
+    public string registerErrorMessage = string.Empty;
     public LoginState loginState = LoginState.Initial;
+    public RegisterState registerState = RegisterState.Initial;
 
-    void Submit()
+    private bool registerPageSelected { get; set; } = false;
+
+    private void ClearLoginAndRegisterFields()
     {
-        MudDialog.Close(DialogResult.Ok(true));
+        loginUserName = string.Empty;
+        loginPassword = string.Empty;
+        loginErrorMessage = string.Empty;
+        registerErrorMessage = string.Empty;
+        CreateUserDto = new CreateUserDto();
+        loginState = LoginState.Initial;
+        registerState = RegisterState.Initial;
     }
-        
-    void Cancel() => MudDialog.Cancel();
+
+    private void SelectRegisterPage()
+    {
+        if (registerPageSelected) return;
+        ClearLoginAndRegisterFields();
+        registerPageSelected = true;
+    }
+
+    private void SelectLoginPage()
+    {
+        if (!registerPageSelected) return;
+        ClearLoginAndRegisterFields();
+        registerPageSelected = false;
+    }
     
     private async Task SignInAsync()
     {
@@ -53,12 +106,37 @@
         catch (ApiException e)
         {
             var statusCode = e.StatusCode;
-            errorMessage = statusCode switch 
+            loginErrorMessage = statusCode switch 
             {
-                400 => "Incorrect username or password",
+                401 => "Incorrect username or password",
                 _ => "An error occurred"
             };
             loginState = LoginState.Error;
+        }
+    }
+
+    public CreateUserDto CreateUserDto { get; set; } = new CreateUserDto();
+    
+    private async Task RegisterAsync()
+    {
+        try
+        {
+            registerState = RegisterState.Sending;
+            //TODO: This may not be ideal behaviour
+            var statusUser = await HttpClient.CreateUserAsync(CreateUserDto);
+            DataState.StatusUser = statusUser;
+            MudDialog.Close(DialogResult.Ok(true));
+            
+        }
+        catch (ApiException e)
+        {
+            var statusCode = e.StatusCode;
+            registerErrorMessage = statusCode switch 
+            {
+                400 => "An error occurred when creating your account",
+                _ => "An error occurred"
+                };
+            registerState = RegisterState.Error;
         }
     }
 }

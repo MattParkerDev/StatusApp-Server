@@ -18,7 +18,7 @@ public static class FriendRoutes
         group
             .MapGet(
                 "/getfriends",
-                async Task<Results<Ok<List<StatusUserDto>>, NoContent>> (
+                async Task<Ok<List<StatusUserDto>>> (
                     IFriendshipService friendshipService,
                     HttpContext context
                 ) =>
@@ -28,9 +28,7 @@ public static class FriendRoutes
                         ?? throw new ArgumentNullException(nameof(context.User.Identity.Name));
 
                     var friendsDtoList = await friendshipService.GetFriendsDtoList(userName);
-                    return friendsDtoList.Count != 0
-                        ? TypedResults.Ok(friendsDtoList)
-                        : TypedResults.NoContent();
+                    return TypedResults.Ok(friendsDtoList);
                 }
             )
             .WithName("GetFriends");

@@ -18,6 +18,7 @@ builder.Services.AddSingleton<DataState>();
 builder.Services.AddSingleton<AuthService>();
 builder.Services.AddSingleton<SignalRClient>();
 builder.Services.AddSingleton<NotifierService>();
+builder.Services.AddScoped<LoginDialogService>();
 builder.Services.AddMudServices();
 
 const string ApiClient = nameof(ApiClient);
