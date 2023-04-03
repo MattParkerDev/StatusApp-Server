@@ -2,7 +2,7 @@
 @inherits LayoutComponentBase
 
 @inject StatusAppClient StatusAppClient
-@inject IDialogService DialogService
+@inject LoginDialogService LoginDialogService
 @inject DataState DataState
 @inject AuthService AuthService
 @inject SignalRClient SignalRClient
@@ -57,10 +57,7 @@
         DataState.Authorized = await AuthService.CheckAuthAsync();
         if (DataState.Authorized is false)
         {
-            var options = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, DisableBackdropClick = true};
-            var dialog = await DialogService.ShowAsync<LoginDialog>("Login", options);
-            var result = await dialog.Result;
-            var success = dialog.Result.IsCompletedSuccessfully;
+            var success = await LoginDialogService.LoginDialog();
             if (success)
             {
                 DataState.Authorized = true;

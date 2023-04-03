@@ -1,7 +1,7 @@
 ﻿@page "/Login"
 @inject AuthService AuthService
 @inject DataState DataState
-@inject IDialogService DialogService
+@inject LoginDialogService LoginDialogService
 
 <PageTitle>Login</PageTitle>
 
@@ -41,10 +41,7 @@
     
     private async Task OpenLoginDialog()
     {
-        var options = new DialogOptions { CloseOnEscapeKey = false, CloseButton = false, DisableBackdropClick = true};
-        var dialog = await DialogService.ShowAsync<LoginDialog>("Login", options);
-        var result = await dialog.Result;
-        var success = dialog.Result.IsCompletedSuccessfully;
+        var success = await LoginDialogService.LoginDialog();
         if (success)
         {
             displayText = "You are signed in!";
