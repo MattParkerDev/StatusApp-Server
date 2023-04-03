@@ -43,6 +43,7 @@ public static class UserRoutes
                 async Task<Results<Ok<StatusUserDto>, BadRequest, UnauthorizedHttpResult>> (
                     IIdentityUserService userService,
                     IStatusUserService statusUserService,
+                    // TODO: Basic auth
                     string userName,
                     string password
                 ) =>
@@ -85,25 +86,25 @@ public static class UserRoutes
                 > (
                     IIdentityUserService identityUserService,
                     IStatusUserService statusUserService,
-                    string userName,
-                    string password,
-                    string firstName,
-                    string lastName,
-                    string email
+                    CreateUserDto createUserDto
                 ) =>
                 {
-                    var newIdentityUser = new User { UserName = userName, Email = email, };
+                    var newIdentityUser = new User
+                    {
+                        UserName = createUserDto.UserName,
+                        Email = createUserDto.Email,
+                    };
 
                     var newStatusUser = new StatusUser
                     {
-                        UserName = userName,
-                        FirstName = firstName,
-                        LastName = lastName
+                        UserName = createUserDto.UserName,
+                        FirstName = createUserDto.FirstName,
+                        LastName = createUserDto.LastName
                     };
 
                     var identityResult = await identityUserService.CreateUserAsync(
                         newIdentityUser,
-                        password
+                        createUserDto.Password
                     );
 
                     if (!identityResult.Succeeded)
