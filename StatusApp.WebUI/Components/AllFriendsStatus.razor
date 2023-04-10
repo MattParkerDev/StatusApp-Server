@@ -47,7 +47,10 @@
     public async Task OpenChat(StatusUserDto friend)
     {
         var friendship = DataState.Friendships.FirstOrDefault(s => s.FriendUserName == friend.UserName);
-        await ChatService.SelectChat(friendship);
+        if (friendship is not null)
+        {
+            await ChatService.SelectChat(friendship);
+        }
     }
 
     // https://learn.microsoft.com/en-us/aspnet/core/blazor/components/?view=aspnetcore-7.0#invoke-component-methods-externally-to-update-state

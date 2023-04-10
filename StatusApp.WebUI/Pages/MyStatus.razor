@@ -20,18 +20,49 @@
                 </MudStack>
             </MudCardContent>
         </MudCard>
+
+        <MudButtonGroup Class="pb-5" Style="width: 100%" Color="Color.Primary" Variant="Variant.Outlined" OverrideStyles="false">
+            <MudButton Color="Color.Primary" FullWidth="true" Variant="DataState.StatusUser.Online ? Variant.Filled : Variant.Outlined" OnClick="UpdateStatusUserOnlineTrue">Online</MudButton>
+            <MudButton Color="Color.Primary" FullWidth="true" Variant="!DataState.StatusUser.Online ? Variant.Filled : Variant.Outlined" OnClick="UpdateStatusUserOnlineFalse">Offline</MudButton>
+        </MudButtonGroup>
+
+        <MudTextField @bind-Value="UserStatusString" Label="Update your status" Variant="Variant.Outlined"></MudTextField>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="UpdateStatusUserStatus">Save</MudButton>
     </MudStack>
 }
-<MudButton Color="Color.Primary" Variant="Variant.Filled" @onclick="UpdateStatusUser">Click me</MudButton>
+
 
 
 @code {
-
-    private async Task UpdateStatusUser()
+    public string UserStatusString { get; set; } = string.Empty;
+    //public StatusUserDto StatusUser { get; set; }
+    protected override async Task OnInitializedAsync()
     {
-        var user = DataState.StatusUser;
+        UserStatusString = DataState?.StatusUser?.Status ?? string.Empty;
+    }
+    
+    private async Task UpdateStatusUserOnlineTrue()
+    {
+        if (DataState.StatusUser?.Online == true)
+            return;
         
-        user.Online = !user.Online;
-        await StatusAppClient.UpdateUserAsync(user);
+        DataState.StatusUser!.Online = true;
+        DataState.StatusUser = await StatusAppClient.UpdateUserAsync(DataState.StatusUser);
+    }
+    
+    private async Task UpdateStatusUserOnlineFalse()
+    {
+        if (DataState.StatusUser?.Online == false)
+            return;
+        
+        DataState.StatusUser!.Online = false;
+        DataState.StatusUser = await StatusAppClient.UpdateUserAsync(DataState.StatusUser);
+    }
+    
+    private async Task UpdateStatusUserStatus()
+    {
+        DataState.StatusUser!.Status = UserStatusString;
+
+        await StatusAppClient.UpdateUserAsync(DataState.StatusUser);
     }
 }

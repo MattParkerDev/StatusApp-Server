@@ -3,15 +3,15 @@
 <PageTitle>My Profile</PageTitle>
 
 <MudText Typo="Typo.h3" GutterBottom="true">My Profile</MudText>
-<MudText Class="mb-4">Current count: @currentCount</MudText>
+<MudText Class="mb-4">Current count: @CurrentCount</MudText>
 <MudButton Color="Color.Primary" Variant="Variant.Filled" @onclick="IncrementCount">Click me</MudButton>
 
 
 @code {
-    private int currentCount = 0;
+    public int CurrentCount { get; set; } = 0;
 
     private void IncrementCount()
     {
-        currentCount++;
+        CurrentCount++;
     }
 }

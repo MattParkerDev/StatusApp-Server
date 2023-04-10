@@ -101,7 +101,7 @@ public class StatusHub : Hub<IStatusClient>
 
         if (friendConnection is not null)
         {
-            await hubContext.Clients.Users(friendUserName).ReceiveMessage(message);
+            await hubContext.Clients.Users(friendUserName!).ReceiveMessage(message);
         }
         return message;
     }

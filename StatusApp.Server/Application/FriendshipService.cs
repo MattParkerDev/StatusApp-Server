@@ -8,23 +8,16 @@ namespace StatusApp.Server.Application;
 public class FriendshipService : IFriendshipService
 {
     private readonly StatusContext _db;
-    private readonly IIdentityUserService _identityUserService;
     private readonly IStatusUserService _statusUserService;
 
-    public FriendshipService(
-        StatusContext db,
-        IIdentityUserService identityUserService,
-        IStatusUserService statusUserService
-    )
+    public FriendshipService(StatusContext db, IStatusUserService statusUserService)
     {
         _db = db;
-        _identityUserService = identityUserService;
         _statusUserService = statusUserService;
     }
 
     public async Task<bool> AcceptFriendRequest(Friendship myFriendship, Friendship theirFriendship)
     {
-        var db = _db;
         var datetime = DateTime.UtcNow;
         var guid = Guid.NewGuid();
         myFriendship.Accepted = true;
@@ -37,7 +30,7 @@ public class FriendshipService : IFriendshipService
         theirFriendship.GroupId = guid;
         try
         {
-            await db.SaveChangesAsync();
+            await _db.SaveChangesAsync();
         }
         catch
         {
@@ -108,8 +101,8 @@ public class FriendshipService : IFriendshipService
     {
         var myFriendship = new Friendship
         {
-            UserName = user.UserName!,
-            FriendUserName = friendUser.UserName!,
+            UserName = user.UserName,
+            FriendUserName = friendUser.UserName,
             Accepted = true,
             AreFriends = false,
             FriendFirstName = friendUser.FirstName,
@@ -117,8 +110,8 @@ public class FriendshipService : IFriendshipService
         };
         var theirFriendship = new Friendship
         {
-            UserName = friendUser.UserName!,
-            FriendUserName = user.UserName!,
+            UserName = friendUser.UserName,
+            FriendUserName = user.UserName,
             Accepted = false,
             AreFriends = false,
             FriendFirstName = user.FirstName,
@@ -147,8 +140,8 @@ public class FriendshipService : IFriendshipService
         var time = DateTime.UtcNow;
         var myFriendship = new Friendship
         {
-            UserName = user.UserName!,
-            FriendUserName = friendUser.UserName!,
+            UserName = user.UserName,
+            FriendUserName = friendUser.UserName,
             Accepted = true,
             AreFriends = true,
             BecameFriendsDate = time,
@@ -158,8 +151,8 @@ public class FriendshipService : IFriendshipService
         };
         var theirFriendship = new Friendship
         {
-            UserName = friendUser.UserName!,
-            FriendUserName = user.UserName!,
+            UserName = friendUser.UserName,
+            FriendUserName = user.UserName,
             Accepted = true,
             AreFriends = true,
             BecameFriendsDate = time,

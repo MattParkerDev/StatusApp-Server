@@ -9,7 +9,7 @@
 <MudText Typo="Typo.h4" GutterBottom="true">Login</MudText>
 
 
-<MudText Typo="Typo.body1" GutterBottom="true">@displayText</MudText>
+<MudText Typo="Typo.body1" GutterBottom="true">@DisplayText</MudText>
 <MudStack Row="true">
     @if (DataState.Authorized is false)
     {
@@ -23,20 +23,17 @@
 </MudStack>
 
 @code {
-    public string displayText = string.Empty;
-
-    public string loginUserName = string.Empty;
-    public string loginPassword = string.Empty;
+    public string DisplayText { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
-        displayText = DataState.Authorized ? "You are signed in!" : "You are unauthorized!";
+        DisplayText = DataState.Authorized ? "You are signed in!" : "You are unauthorized!";
     }
 
     private async Task CheckAuthAsync()
     {
         var success = await AuthService.CheckAuthAsync();
-        displayText = success ? "You are signed in!" : "You are unauthorized!";
+        DisplayText = success ? "You are signed in!" : "You are unauthorized!";
     }
     
     private async Task OpenLoginDialog()
@@ -44,7 +41,7 @@
         var success = await LoginDialogService.LoginDialog();
         if (success)
         {
-            displayText = "You are signed in!";
+            DisplayText = "You are signed in!";
             DataState.Authorized = true;
             StateHasChanged();
         }
@@ -55,12 +52,12 @@
         var success = await AuthService.SignOutAsync();
         if (success)
         {
-            displayText = "Successfully logged out";
+            DisplayText = "Successfully logged out";
             DataState.Authorized = false;
         }
         else
         {
-            displayText = "An error occurred";
+            DisplayText = "An error occurred";
         }
     }
 }

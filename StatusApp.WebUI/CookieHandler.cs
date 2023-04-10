@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Microsoft.AspNetCore.Components.WebAssembly.Http;
+﻿using Microsoft.AspNetCore.Components.WebAssembly.Http;
 
 namespace StatusApp.WebUI;
 

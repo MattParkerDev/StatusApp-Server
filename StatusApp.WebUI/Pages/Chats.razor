@@ -56,7 +56,7 @@
         {
             return;
         }
-        var message = await SignalR.SendMessageAsync(DataState.SelectedFriendshipForChat.GroupId, NewMessageString);
+        var message = await SignalR.SendMessageAsync(DataState.SelectedFriendshipForChat!.GroupId, NewMessageString);
         if (message is null)
         {
             // TODO: Create an error

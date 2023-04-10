@@ -27,12 +27,10 @@ public partial class FriendshipServiceTests
         var chatContextMock = new Mock<StatusContext>(options);
         chatContextMock.Setup(db => db.Friendships).ReturnsDbSet(new List<Friendship>());
 
-        var identityUserServiceMock = new Mock<IIdentityUserService>();
         var statusUserServiceMock = new Mock<IStatusUserService>();
 
         var friendshipService = new FriendshipService(
             chatContextMock.Object,
-            identityUserServiceMock.Object,
             statusUserServiceMock.Object
         );
         // Act

@@ -8,7 +8,6 @@ namespace StatusApp.WebUI;
 public class SignalRClient
 {
     private readonly DataState _dataState;
-    private readonly IWebAssemblyHostEnvironment _hostEnvironment;
     private readonly NotifierService _notifierService;
     private readonly HubConnection _connection;
 
@@ -19,9 +18,8 @@ public class SignalRClient
     )
     {
         _dataState = dataState;
-        _hostEnvironment = hostEnvironment;
         _notifierService = notifierService;
-        var hubeBaseUrl = _hostEnvironment.IsDevelopment()
+        var hubeBaseUrl = hostEnvironment.IsDevelopment()
             ? "https://localhost:7104"
             : "https://statusapp1.azurewebsites.net";
         var hubUrl = $"{hubeBaseUrl}/statushub";

@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
-using StatusApp.Server.Application;
 using StatusApp.Server.Application.Contracts;
 using StatusApp.Server.Domain;
 using StatusApp.Server.Domain.DTOs;

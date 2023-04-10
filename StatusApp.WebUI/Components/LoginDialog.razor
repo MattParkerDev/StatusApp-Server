@@ -4,16 +4,16 @@
 <MudDialog>
     <DialogContent>
         <MudButtonGroup Class="pt-5" Style="width: 100%" Color="Color.Primary" Variant="Variant.Outlined" OverrideStyles="false">
-            <MudButton Color="Color.Primary" FullWidth="true" Variant="!registerPageSelected ? Variant.Filled : Variant.Outlined" OnClick="SelectLoginPage">Login</MudButton>
-            <MudButton Color="Color.Primary" FullWidth="true" Variant="registerPageSelected ? Variant.Filled : Variant.Outlined" OnClick="SelectRegisterPage">Register</MudButton>
+            <MudButton Color="Color.Primary" FullWidth="true" Variant="!RegisterPageSelected ? Variant.Filled : Variant.Outlined" OnClick="SelectLoginPage">Login</MudButton>
+            <MudButton Color="Color.Primary" FullWidth="true" Variant="RegisterPageSelected ? Variant.Filled : Variant.Outlined" OnClick="SelectRegisterPage">Register</MudButton>
         </MudButtonGroup>
-        @if (registerPageSelected == false)
+        @if (RegisterPageSelected == false)
         {
-            <MudTextField @bind-Value="loginUserName" Label="Username" Variant="Variant.Text"></MudTextField>
-            <MudTextField @bind-Value="loginPassword" Label="Password" Variant="Variant.Text"></MudTextField>
+            <MudTextField @bind-Value="LoginUserName" Label="Username" Variant="Variant.Text"></MudTextField>
+            <MudTextField @bind-Value="LoginPassword" Label="Password" Variant="Variant.Text"></MudTextField>
             @if (loginState == LoginState.Error)
             {
-                <MudAlert Severity="Severity.Error" Dense="true" Class="my-2">@loginErrorMessage</MudAlert>
+                <MudAlert Severity="Severity.Error" Dense="true" Class="my-2">@LoginErrorMessage</MudAlert>
             }
         }
         else
@@ -25,12 +25,12 @@
             <MudTextField @bind-Value="CreateUserDto.Password" Label="Password" Variant="Variant.Text"></MudTextField>
             @if (registerState == RegisterState.Error)
             {
-                <MudAlert Severity="Severity.Error" Dense="true" Class="my-2">@registerErrorMessage</MudAlert>
+                <MudAlert Severity="Severity.Error" Dense="true" Class="my-2">@RegisterErrorMessage</MudAlert>
             }
         }
     </DialogContent>
     <DialogActions>
-        @if (registerPageSelected == false)
+        @if (RegisterPageSelected == false)
         {
             <MudButton Color="Color.Primary" OnClick="SignInAsync">Login</MudButton>
         }
@@ -42,7 +42,9 @@
 </MudDialog>
 
 @code {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; } = default!;
 
     public enum LoginState
     {
@@ -57,22 +59,22 @@
         Error
     }
 
-    public string loginUserName = string.Empty;
-    public string loginPassword = string.Empty;
-    
-    public string loginErrorMessage = string.Empty;
-    public string registerErrorMessage = string.Empty;
-    public LoginState loginState = LoginState.Initial;
-    public RegisterState registerState = RegisterState.Initial;
+    public string LoginUserName { get; set; } = string.Empty;
+    public string LoginPassword { get; set; } = string.Empty;
 
-    private bool registerPageSelected { get; set; } = false;
+    public string LoginErrorMessage { get; set; } = string.Empty;
+    public string RegisterErrorMessage { get; set; } = string.Empty;
+    public LoginState loginState { get; set; } = LoginState.Initial;
+    public RegisterState registerState { get; set; } = RegisterState.Initial;
+
+    private bool RegisterPageSelected { get; set; } = false;
 
     private void ClearLoginAndRegisterFields()
     {
-        loginUserName = string.Empty;
-        loginPassword = string.Empty;
-        loginErrorMessage = string.Empty;
-        registerErrorMessage = string.Empty;
+        LoginUserName = string.Empty;
+        LoginPassword = string.Empty;
+        LoginErrorMessage = string.Empty;
+        RegisterErrorMessage = string.Empty;
         CreateUserDto = new CreateUserDto();
         loginState = LoginState.Initial;
         registerState = RegisterState.Initial;
@@ -80,16 +82,16 @@
 
     private void SelectRegisterPage()
     {
-        if (registerPageSelected) return;
+        if (RegisterPageSelected) return;
         ClearLoginAndRegisterFields();
-        registerPageSelected = true;
+        RegisterPageSelected = true;
     }
 
     private void SelectLoginPage()
     {
-        if (!registerPageSelected) return;
+        if (!RegisterPageSelected) return;
         ClearLoginAndRegisterFields();
-        registerPageSelected = false;
+        RegisterPageSelected = false;
     }
     
     private async Task SignInAsync()
@@ -98,7 +100,7 @@
         {
             loginState = LoginState.Sending;
             //TODO: This may not be ideal behaviour
-            var statusUser = await HttpClient.SignInAsync(loginUserName, loginPassword);
+            var statusUser = await HttpClient.SignInAsync(LoginUserName, LoginPassword);
             DataState.StatusUser = statusUser;
             MudDialog.Close(DialogResult.Ok(true));
             
@@ -106,7 +108,7 @@
         catch (ApiException e)
         {
             var statusCode = e.StatusCode;
-            loginErrorMessage = statusCode switch 
+            LoginErrorMessage = statusCode switch 
             {
                 401 => "Incorrect username or password",
                 _ => "An error occurred"
@@ -131,7 +133,7 @@
         catch (ApiException e)
         {
             var statusCode = e.StatusCode;
-            registerErrorMessage = statusCode switch 
+            RegisterErrorMessage = statusCode switch 
             {
                 400 => "An error occurred when creating your account",
                 _ => "An error occurred"
