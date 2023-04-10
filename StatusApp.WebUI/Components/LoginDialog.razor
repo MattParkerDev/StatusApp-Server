@@ -10,7 +10,7 @@
         @if (RegisterPageSelected == false)
         {
             <MudTextField @bind-Value="LoginUserName" Label="Username" Variant="Variant.Text"></MudTextField>
-            <MudTextField @bind-Value="LoginPassword" Label="Password" Variant="Variant.Text"></MudTextField>
+            <MudTextField @bind-Value="LoginPassword" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" Label="Password" OnAdornmentClick="ToggleShowPassword" Variant="Variant.Text"></MudTextField>
             @if (loginState == LoginState.Error)
             {
                 <MudAlert Severity="Severity.Error" Dense="true" Class="my-2">@LoginErrorMessage</MudAlert>
@@ -59,6 +59,9 @@
         Error
     }
 
+    private bool ShowPassword { get; set; } = false;
+    private InputType PasswordInput = InputType.Password;
+    private string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
     public string LoginUserName { get; set; } = string.Empty;
     public string LoginPassword { get; set; } = string.Empty;
 
@@ -68,6 +71,21 @@
     public RegisterState registerState { get; set; } = RegisterState.Initial;
 
     private bool RegisterPageSelected { get; set; } = false;
+
+    private void ToggleShowPassword()
+    {
+        if (ShowPassword)
+        {
+            ShowPassword = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else {
+            ShowPassword = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
 
     private void ClearLoginAndRegisterFields()
     {

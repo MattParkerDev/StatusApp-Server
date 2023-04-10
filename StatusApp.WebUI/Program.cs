@@ -19,7 +19,7 @@ builder.Services.AddSingleton<AuthService>();
 builder.Services.AddSingleton<SignalRClient>();
 builder.Services.AddSingleton<NotifierService>();
 builder.Services.AddSingleton<ChatService>();
-builder.Services.AddScoped<LoginDialogService>();
+builder.Services.AddScoped<StatusAppDialogService>();
 builder.Services.AddMudServices();
 
 const string ApiClient = nameof(ApiClient);

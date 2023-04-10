@@ -3,11 +3,11 @@ using StatusApp.WebUI.Components;
 
 namespace StatusApp.WebUI.Services;
 
-public class LoginDialogService
+public class StatusAppDialogService
 {
     private readonly IDialogService _dialogService;
 
-    public LoginDialogService(IDialogService dialogService)
+    public StatusAppDialogService(IDialogService dialogService)
     {
         _dialogService = dialogService;
     }
@@ -25,5 +25,18 @@ public class LoginDialogService
         var result = await dialog.Result;
         var success = dialog.Result.IsCompletedSuccessfully;
         return success;
+    }
+
+    public async Task ProfileDialog()
+    {
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            CloseButton = false,
+            DisableBackdropClick = false,
+            NoHeader = true,
+            MaxWidth = MaxWidth.ExtraExtraLarge
+        };
+        var dialog = await _dialogService.ShowAsync<ProfileDialog>(string.Empty, options);
     }
 }

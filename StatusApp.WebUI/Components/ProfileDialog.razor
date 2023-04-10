@@ -1,0 +1,66 @@
+﻿@inject DataState DataState
+@inject StatusAppClient StatusAppClient
+@inject AuthService AuthService
+@inject StatusAppDialogService StatusAppDialogService
+
+<MudDialog>
+    <DialogContent>
+        <MudText Class="pt-3" Typo="Typo.h5">Hi @DataState.StatusUser.FirstName @(DataState.StatusUser.LastName)!</MudText>
+        <MudText Typo="Typo.subtitle1">Username: @DataState.StatusUser.UserName</MudText>
+        <MudText Class="pb-1 pt-3" Typo="Typo.subtitle1">Update Name</MudText>
+        <MudStack Row="true">
+            <MudTextField @bind-Value="FirstName" Label="First Name" Margin="Margin.Dense" Variant="Variant.Outlined"></MudTextField>
+            <MudButton Style="height: min-content; align-self: center" Color="Color.Primary" Variant="Variant.Filled" OnClick="UpdateStatusUserFirstName">Save</MudButton>
+        </MudStack>
+        <MudStack Row="true">
+            <MudTextField Class="my-4" @bind-Value="LastName" Label="Last Name" Margin="Margin.Dense" Variant="Variant.Outlined"></MudTextField>
+            <MudButton Style="height: min-content; align-self: center" Color="Color.Primary" Variant="Variant.Filled" OnClick="UpdateStatusUserLastName">Save</MudButton>
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="SignOutAsync">Sign Out</MudButton>
+        <MudSpacer/>
+        <MudButton OnClick="Cancel">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; } = default!;
+
+    private string FirstName { get; set; } = string.Empty;
+    private string LastName { get; set; } = string.Empty;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        FirstName = DataState.StatusUser!.FirstName;
+        LastName = DataState.StatusUser!.LastName;
+    }
+    
+    private void Cancel() => MudDialog.Cancel();
+    
+    private async Task UpdateStatusUserFirstName()
+    {
+        if (FirstName == DataState.StatusUser!.FirstName)
+            return;
+        
+        DataState.StatusUser!.FirstName = FirstName;
+        DataState.StatusUser = await StatusAppClient.UpdateUserAsync(DataState.StatusUser);
+    }
+    
+    private async Task UpdateStatusUserLastName()
+    {
+        if (LastName == DataState.StatusUser!.LastName)
+            return;
+        
+        DataState.StatusUser!.LastName = LastName;
+        DataState.StatusUser = await StatusAppClient.UpdateUserAsync(DataState.StatusUser);
+    }
+
+    private async Task SignOutAsync()
+    {
+        await AuthService.SignOutAsync();
+        MudDialog.Cancel();
+        StatusAppDialogService.LoginDialog();
+    }
+}
