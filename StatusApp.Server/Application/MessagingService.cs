@@ -17,4 +17,29 @@ public class MessagingService : IMessagingService
     {
         return _db.Messages.Where(s => s.GroupId == groupId).ToList();
     }
+
+    public async Task<Message?> CreateMessageAsUserInGroup(
+        string userName,
+        Guid groupId,
+        string data
+    )
+    {
+        var message = new Message
+        {
+            GroupId = groupId,
+            Data = data,
+            AuthorUserName = userName
+        };
+        _db.Messages.Add(message);
+        try
+        {
+            await _db.SaveChangesAsync();
+        }
+        catch
+        {
+            return null;
+        }
+
+        return message;
+    }
 }

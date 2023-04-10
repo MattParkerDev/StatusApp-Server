@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
+using StatusApp.Server.Application.Contracts;
 using StatusApp.Server.Domain;
 using StatusApp.Server.Domain.DTOs;
 
@@ -9,10 +11,12 @@ namespace StatusApp.Server.Infrastructure;
 public class StatusHub : Hub<IStatusClient>
 {
     private readonly StatusContext _db;
+    private readonly IMessagingService _messagingService;
 
-    public StatusHub(StatusContext db)
+    public StatusHub(StatusContext db, IMessagingService messagingService)
     {
         _db = db;
+        _messagingService = messagingService;
     }
 
     public override Task OnConnectedAsync()
@@ -70,7 +74,7 @@ public class StatusHub : Hub<IStatusClient>
         return Context.UserIdentifier!;
     }
 
-    public async Task<Message> SendMessage(
+    public async Task<Message?> SendMessage(
         IHubContext<StatusHub, IStatusClient> hubContext,
         Guid groupId,
         string data
@@ -78,35 +82,27 @@ public class StatusHub : Hub<IStatusClient>
     {
         // TODO:Consider checking if are a member of this groupId?
         var userName = Context.UserIdentifier!;
-        var message = new Message
+
+        var message = await _messagingService.CreateMessageAsUserInGroup(userName, groupId, data);
+
+        if (message == null)
         {
-            GroupId = groupId,
-            Data = data,
-            AuthorUserName = userName
-        };
-        _db.Messages.Add(message);
-        try
-        {
-            await _db.SaveChangesAsync();
+            return null;
         }
-        catch
-        {
-            return new Message();
-        }
-        Console.WriteLine(message);
-        Console.WriteLine(message.MessageId);
+
         // TODO:Consider checking if they are friends
         var friendUserName = _db.Friendships
             .FirstOrDefault(s => s.UserName == userName && s.GroupId == groupId)
             ?.FriendUserName;
 
-        var userToNotify = _db.Connections
-            .Where(s => s.UserName == friendUserName)
-            .GroupBy(s => s.UserName)
-            .Select(s => s.First().UserName)
-            .ToList();
+        var friendConnection = await _db.Connections.FirstOrDefaultAsync(
+            s => s.UserName == friendUserName
+        );
 
-        await hubContext.Clients.Users(userToNotify).ReceiveMessage(message);
+        if (friendConnection is not null)
+        {
+            await hubContext.Clients.Users(friendUserName).ReceiveMessage(message);
+        }
         return message;
     }
 }

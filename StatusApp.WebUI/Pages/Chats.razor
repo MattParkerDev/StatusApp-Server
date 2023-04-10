@@ -1,17 +1,81 @@
 ﻿@page "/chats"
 
+@inject DataState DataState
+@inject StatusAppClient StatusAppClient
+@inject SignalRClient SignalR
+@inject NotifierService NotifierService
+@inject ChatService ChatService
+
 <PageTitle>Chats</PageTitle>
 
 <MudText Typo="Typo.h3" GutterBottom="true">Chats</MudText>
-<MudText Class="mb-4">Current count: @currentCount</MudText>
-<MudButton Color="Color.Primary" Variant="Variant.Filled" @onclick="IncrementCount">Click me</MudButton>
+
+<MudList>
+    @foreach (var friendship in DataState.Friendships)
+    {
+        <MudListItem>
+            <MudText>@friendship.FriendFirstName @friendship.FriendLastName</MudText>
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="() => SelectChat(friendship)">Select Chat</MudButton>
+        </MudListItem>
+    }
+</MudList>
+
+@if (DataState.SelectedFriendshipForChat is not null && DataState.Messages.ContainsKey(DataState.SelectedFriendshipForChat.GroupId))
+{
+    <MudList>
+        @foreach (var message in DataState.Messages[DataState.SelectedFriendshipForChat.GroupId])
+        {
+            <MudListItem>
+                <MudText>@message.AuthorUserName</MudText>
+                <MudText>@message.Data</MudText>
+            </MudListItem>
+        }
+    </MudList>
+    <MudTextField @bind-Value="NewMessageString" Label="Send a message" Variant="Variant.Outlined"></MudTextField>
+    <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SendMessage">Send</MudButton>
+}
 
 
 @code {
-    private int currentCount = 0;
-
-    private void IncrementCount()
+    public string NewMessageString { get; set; } = string.Empty;
+    
+    protected override async Task OnInitializedAsync()
     {
-        currentCount++;
+        NotifierService.Notify += OnNotify;
+        DataState.Friendships = await StatusAppClient.GetFriendshipsAsync(areFriends: true);
+    }
+    
+    public async Task SelectChat(Friendship friendship)
+    {
+        await ChatService.SelectChat(friendship);
+    }
+    
+    public async Task SendMessage()
+    {
+        if (string.IsNullOrWhiteSpace(NewMessageString))
+        {
+            return;
+        }
+        var message = await SignalR.SendMessageAsync(DataState.SelectedFriendshipForChat.GroupId, NewMessageString);
+        if (message is null)
+        {
+            // TODO: Create an error
+            return;
+        }
+        DataState.Messages[DataState.SelectedFriendshipForChat.GroupId].Add(message);
+        NewMessageString = string.Empty;
+    }
+    
+    public async Task OnNotify()
+    {
+        await InvokeAsync(() =>
+        {
+            StateHasChanged();
+        });
+    }
+
+    public void Dispose()
+    {
+        NotifierService.Notify -= OnNotify;
     }
 }

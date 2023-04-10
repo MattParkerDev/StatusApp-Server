@@ -117,14 +117,14 @@ namespace StatusApp.WebUI
         }
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<StatusUserDto>> GetFriendsAsync()
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.List<StatusUserDto>> GetFriendsAsync()
         {
             return GetFriendsAsync(System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<StatusUserDto>> GetFriendsAsync(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.List<StatusUserDto>> GetFriendsAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("getfriends");
@@ -161,7 +161,7 @@ namespace StatusApp.WebUI
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.IReadOnlyList<StatusUserDto>>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.List<StatusUserDto>>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -189,14 +189,14 @@ namespace StatusApp.WebUI
         }
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Friendship>> GetFriendshipsAsync(bool? areFriends)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.List<Friendship>> GetFriendshipsAsync(bool? areFriends)
         {
             return GetFriendshipsAsync(areFriends, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Friendship>> GetFriendshipsAsync(bool? areFriends, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.List<Friendship>> GetFriendshipsAsync(bool? areFriends, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("getfriendships?");
@@ -238,7 +238,7 @@ namespace StatusApp.WebUI
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.IReadOnlyList<Friendship>>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.List<Friendship>>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -512,14 +512,14 @@ namespace StatusApp.WebUI
         }
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Message>> GetMessagesAsync(System.Guid groupId)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.List<Message>> GetMessagesAsync(System.Guid groupId)
         {
             return GetMessagesAsync(groupId, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Message>> GetMessagesAsync(System.Guid groupId, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.List<Message>> GetMessagesAsync(System.Guid groupId, System.Threading.CancellationToken cancellationToken)
         {
             if (groupId == null)
                 throw new System.ArgumentNullException("groupId");
@@ -561,7 +561,7 @@ namespace StatusApp.WebUI
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.IReadOnlyList<Message>>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.List<Message>>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -881,12 +881,12 @@ namespace StatusApp.WebUI
                         else
                         if (status_ == 400)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.IReadOnlyList<IdentityError>>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.List<IdentityError>>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
-                            throw new ApiException<System.Collections.Generic.IReadOnlyList<IdentityError>>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                            throw new ApiException<System.Collections.Generic.List<IdentityError>>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
                         else
                         {
@@ -1274,7 +1274,7 @@ namespace StatusApp.WebUI
         [System.Text.Json.Serialization.JsonPropertyName("lastUpdated")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public System.DateTimeOffset LastUpdated { get; set; }
+        public System.DateTimeOffset? LastUpdated { get; set; }
 
     }
 

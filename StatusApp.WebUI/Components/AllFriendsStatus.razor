@@ -1,6 +1,7 @@
-@inject StatusAppClient HttpClient
+@inject StatusAppClient StatusAppClient
 @inject DataState DataState
 @inject NotifierService NotifierService
+@inject ChatService ChatService
 
 
 <MudText Class="mb-8" GutterBottom="true">
@@ -25,7 +26,7 @@
                     </MudStack>
                 </MudCardContent>
                 <MudCardActions>
-                    <MudButton Variant="Variant.Text" Color="Color.Primary">Chat</MudButton>
+                    <MudButton Variant="Variant.Text" Color="Color.Primary" Href="/chats" OnClick="() => OpenChat(friend)">Chat</MudButton>
                 </MudCardActions>
             </MudCard>
         }
@@ -38,8 +39,15 @@
     protected override async Task OnInitializedAsync()
     {
         NotifierService.Notify += OnNotify;
-        DataState.FriendList = new List<StatusUserDto>(await HttpClient.GetFriendsAsync());
+        DataState.FriendList = await StatusAppClient.GetFriendsAsync();
+        DataState.Friendships = await StatusAppClient.GetFriendshipsAsync(areFriends: true);
         StateHasChanged();
+    }
+    
+    public async Task OpenChat(StatusUserDto friend)
+    {
+        var friendship = DataState.Friendships.FirstOrDefault(s => s.FriendUserName == friend.UserName);
+        await ChatService.SelectChat(friendship);
     }
 
     // https://learn.microsoft.com/en-us/aspnet/core/blazor/components/?view=aspnetcore-7.0#invoke-component-methods-externally-to-update-state

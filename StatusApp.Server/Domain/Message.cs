@@ -12,5 +12,5 @@ public class Message
     public string AuthorUserName { get; set; } = string.Empty;
     public string Data { get; set; } = string.Empty;
     public DateTime Created { get; set; } = DateTime.UtcNow;
-    public DateTime LastUpdated { get; set; }
+    public DateTime? LastUpdated { get; set; }
 }

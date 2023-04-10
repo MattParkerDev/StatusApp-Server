@@ -18,6 +18,7 @@ builder.Services.AddSingleton<DataState>();
 builder.Services.AddSingleton<AuthService>();
 builder.Services.AddSingleton<SignalRClient>();
 builder.Services.AddSingleton<NotifierService>();
+builder.Services.AddSingleton<ChatService>();
 builder.Services.AddScoped<LoginDialogService>();
 builder.Services.AddMudServices();
 

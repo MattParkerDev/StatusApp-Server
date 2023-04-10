@@ -118,7 +118,7 @@ await db.Database.EnsureCreatedAsync();
 
 await db.Connections.ExecuteDeleteAsync();
 
-await testDataGeneratorService.GenerateTestUsersAndFriendships();
+await testDataGeneratorService.SeedTestData();
 
 app.MapAuthRoutes();
 app.MapFriendRoutes();
