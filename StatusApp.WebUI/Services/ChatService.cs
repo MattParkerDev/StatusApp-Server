@@ -15,6 +15,8 @@ public class ChatService
 
     public async Task SelectChat(Friendship friendship)
     {
+        if (_dataState.SelectedFriendshipForChat == friendship)
+            return;
         _dataState.SelectedFriendshipForChat = friendship;
 
         try
