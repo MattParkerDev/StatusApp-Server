@@ -30,7 +30,7 @@ jobs:
         run: dotnet build --configuration Release
 
       - name: dotnet publish API
-        run: dotnet publish ./src/Presentation -c Release --property PublishDir=${{env.DOTNET_ROOT}}/myapp/api
+        run: dotnet publish ./src/WebAPI -c Release --property PublishDir=${{env.DOTNET_ROOT}}/myapp/api
 
       - name: dotnet publish WebUI
         run: dotnet publish ./src/WebUI -c Release --property PublishDir=${{env.DOTNET_ROOT}}/myapp/webui

@@ -1,98 +1,17 @@
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Application;
-using Application.Contracts;
-using Domain;
 using Infrastructure;
+using WebAPI;
 using WebAPI.Routes;
 using WebAPI.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ReSharper disable once RedundantAssignment
-var connectionString = string.Empty;
-if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
-{
-    connectionString = builder.Configuration.GetConnectionString("LocalConnection");
-}
-else
-{
-    connectionString = Environment.GetEnvironmentVariable("ConnectionString");
-}
-
-builder.Services.AddDbContext<IStatusContext, StatusContext>(
-    options => options.UseNpgsql(connectionString).EnableSensitiveDataLogging()
-);
-builder.Services
-    .AddIdentityCore<User>(options =>
-    {
-        options.SignIn.RequireConfirmedAccount = false;
-        options.User.RequireUniqueEmail = false;
-        options.Password.RequireDigit = false;
-        options.Password.RequiredLength = 6;
-        options.Password.RequireNonAlphanumeric = false;
-        options.Password.RequireUppercase = false;
-        options.Password.RequireLowercase = false;
-    })
-    .AddEntityFrameworkStores<StatusContext>()
-    .AddSignInManager<SignInManager<User>>();
-
-builder.Services
-    .AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
-        options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
-        options.DefaultSignInScheme = IdentityConstants.ApplicationScheme;
-        options.DefaultScheme = IdentityConstants.ApplicationScheme;
-    })
-    .AddIdentityCookies();
-builder.Services.ConfigureApplicationCookie(options =>
-{
-    options.Cookie.SameSite = SameSiteMode.None;
-    options.Events.OnRedirectToLogin = context =>
-    {
-        context.Response.Clear();
-        context.Response.StatusCode = 401;
-        return Task.CompletedTask;
-    };
-});
-builder.Services.AddAuthorization();
-builder.Services.AddSignalR();
-
-builder.Services.AddSingleton<IUserIdProvider, SignalRUserIdProvider>();
-builder.Services.AddScoped<IMessagingService, MessagingService>();
-builder.Services.AddScoped<IFriendshipService, FriendshipService>();
-builder.Services.AddScoped<IIdentityUserService, IdentityUserService>();
-builder.Services.AddScoped<IStatusUserService, StatusUserService>();
-builder.Services.AddScoped<IStatusUserService, StatusUserService>();
-builder.Services.AddScoped<TestDataGeneratorService>();
-
-builder.Services.AddOpenApiDocument(configure =>
-{
-    configure.Title = "StatusApp Api";
-});
-
-builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddApplication(builder.Configuration);
+builder.Services.AddInfrastructure(builder.Configuration);
 
 const string StatusAppCorsPolicy = nameof(StatusAppCorsPolicy);
-builder.Services.AddCors(
-    options =>
-        options.AddPolicy(
-            name: StatusAppCorsPolicy,
-            policy =>
-                policy
-                    .WithOrigins(
-                        Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
-                        == "Development"
-                            ? "https://localhost:5001"
-                            : "https://red-ground-0805be400.2.azurestaticapps.net"
-                    )
-                    .AllowAnyMethod()
-                    .AllowAnyHeader()
-                    .AllowCredentials()
-        )
-);
+builder.Services.AddWebApi(builder.Configuration, StatusAppCorsPolicy);
 
 var app = builder.Build();
 
@@ -129,4 +48,4 @@ app.MapUserRoutes();
 
 app.MapHub<StatusHub>("/statushub");
 
-app.Run();
+await app.RunAsync();
