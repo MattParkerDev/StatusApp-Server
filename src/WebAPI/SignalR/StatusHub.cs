@@ -6,7 +6,7 @@ using Domain;
 using Domain.DTOs;
 using Infrastructure;
 
-namespace Presentation.SignalR;
+namespace WebAPI.SignalR;
 
 [Authorize]
 public class StatusHub : Hub<IStatusClient>

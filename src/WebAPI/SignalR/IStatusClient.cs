@@ -1,7 +1,7 @@
 ﻿using Domain;
 using Domain.DTOs;
 
-namespace Presentation.SignalR;
+namespace WebAPI.SignalR;
 
 public interface IStatusClient
 {

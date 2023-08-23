@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
 
-namespace Presentation.SignalR;
+namespace WebAPI.SignalR;
 
 public class SignalRUserIdProvider : IUserIdProvider
 {

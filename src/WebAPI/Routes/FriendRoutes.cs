@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.SignalR;
 using Application.Contracts;
 using Domain;
 using Domain.DTOs;
-using Presentation.SignalR;
+using WebAPI.SignalR;
 
-namespace Presentation.Routes;
+namespace WebAPI.Routes;
 
 public static class FriendRoutes
 {

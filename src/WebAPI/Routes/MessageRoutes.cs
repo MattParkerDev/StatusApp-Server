@@ -2,7 +2,7 @@
 using Application.Contracts;
 using Domain;
 
-namespace Presentation.Routes;
+namespace WebAPI.Routes;
 
 public static class MessageRoutes
 {

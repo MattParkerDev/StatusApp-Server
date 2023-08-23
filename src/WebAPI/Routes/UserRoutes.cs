@@ -6,9 +6,9 @@ using Domain;
 using Domain.DTOs;
 //TODO: Remove
 using Infrastructure;
-using Presentation.SignalR;
+using WebAPI.SignalR;
 
-namespace Presentation.Routes;
+namespace WebAPI.Routes;
 
 public static class UserRoutes
 {

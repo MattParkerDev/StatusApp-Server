@@ -5,8 +5,8 @@ using Application;
 using Application.Contracts;
 using Domain;
 using Infrastructure;
-using Presentation.Routes;
-using Presentation.SignalR;
+using WebAPI.Routes;
+using WebAPI.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
