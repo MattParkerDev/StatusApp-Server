@@ -15,7 +15,7 @@ public partial class FriendshipServiceTests
     {
         //Arrange
         var userName = "TestUserName";
-        var friendship = new Friendship { UserName = userName, AreFriends = areFriends ?? false };
+        var friendship = new Friendship { UserName1 = userName, UserName2Accepted = areFriends ?? false };
         var friendships = new List<Friendship> { friendship };
 
         var options = new DbContextOptions<StatusContext>();

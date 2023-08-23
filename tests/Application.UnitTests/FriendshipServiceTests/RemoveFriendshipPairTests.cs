@@ -14,13 +14,7 @@ public partial class FriendshipServiceTests
         var userName = "TestUserName";
         var friendUserName = "AnotherUserName";
 
-        var myFriendship = new Friendship { UserName = userName, FriendUserName = friendUserName };
-
-        var theirFriendship = new Friendship
-        {
-            UserName = userName,
-            FriendUserName = friendUserName
-        };
+        var myFriendship = new Friendship { UserName1 = userName, UserName2 = friendUserName };
 
         var options = new DbContextOptions<StatusContext>();
         var chatContextMock = new Mock<StatusContext>(options);
@@ -33,7 +27,7 @@ public partial class FriendshipServiceTests
             statusUserServiceMock.Object
         );
         // Act
-        var result = await friendshipService.DeleteFriendshipPair(myFriendship, theirFriendship);
+        var result = await friendshipService.DeleteFriendship(myFriendship);
 
         // Assert
         result.Should().BeTrue();

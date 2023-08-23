@@ -105,8 +105,8 @@ public class SignalRClient
             "ReceiveMessage",
             async (message) =>
             {
-                var groupId = message.GroupId;
-                var messageList = _dataState.Messages[groupId];
+                var chatId = message.ChatId;
+                var messageList = _dataState.Chats.FirstOrDefault(s => s.Id == chatId)?.Messages;
                 if (messageList != null)
                 {
                     messageList.Add(message);
@@ -125,17 +125,17 @@ public class SignalRClient
             {
                 if (user.UserName == _dataState.StatusUser?.UserName)
                     return;
-                var targetUser = _dataState.FriendList.FirstOrDefault(
+                var targetUser = _dataState.Friends.FirstOrDefault(
                     s => s.UserName == user.UserName
                 );
                 if (targetUser is null)
                 {
-                    _dataState.FriendList.Add(user);
+                    _dataState.Friends.Add(user);
                     return;
                 }
                 // TODO: Review regarding ordering
-                _dataState.FriendList.Remove(targetUser);
-                _dataState.FriendList.Add(user);
+                _dataState.Friends.Remove(targetUser);
+                _dataState.Friends.Add(user);
                 await _notifierService.Update();
             }
         );

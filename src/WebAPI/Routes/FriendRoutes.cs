@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.SignalR;
 using Application.Contracts;
+using Application.DTOs;
+using Application.Mappers;
+using Application.Services.Contracts;
 using Domain;
-using Domain.DTOs;
 using WebAPI.SignalR;
 
 namespace WebAPI.Routes;
@@ -67,10 +69,7 @@ public static class FriendRoutes
                         return TypedResults.NotFound();
                     }
 
-                    var myFriendship = await friendshipService.CreateFriendshipPair(
-                        user,
-                        friendUser
-                    );
+                    var myFriendship = await friendshipService.CreateFriendship(user, friendUser);
 
                     if (myFriendship is null)
                     {
@@ -97,29 +96,23 @@ public static class FriendRoutes
                     var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
                     var statusUser = await statusUserService.GetUserByNameAsync(userName);
 
-                    var myFriendship = friendshipService.GetFriendship(userName, friendUserName);
-                    var theirFriendship = friendshipService.GetFriendship(friendUserName, userName);
+                    var friendship = friendshipService.GetFriendship(userName, friendUserName);
 
-                    if (myFriendship is null || theirFriendship is null)
+                    if (friendship is null)
                         throw new ArgumentNullException();
 
                     if (!accepted)
                     {
-                        var removeFriendshipSucceeded =
-                            await friendshipService.DeleteFriendshipPair(
-                                myFriendship,
-                                theirFriendship
-                            );
+                        var removeFriendshipSucceeded = await friendshipService.DeleteFriendship(
+                            friendship
+                        );
                         //TODO: Consider SignalR Push
                         return removeFriendshipSucceeded
                             ? TypedResults.Ok()
                             : TypedResults.Conflict();
                     }
 
-                    var acceptSucceeded = await friendshipService.AcceptFriendRequest(
-                        myFriendship,
-                        theirFriendship
-                    );
+                    var acceptSucceeded = await friendshipService.AcceptFriendRequest(friendship);
                     if (acceptSucceeded is false)
                         return TypedResults.Conflict();
 
@@ -128,9 +121,9 @@ public static class FriendRoutes
                     // Push this user and friendship to the new friend
                     await hubContext.Clients
                         .User(friendUserName)
-                        .ReceiveUpdatedFriendship(theirFriendship);
+                        .ReceiveUpdatedFriendship(friendship);
                     await hubContext.Clients.User(friendUserName).ReceiveUpdatedUser(statusUserDto);
-                    return TypedResults.Ok(myFriendship);
+                    return TypedResults.Ok(friendship);
                 }
             )
             .WithName("ActionFriendRequest");
@@ -147,15 +140,11 @@ public static class FriendRoutes
                 {
                     var success = false;
                     var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
-                    var myFriendship = friendshipService.GetFriendship(userName, friendUserName);
-                    var theirFriendship = friendshipService.GetFriendship(friendUserName, userName);
+                    var friendship = friendshipService.GetFriendship(userName, friendUserName);
 
-                    if (myFriendship != null && theirFriendship != null)
+                    if (friendship != null)
                     {
-                        success = await friendshipService.DeleteFriendshipPair(
-                            myFriendship,
-                            theirFriendship
-                        );
+                        success = await friendshipService.DeleteFriendship(friendship);
                     }
 
                     if (success is not true)

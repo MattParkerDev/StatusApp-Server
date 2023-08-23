@@ -7,21 +7,14 @@ namespace Application.UnitTests.FriendshipServiceTests;
 
 public partial class FriendshipServiceTests
 {
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public void WhenGetFriendshipIsCalled_ReturnsFriendship(bool useGroupId)
+    [Fact]
+    public void WhenGetFriendshipIsCalled_ReturnsFriendship()
     {
         //Arrange
         var userName = "TestUserName";
         var friendUserName = "AnotherUserName";
         var groupId = Guid.NewGuid();
-        var friendship = new Friendship
-        {
-            UserName = userName,
-            FriendUserName = friendUserName,
-            GroupId = groupId
-        };
+        var friendship = new Friendship { UserName1 = userName, UserName2 = friendUserName, };
         var friendships = new List<Friendship> { friendship };
 
         var options = new DbContextOptions<StatusContext>();
@@ -35,9 +28,7 @@ public partial class FriendshipServiceTests
             statusUserServiceMock.Object
         );
         // Act
-        var result = !useGroupId
-            ? friendshipService.GetFriendship(userName, friendUserName)
-            : friendshipService.GetFriendship(userName, groupId);
+        var result = friendshipService.GetFriendship(userName, friendUserName);
 
         // Assert
         result.Should().Be(friendship);

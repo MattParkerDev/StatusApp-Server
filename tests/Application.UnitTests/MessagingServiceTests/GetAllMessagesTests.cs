@@ -13,7 +13,7 @@ public class MessagingServiceTests
         //Arrange
         var groupId = Guid.NewGuid();
 
-        var messageList = new List<Message> { new Message { GroupId = groupId } };
+        var messageList = new List<Message> { new Message { ChatId = groupId } };
 
         var options = new DbContextOptions<StatusContext>();
         var chatContextMock = new Mock<StatusContext>(options);

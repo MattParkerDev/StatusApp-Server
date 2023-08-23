@@ -34,14 +34,11 @@ public partial class FriendshipServiceTests
 
         var expectedFriendship = new Friendship
         {
-            UserName = user.UserName,
-            FriendUserName = friendUser.UserName,
-            Accepted = true,
-            AreFriends = true,
+            UserName1 = user.UserName,
+            UserName2 = friendUser.UserName,
+            UserName1Accepted = true,
+            UserName2Accepted = true,
             BecameFriendsDate = It.IsAny<DateTime>(),
-            FriendFirstName = friendUser.FirstName,
-            FriendLastName = friendUser.LastName,
-            GroupId = It.IsAny<Guid>()
         };
 
         var options = new DbContextOptions<StatusContext>();
@@ -55,15 +52,13 @@ public partial class FriendshipServiceTests
             statusUserServiceMock.Object
         );
         // Act
-        var result = await friendshipService.CreateAcceptedFriendshipPair(user, friendUser);
+        var result = await friendshipService.CreateAcceptedFriendship(user, friendUser);
 
         // Assert
         result.Should().BeOfType<Friendship>();
-        result!.UserName.Should().Be(expectedFriendship.UserName);
-        result.FriendUserName.Should().Be(expectedFriendship.FriendUserName);
-        result.Accepted.Should().Be(expectedFriendship.Accepted);
-        result.AreFriends.Should().Be(expectedFriendship.AreFriends);
-        result.FriendFirstName.Should().Be(expectedFriendship.FriendFirstName);
-        result.FriendLastName.Should().Be(expectedFriendship.FriendLastName);
+        result!.UserName1.Should().Be(expectedFriendship.UserName1);
+        result.UserName2.Should().Be(expectedFriendship.UserName2);
+        result.UserName1Accepted.Should().Be(expectedFriendship.UserName1Accepted);
+        result.UserName2Accepted.Should().Be(expectedFriendship.UserName2Accepted);
     }
 }

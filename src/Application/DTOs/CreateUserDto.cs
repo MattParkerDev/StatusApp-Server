@@ -1,4 +1,4 @@
-namespace Domain.DTOs;
+namespace Application.DTOs;
 
 public class CreateUserDto
 {

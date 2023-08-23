@@ -12,20 +12,41 @@ public class MessagingService : IMessagingService
         _db = db;
     }
 
-    public List<Message> GetAllMessages(Guid groupId)
+    public List<Message> GetAllMessages(Guid chatId)
     {
-        return _db.Messages.Where(s => s.GroupId == groupId).ToList();
+        return _db.Messages.Where(s => s.ChatId == chatId).ToList();
+    }
+
+    public List<Guid> GetAllChatIdsByUserName(string userName)
+    {
+        var chats = _db.Chats
+            // where user is a chat participant
+            .Where(s => s.ChatParticipants.Any(d => d.UserName == userName))
+            .Select(d => d.Id)
+            .ToList();
+
+        return chats;
+    }
+
+    public List<Chat> GetAllChatsByUserName(string userName)
+    {
+        var chats = _db.Chats
+            // where user is a chat participant
+            .Where(s => s.ChatParticipants.Any(d => d.UserName == userName))
+            .ToList();
+
+        return chats;
     }
 
     public async Task<Message?> CreateMessageAsUserInGroup(
         string userName,
-        Guid groupId,
+        Guid chatId,
         string data
     )
     {
         var message = new Message
         {
-            GroupId = groupId,
+            ChatId = chatId,
             Data = data,
             AuthorUserName = userName
         };
@@ -40,5 +61,26 @@ public class MessagingService : IMessagingService
         }
 
         return message;
+    }
+
+    public async Task<Chat?> CreateChatForUsers(List<StatusUser> users)
+    {
+        var chat = new Chat
+        {
+            Id = Guid.NewGuid(),
+            ChatName = "New Group Chat",
+            ChatParticipants = users
+        };
+        _db.Chats.Add(chat);
+        try
+        {
+            await _db.SaveChangesAsync();
+        }
+        catch
+        {
+            return null;
+        }
+
+        return chat;
     }
 }

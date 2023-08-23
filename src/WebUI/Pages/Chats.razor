@@ -1,6 +1,8 @@
 ﻿@page "/chats"
 @using MudBlazor.Extensions
 
+@implements IDisposable
+
 @inject DataState DataState
 @inject StatusAppClient StatusAppClient
 @inject SignalRClient SignalR
@@ -13,21 +15,21 @@
 
 <MudPaper>
     <MudStack Row="true" Style="width: 100%">
-        <MudList Style="width: 20%" Clickable="true" SelectedValue="DataState.SelectedFriendshipForChat?.GroupId">
-            @foreach (var friendship in DataState.Friendships)
+        <MudList Style="width: 20%" Clickable="true" SelectedValue="@_selectedChat">
+            @foreach (var chat in DataState.Chats)
             {
-                <MudListItem Value="friendship.GroupId" OnClick="() => SelectChat(friendship)">
-                    @($"{friendship.FriendFirstName} {friendship.FriendLastName}")
+                <MudListItem Value="@chat.Id" OnClick="() => SelectChat(chat)">
+                    @($"Someone Someone")
                 </MudListItem>
             }
         </MudList>
         <MudDivider Vertical="true" FlexItem="true" />
         <MudStack Style="width: 80%">
-            @if (DataState.SelectedFriendshipForChat is not null && DataState.Messages.ContainsKey(DataState.SelectedFriendshipForChat.GroupId))
+            @if (_selectedChat is not null)
             {
                 <MudContainer Style="max-height: 55vh; height: 55vh; overflow-y: scroll">
                     <MudList>
-                        @foreach (var message in DataState.Messages[DataState.SelectedFriendshipForChat.GroupId])
+                        @foreach (var message in _selectedChat.Messages)
                         {
                             <MudListItem>
                                 <MudText>@message.AuthorUserName</MudText>
@@ -37,7 +39,7 @@
                     </MudList>
                 </MudContainer>
                 <MudStack Row="true">
-                    <MudTextField @bind-Value="NewMessageString" OnKeyDown="MessageTextFieldHandleEnterKey" Immediate="true" Label="Send a message" Variant="Variant.Outlined"></MudTextField>
+                    <MudTextField @bind-Value="@_newMessageString" OnKeyDown="MessageTextFieldHandleEnterKey" Immediate="true" Label="Send a message" Variant="Variant.Outlined"></MudTextField>
                     <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SendMessage">Send</MudButton>
                 </MudStack>
             }
@@ -53,33 +55,37 @@
 
 
 @code {
-    public string NewMessageString { get; set; } = string.Empty;
+    private string _newMessageString = string.Empty;
+    private Chat? _selectedChat = null;
 
     protected override async Task OnInitializedAsync()
     {
         NotifierService.Notify += OnNotify;
+        DataState.Chats = await StatusAppClient.GetChatsAsync();
         DataState.Friendships = await StatusAppClient.GetFriendshipsAsync(areFriends: true);
     }
     
-    public async Task SelectChat(Friendship friendship)
+    public async Task SelectChat(Chat chat)
     {
-        await ChatService.SelectChat(friendship);
+        await ChatService.PopulateMessagesForChat(chat);
+        _selectedChat = chat;
+        StateHasChanged();
     }
     
     public async Task SendMessage()
     {
-        if (string.IsNullOrWhiteSpace(NewMessageString))
+        if (string.IsNullOrWhiteSpace(_newMessageString))
         {
             return;
         }
-        var message = await SignalR.SendMessageAsync(DataState.SelectedFriendshipForChat!.GroupId, NewMessageString);
+        var message = await SignalR.SendMessageAsync(_selectedChat.Id, _newMessageString);
         if (message is null)
         {
             // TODO: Create an error
             return;
         }
-        DataState.Messages[DataState.SelectedFriendshipForChat.GroupId].Add(message);
-        NewMessageString = string.Empty;
+        //_selectedChat.Messages.Add(message);
+        _newMessageString = string.Empty;
     }
     
     async Task MessageTextFieldHandleEnterKey(KeyboardEventArgs args)

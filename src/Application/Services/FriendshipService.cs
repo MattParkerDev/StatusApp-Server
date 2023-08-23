@@ -1,6 +1,8 @@
 using Application.Contracts;
+using Application.DTOs;
+using Application.Mappers;
+using Application.Services.Contracts;
 using Domain;
-using Domain.DTOs;
 
 namespace Application;
 
@@ -15,18 +17,13 @@ public class FriendshipService : IFriendshipService
         _statusUserService = statusUserService;
     }
 
-    public async Task<bool> AcceptFriendRequest(Friendship myFriendship, Friendship theirFriendship)
+    public async Task<bool> AcceptFriendRequest(Friendship friendship)
     {
         var datetime = DateTime.UtcNow;
-        var guid = Guid.NewGuid();
-        myFriendship.Accepted = true;
-        myFriendship.AreFriends = true;
-        myFriendship.BecameFriendsDate = datetime;
-        myFriendship.GroupId = guid;
+        friendship.UserName1Accepted = true;
+        friendship.UserName2Accepted = true;
+        friendship.BecameFriendsDate = datetime;
 
-        theirFriendship.AreFriends = true;
-        theirFriendship.BecameFriendsDate = datetime;
-        theirFriendship.GroupId = guid;
         try
         {
             await _db.SaveChangesAsync();
@@ -38,18 +35,18 @@ public class FriendshipService : IFriendshipService
         return true;
     }
 
-    public Friendship? GetFriendship(string userName, Guid groupId)
+    public Friendship? GetFriendship(Guid friendshipId)
     {
-        var friendship = _db.Friendships.FirstOrDefault(
-            s => s.GroupId == groupId && s.UserName == userName
-        );
+        var friendship = _db.Friendships.FirstOrDefault(s => s.Id == friendshipId);
         return friendship;
     }
 
     public Friendship? GetFriendship(string userName, string friendUserName)
     {
         var friendship = _db.Friendships.FirstOrDefault(
-            s => s.UserName == userName && s.FriendUserName == friendUserName
+            s =>
+                (s.UserName1 == userName || s.UserName1 == friendUserName)
+                && (s.UserName2 == userName || s.UserName2 == friendUserName)
         );
         return friendship;
     }
@@ -59,12 +56,15 @@ public class FriendshipService : IFriendshipService
         List<Friendship> friendships;
         if (areFriends is null)
         {
-            friendships = _db.Friendships.Where(s => s.UserName == userName).ToList();
+            friendships = _db.Friendships
+                .Where(s => s.UserName1 == userName || s.UserName2 == userName)
+                .ToList();
             return friendships;
         }
 
         friendships = _db.Friendships
-            .Where(s => s.UserName == userName && s.AreFriends == areFriends)
+            .Where(s => s.UserName1 == userName || s.UserName2 == userName)
+            .Where(x => x.UserName1Accepted == areFriends && x.UserName2Accepted == areFriends)
             .ToList();
         return friendships;
     }
@@ -72,8 +72,8 @@ public class FriendshipService : IFriendshipService
     public List<string> GetFriendsUserNameList(string userName)
     {
         var friendUserNameList = _db.Friendships
-            .Where(s => s.UserName == userName && s.AreFriends == true)
-            .Select(x => x.FriendUserName)
+            .Where(s => s.UserName1 == userName && s.UserName2Accepted == true)
+            .Select(x => x.UserName2)
             .ToList();
 
         return friendUserNameList;
@@ -89,35 +89,24 @@ public class FriendshipService : IFriendshipService
             if (statusUser == null)
             {
                 //TODO: Review
-                throw new ArgumentNullException();
+                throw new ArgumentNullException(nameof(statusUser));
             }
             friendsDtoList.Add(statusUser.ToDto());
         }
         return friendsDtoList;
     }
 
-    public async Task<Friendship?> CreateFriendshipPair(StatusUser user, StatusUser friendUser)
+    public async Task<Friendship?> CreateFriendship(StatusUser user, StatusUser friendUser)
     {
-        var myFriendship = new Friendship
+        var friendship = new Friendship
         {
-            UserName = user.UserName,
-            FriendUserName = friendUser.UserName,
-            Accepted = true,
-            AreFriends = false,
-            FriendFirstName = friendUser.FirstName,
-            FriendLastName = friendUser.LastName,
+            UserName1 = user.UserName,
+            UserName2 = friendUser.UserName,
+            UserName1Accepted = true,
+            UserName2Accepted = false,
         };
-        var theirFriendship = new Friendship
-        {
-            UserName = friendUser.UserName,
-            FriendUserName = user.UserName,
-            Accepted = false,
-            AreFriends = false,
-            FriendFirstName = user.FirstName,
-            FriendLastName = user.LastName,
-        };
-        _db.Friendships.Add(myFriendship);
-        _db.Friendships.Add(theirFriendship);
+
+        _db.Friendships.Add(friendship);
         try
         {
             await _db.SaveChangesAsync();
@@ -127,40 +116,24 @@ public class FriendshipService : IFriendshipService
             return null;
         }
 
-        return myFriendship;
+        return friendship;
     }
 
-    public async Task<Friendship?> CreateAcceptedFriendshipPair(
-        StatusUser user,
-        StatusUser friendUser
-    )
+    public async Task<Friendship?> CreateAcceptedFriendship(StatusUser user, StatusUser friendUser)
     {
         var guid = Guid.NewGuid();
         var time = DateTime.UtcNow;
-        var myFriendship = new Friendship
+        var friendship = new Friendship
         {
-            UserName = user.UserName,
-            FriendUserName = friendUser.UserName,
-            Accepted = true,
-            AreFriends = true,
+            UserName1 = user.UserName,
+            UserName2 = friendUser.UserName,
+            UserName1Accepted = true,
+            UserName2Accepted = true,
             BecameFriendsDate = time,
-            FriendFirstName = friendUser.FirstName,
-            FriendLastName = friendUser.LastName,
-            GroupId = guid
         };
-        var theirFriendship = new Friendship
-        {
-            UserName = friendUser.UserName,
-            FriendUserName = user.UserName,
-            Accepted = true,
-            AreFriends = true,
-            BecameFriendsDate = time,
-            FriendFirstName = user.FirstName,
-            FriendLastName = user.LastName,
-            GroupId = guid
-        };
-        _db.Friendships.Add(myFriendship);
-        _db.Friendships.Add(theirFriendship);
+
+        _db.Friendships.Add(friendship);
+
         try
         {
             await _db.SaveChangesAsync();
@@ -170,16 +143,12 @@ public class FriendshipService : IFriendshipService
             return null;
         }
 
-        return myFriendship;
+        return friendship;
     }
 
-    public async Task<bool> DeleteFriendshipPair(
-        Friendship myFriendship,
-        Friendship theirFriendship
-    )
+    public async Task<bool> DeleteFriendship(Friendship myFriendship)
     {
         _db.Friendships.Remove(myFriendship);
-        _db.Friendships.Remove(theirFriendship);
         try
         {
             await _db.SaveChangesAsync();

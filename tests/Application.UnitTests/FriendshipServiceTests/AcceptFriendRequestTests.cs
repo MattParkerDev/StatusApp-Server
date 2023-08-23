@@ -12,8 +12,7 @@ public partial class FriendshipServiceTests
     public async Task WhenAcceptFriendRequestIsCalled_ReturnsTrue()
     {
         //Arrange
-        var myFriendship = new Friendship { Accepted = false, AreFriends = false };
-        var theirFriendship = new Friendship { Accepted = true, AreFriends = false };
+        var myFriendship = new Friendship { UserName1Accepted = false, UserName2Accepted = false };
 
         var options = new DbContextOptions<StatusContext>();
         var chatContextMock = new Mock<StatusContext>(options);
@@ -26,7 +25,7 @@ public partial class FriendshipServiceTests
             statusUserServiceMock.Object
         );
         // Act
-        var result = await friendshipService.AcceptFriendRequest(myFriendship, theirFriendship);
+        var result = await friendshipService.AcceptFriendRequest(myFriendship);
 
         // Assert
         result.Should().BeTrue();
@@ -37,8 +36,7 @@ public partial class FriendshipServiceTests
     public async Task WhenAcceptFriendRequestIsCalled_ReturnsFalse()
     {
         //Arrange
-        var myFriendship = new Friendship { Accepted = false, AreFriends = false };
-        var theirFriendship = new Friendship { Accepted = true, AreFriends = false };
+        var myFriendship = new Friendship { UserName1Accepted = false, UserName2Accepted = false };
 
         var options = new DbContextOptions<StatusContext>();
         var chatContextMock = new Mock<StatusContext>(options);
@@ -53,7 +51,7 @@ public partial class FriendshipServiceTests
             statusUserServiceMock.Object
         );
         // Act
-        var result = await friendshipService.AcceptFriendRequest(myFriendship, theirFriendship);
+        var result = await friendshipService.AcceptFriendRequest(myFriendship);
 
         // Assert
         result.Should().BeFalse();

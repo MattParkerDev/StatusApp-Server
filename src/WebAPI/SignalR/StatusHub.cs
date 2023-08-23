@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Application.Contracts;
 using Domain;
-using Domain.DTOs;
 using Infrastructure;
 
 namespace WebAPI.SignalR;
@@ -30,13 +29,13 @@ public class StatusHub : Hub<IStatusClient>
             return base.OnConnectedAsync();
         }
 
-        var connectionPair = new Connection
+        var connectionPair = new SignalRConnection
         {
             UserName = userName,
             ConnectionId = Context.ConnectionId
         };
 
-        _db.Connections.Add(connectionPair);
+        _db.SignalRConnections.Add(connectionPair);
         _db.SaveChanges();
 
         return base.OnConnectedAsync();
@@ -51,10 +50,10 @@ public class StatusHub : Hub<IStatusClient>
             return base.OnDisconnectedAsync(exception);
         }
         var connectionId = Context.ConnectionId;
-        var connectionPair = _db.Connections.First(
+        var connectionPair = _db.SignalRConnections.First(
             s => s.ConnectionId == connectionId && s.UserName == userName
         );
-        _db.Connections.Remove(connectionPair);
+        _db.SignalRConnections.Remove(connectionPair);
         _db.SaveChanges();
         return base.OnDisconnectedAsync(exception);
     }
@@ -77,14 +76,14 @@ public class StatusHub : Hub<IStatusClient>
 
     public async Task<Message?> SendMessage(
         IHubContext<StatusHub, IStatusClient> hubContext,
-        Guid groupId,
+        Guid chatId,
         string data
     )
     {
         // TODO:Consider checking if are a member of this groupId?
         var userName = Context.UserIdentifier!;
 
-        var message = await _messagingService.CreateMessageAsUserInGroup(userName, groupId, data);
+        var message = await _messagingService.CreateMessageAsUserInGroup(userName, chatId, data);
 
         if (message == null)
         {
@@ -92,11 +91,12 @@ public class StatusHub : Hub<IStatusClient>
         }
 
         // TODO:Consider checking if they are friends
-        var friendUserName = _db.Friendships
-            .FirstOrDefault(s => s.UserName == userName && s.GroupId == groupId)
-            ?.FriendUserName;
+        var friendUserName = _db.Chats
+            .Where(s => s.Id == chatId)
+            .Select(x => x.ChatParticipants.Select(z => z.UserName).FirstOrDefault())
+            .FirstOrDefault();
 
-        var friendConnection = await _db.Connections.FirstOrDefaultAsync(
+        var friendConnection = await _db.SignalRConnections.FirstOrDefaultAsync(
             s => s.UserName == friendUserName
         );
 

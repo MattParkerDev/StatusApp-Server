@@ -1,14 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain;
 
-[PrimaryKey(nameof(GroupId), nameof(MessageId))]
 public class Message
 {
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int? MessageId { get; set; }
-    public Guid GroupId { get; set; }
+    [Key]
+    public int? Id { get; set; }
+    public Guid ChatId { get; set; }
     public string AuthorUserName { get; set; } = string.Empty;
     public string Data { get; set; } = string.Empty;
     public DateTime Created { get; set; } = DateTime.UtcNow;

@@ -3,17 +3,18 @@
 @inject NotifierService NotifierService
 @inject ChatService ChatService
 
+@implements IDisposable
 
 <MudText Class="mb-8" GutterBottom="true">
-    @(DataState.FriendList.Count == 0
+    @(DataState.Friends.Count == 0
         ? "Add some friends to see their statuses here!"
         : "See your friends' statuses here!")
 </MudText>
 
 <MudStack Style="width: fit-content">
-@if (DataState.FriendList.Count > 0)
+@if (DataState.Friends.Count > 0)
 {
-    @foreach (var friend in DataState.FriendList)
+    @foreach (var friend in DataState.Friends)
         {
             <MudCard Elevation="2">
                 <MudCardContent>
@@ -39,17 +40,21 @@
     protected override async Task OnInitializedAsync()
     {
         NotifierService.Notify += OnNotify;
-        DataState.FriendList = await StatusAppClient.GetFriendsAsync();
+        DataState.Friends = await StatusAppClient.GetFriendsAsync();
         DataState.Friendships = await StatusAppClient.GetFriendshipsAsync(areFriends: true);
         StateHasChanged();
     }
     
     public async Task OpenChat(StatusUserDto friend)
     {
-        var friendship = DataState.Friendships.FirstOrDefault(s => s.FriendUserName == friend.UserName);
-        if (friendship is not null)
+        var friendship = DataState.Friendships
+            .Where(s => s.UserName1 == friend.UserName || s.UserName2 == friend.UserName)
+            .Where(s => s.UserName1 == DataState.StatusUser.UserName || s.UserName2 == DataState.StatusUser.UserName)
+            .FirstOrDefault();
+        var chat = DataState.Chats.Where(s => s.Id == friendship.ChatId).FirstOrDefault();
+        if (chat is not null)
         {
-            await ChatService.SelectChat(friendship);
+            await ChatService.PopulateMessagesForChat(chat);
         }
     }
 

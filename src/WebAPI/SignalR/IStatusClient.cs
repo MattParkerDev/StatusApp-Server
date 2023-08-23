@@ -1,5 +1,5 @@
-﻿using Domain;
-using Domain.DTOs;
+﻿using Application.DTOs;
+using Domain;
 
 namespace WebAPI.SignalR;
 

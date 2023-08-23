@@ -1,6 +1,6 @@
 ﻿using Application.Contracts;
+using Application.DTOs;
 using Domain;
-using Domain.DTOs;
 using Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,9 +16,9 @@ public partial class FriendshipServiceTests
         var friendUserName = "AnotherUserName";
         var friendship = new Friendship
         {
-            UserName = userName,
-            FriendUserName = friendUserName,
-            AreFriends = true
+            UserName1 = userName,
+            UserName2 = friendUserName,
+            UserName2Accepted = true
         };
         var friendships = new List<Friendship> { friendship };
 

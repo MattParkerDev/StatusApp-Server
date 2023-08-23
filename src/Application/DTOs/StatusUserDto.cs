@@ -1,4 +1,6 @@
-﻿namespace Domain.DTOs;
+﻿using Domain;
+
+namespace Application.DTOs;
 
 public class StatusUserDto
 {

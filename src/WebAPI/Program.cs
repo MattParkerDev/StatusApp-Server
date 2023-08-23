@@ -37,7 +37,7 @@ var testDataGeneratorService = scope.ServiceProvider.GetRequiredService<TestData
 await db.Database.EnsureDeletedAsync();
 await db.Database.EnsureCreatedAsync();
 
-await db.Connections.ExecuteDeleteAsync();
+await db.SignalRConnections.ExecuteDeleteAsync();
 
 await testDataGeneratorService.SeedTestData();
 

@@ -1,4 +1,5 @@
 ﻿using Application.Contracts;
+using Application.Services.Contracts;
 using Domain;
 
 namespace Application;
@@ -68,18 +69,22 @@ public class TestDataGeneratorService
         await _statusUserService.CreateUserAsync(newStatusUser2);
         await _statusUserService.CreateUserAsync(newStatusUser3);
 
-        var friendship1 = await _friendshipService.CreateAcceptedFriendshipPair(
+        var friendship1 = await _friendshipService.CreateAcceptedFriendship(
             newStatusUser,
             newStatusUser2
         );
-        var friendship2 = await _friendshipService.CreateAcceptedFriendshipPair(
+        var friendship2 = await _friendshipService.CreateAcceptedFriendship(
             newStatusUser,
             newStatusUser3
         );
 
+        var chat = await _messagingService.CreateChatForUsers(
+            new List<StatusUser> { newStatusUser, newStatusUser2 }
+        );
+
         var message = await _messagingService.CreateMessageAsUserInGroup(
             newStatusUser.UserName,
-            friendship1.GroupId,
+            chat.Id,
             "Test Message"
         );
     }

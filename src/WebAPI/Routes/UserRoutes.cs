@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Application.Contracts;
+using Application.DTOs;
+using Application.Mappers;
+using Application.Services.Contracts;
 using Domain;
-using Domain.DTOs;
 //TODO: Remove
 using Infrastructure;
 using WebAPI.SignalR;
@@ -185,7 +187,7 @@ public static class UserRoutes
 
                     // Push changes to this user to any of their friends
                     var friendsUserNameList = friendshipService.GetFriendsUserNameList(userName);
-                    var usersToNotify = db.Connections
+                    var usersToNotify = db.SignalRConnections
                         .Where(s => friendsUserNameList.Contains(s.UserName))
                         .GroupBy(s => s.UserName)
                         .Select(s => s.First().UserName)

@@ -34,12 +34,10 @@ public partial class FriendshipServiceTests
 
         var expectedFriendship = new Friendship
         {
-            UserName = user.UserName,
-            FriendUserName = friendUser.UserName,
-            Accepted = true,
-            AreFriends = false,
-            FriendFirstName = friendUser.FirstName,
-            FriendLastName = friendUser.LastName,
+            UserName1 = user.UserName,
+            UserName2 = friendUser.UserName,
+            UserName1Accepted = true,
+            UserName2Accepted = false,
         };
 
         var options = new DbContextOptions<StatusContext>();
@@ -53,7 +51,7 @@ public partial class FriendshipServiceTests
             statusUserServiceMock.Object
         );
         // Act
-        var result = await friendshipService.CreateFriendshipPair(user, friendUser);
+        var result = await friendshipService.CreateFriendship(user, friendUser);
 
         // Assert
         result.Should().BeEquivalentTo(expectedFriendship);

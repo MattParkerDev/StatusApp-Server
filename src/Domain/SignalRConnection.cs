@@ -2,10 +2,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Domain;
 
-public class Connection
+public class SignalRConnection
 {
-    public string UserName { get; set; } = string.Empty;
-
     [Key]
     public string? ConnectionId { get; set; }
+    public string UserName { get; set; } = string.Empty;
 }

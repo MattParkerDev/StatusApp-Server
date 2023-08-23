@@ -1,16 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Domain;
 
-[PrimaryKey(nameof(UserName), nameof(FriendUserName))]
 public class Friendship
 {
-    public string UserName { get; set; } = string.Empty;
-    public string FriendUserName { get; set; } = string.Empty;
-    public bool Accepted { get; set; } = false;
-    public bool AreFriends { get; set; } = false;
+    [Key]
+    public Guid Id { get; set; }
+    public string UserName1 { get; set; } = string.Empty;
+    public string UserName2 { get; set; } = string.Empty;
+    public bool UserName1Accepted { get; set; } = false;
+    public bool UserName2Accepted { get; set; } = false;
     public DateTime BecameFriendsDate { get; set; }
-    public string? FriendFirstName { get; set; }
-    public string? FriendLastName { get; set; }
-    public Guid GroupId { get; set; }
+    public Guid ChatId { get; set; }
 }
