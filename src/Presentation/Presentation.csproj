@@ -7,8 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="NSwag.AspNetCore" Version="13.18.2" />
-        <PackageReference Include="NSwag.MSBuild" Version="13.18.2">
+        <PackageReference Include="NSwag.AspNetCore" Version="13.20.0" />
+        <PackageReference Include="NSwag.MSBuild" Version="13.20.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
