@@ -15,13 +15,13 @@ public class FriendshipConfiguration : IEntityTypeConfiguration<Friendship>
         friendship.Property(t => t.ChatId).HasConversion(x => x.Value, x => new ChatId(x));
 
         friendship
-            .HasOne<StatusUser>()
-            .WithMany(s => s.Friendships)
-            .HasForeignKey(t => t.UserName1);
+            .HasOne<StatusUser>(s => s.StatusUser1)
+            .WithMany()
+            .HasForeignKey(s => s.UserName1);
 
         friendship
-            .HasOne<StatusUser>()
-            .WithMany(s => s.Friendships)
+            .HasOne<StatusUser>(s => s.StatusUser2)
+            .WithMany()
             .HasForeignKey(s => s.UserName2);
     }
 }

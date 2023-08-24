@@ -11,6 +11,5 @@ public class StatusUser
     public string Status { get; set; } = string.Empty;
     public bool Online { get; set; }
 
-    public virtual ICollection<Friendship> Friendships { get; set; } = new HashSet<Friendship>();
     public virtual ICollection<Chat> Chats { get; set; } = new HashSet<Chat>();
 }

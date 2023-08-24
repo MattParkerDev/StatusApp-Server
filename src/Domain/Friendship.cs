@@ -16,4 +16,6 @@ public class Friendship
 
     // Navigation properties
     public virtual Chat? Chat { get; set; } = null!;
+    public virtual StatusUser? StatusUser1 { get; set; } = null!;
+    public virtual StatusUser? StatusUser2 { get; set; } = null!;
 }

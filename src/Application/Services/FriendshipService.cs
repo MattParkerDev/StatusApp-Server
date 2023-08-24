@@ -2,6 +2,7 @@ using Application.DTOs;
 using Application.Mappers;
 using Application.Services.Contracts;
 using Domain;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;
 
@@ -23,6 +24,17 @@ public class FriendshipService : IFriendshipService
         friendship.UserName2Accepted = true;
         friendship.BecameFriendsDate = datetime;
 
+        var chat = new Chat
+        {
+            ChatName = "New Chat",
+            ChatParticipants = new List<StatusUser>()
+            {
+                friendship.StatusUser1,
+                friendship.StatusUser2
+            }
+        };
+        _db.Chats.Add(chat);
+
         try
         {
             await _db.SaveChangesAsync();
@@ -42,11 +54,14 @@ public class FriendshipService : IFriendshipService
 
     public Friendship? GetFriendship(string userName, string friendUserName)
     {
-        var friendship = _db.Friendships.FirstOrDefault(
-            s =>
-                (s.UserName1 == userName || s.UserName1 == friendUserName)
-                && (s.UserName2 == userName || s.UserName2 == friendUserName)
-        );
+        var friendship = _db.Friendships
+            .Include(x => x.StatusUser1)
+            .Include(y => y.StatusUser2)
+            .FirstOrDefault(
+                s =>
+                    (s.UserName1 == userName || s.UserName1 == friendUserName)
+                    && (s.UserName2 == userName || s.UserName2 == friendUserName)
+            );
         return friendship;
     }
 
@@ -66,6 +81,8 @@ public class FriendshipService : IFriendshipService
                     .ToList(),
             null
                 => _db.Friendships
+                    .Include(x => x.StatusUser1)
+                    .Include(y => y.StatusUser2)
                     .Where(s => s.UserName1 == userName || s.UserName2 == userName)
                     .ToList(),
         };
@@ -135,7 +152,14 @@ public class FriendshipService : IFriendshipService
             BecameFriendsDate = time,
         };
 
+        var chat = new Chat
+        {
+            ChatName = "New Chat",
+            ChatParticipants = new List<StatusUser>() { user, friendUser }
+        };
+
         _db.Friendships.Add(friendship);
+        _db.Chats.Add(chat);
 
         try
         {

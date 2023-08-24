@@ -11,7 +11,13 @@ public class StatusUserConfiguration : IEntityTypeConfiguration<StatusUser>
     {
         statusUser.HasKey(t => t.UserName);
 
-        statusUser.HasMany<Friendship>().WithOne().HasForeignKey(s => s.UserName1);
-        statusUser.HasMany<Friendship>().WithOne().HasForeignKey(s => s.UserName2);
+        statusUser
+            .HasMany<Friendship>()
+            .WithOne(s => s.StatusUser1)
+            .HasForeignKey(x => x.UserName1);
+        statusUser
+            .HasMany<Friendship>()
+            .WithOne(s => s.StatusUser2)
+            .HasForeignKey(x => x.UserName2);
     }
 }

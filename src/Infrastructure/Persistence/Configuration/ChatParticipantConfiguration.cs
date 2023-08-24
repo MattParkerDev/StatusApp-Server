@@ -10,6 +10,7 @@ public class ChatParticipantConfiguration : IEntityTypeConfiguration<ChatPartici
     public void Configure(EntityTypeBuilder<ChatParticipant> chatParticipant)
     {
         chatParticipant.HasKey(t => t.Id);
+        chatParticipant.Property(s => s.Id).ValueGeneratedOnAdd();
         chatParticipant.Property(t => t.ChatId).HasConversion(x => x.Value, x => new ChatId(x));
 
         chatParticipant.HasOne(s => s.Chat).WithMany().HasForeignKey(s => s.ChatId);
