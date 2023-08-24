@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
-using Application.Contracts;
 using Application.DTOs;
 using Application.Mappers;
 using Application.Services.Contracts;
 using Domain;
 //TODO: Remove
 using Infrastructure;
+using Infrastructure.Persistence;
 using WebAPI.SignalR;
 
 namespace WebAPI.Routes;

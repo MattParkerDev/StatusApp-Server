@@ -1,8 +1,7 @@
-﻿using Application.Contracts;
-using Application.Services.Contracts;
+﻿using Application.Services.Contracts;
 using Domain;
 
-namespace Application;
+namespace Application.Services;
 
 public class TestDataGeneratorService
 {

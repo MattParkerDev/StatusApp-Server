@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Application.Contracts;
+﻿using Application.Services.Contracts;
 using Domain;
+using Microsoft.EntityFrameworkCore;
 
-namespace Application;
+namespace Application.Services;
 
 public class StatusUserService : IStatusUserService
 {

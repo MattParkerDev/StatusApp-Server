@@ -1,9 +1,9 @@
 ﻿using Application;
+using Domain;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Domain;
 
-namespace Infrastructure;
+namespace Infrastructure.Persistence;
 
 public class StatusContext : IdentityUserContext<User>, IStatusContext
 {
@@ -16,9 +16,11 @@ public class StatusContext : IdentityUserContext<User>, IStatusContext
     public virtual DbSet<SignalRConnection> SignalRConnections { get; set; } = null!;
     public virtual DbSet<StatusUser> StatusUsers { get; set; } = null!;
     public virtual DbSet<Chat> Chats { get; set; } = null!;
+    public virtual DbSet<ChatParticipant> ChatParticipants { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(StatusContext).Assembly);
         base.OnModelCreating(modelBuilder);
     }
 }

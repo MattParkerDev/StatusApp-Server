@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Application;
-using Application.Contracts;
+using Application.Services;
+using Application.Services.Contracts;
 using Domain;
 using Infrastructure;
+using Infrastructure.Persistence;
 
 namespace Application.UnitTests.FriendshipServiceTests;
 

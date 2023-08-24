@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.SignalR;
-using Application.Contracts;
 using Application.DTOs;
 using Application.Mappers;
 using Application.Services.Contracts;

@@ -1,6 +1,7 @@
 ﻿using Application;
 using Domain;
 using Infrastructure;
+using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;

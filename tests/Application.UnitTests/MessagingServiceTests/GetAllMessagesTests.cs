@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Application;
+using Application.Services;
 using Domain;
 using Infrastructure;
+using Infrastructure.Persistence;
 
 namespace Application.UnitTests.MessagingServiceTests;
 
@@ -11,9 +13,8 @@ public class MessagingServiceTests
     public void WhenGetAllMessagesIsCalled_ReturnsMessageList()
     {
         //Arrange
-        var groupId = Guid.NewGuid();
-
-        var messageList = new List<Message> { new Message { ChatId = groupId } };
+        var chatId = new ChatId(Guid.NewGuid());
+        var messageList = new List<Message> { new Message { ChatId = chatId } };
 
         var options = new DbContextOptions<StatusContext>();
         var chatContextMock = new Mock<StatusContext>(options);
@@ -22,7 +23,7 @@ public class MessagingServiceTests
         var messagingService = new MessagingService(chatContextMock.Object);
 
         // Act
-        var result = messagingService.GetAllMessages(groupId);
+        var result = messagingService.GetAllMessages(chatId);
 
         // Assert
         result.Should().BeEquivalentTo(messageList);

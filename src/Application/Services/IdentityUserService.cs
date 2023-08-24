@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Application.Contracts;
+﻿using Application.Services.Contracts;
 using Domain;
+using Microsoft.AspNetCore.Identity;
 
-namespace Application;
+namespace Application.Services;
 
 public class IdentityUserService : IIdentityUserService
 {

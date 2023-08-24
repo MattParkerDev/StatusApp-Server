@@ -1,9 +1,10 @@
+using Application.Services.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using Application.Contracts;
 using Domain;
 using Infrastructure;
+using Infrastructure.Persistence;
 
 namespace WebAPI.SignalR;
 
@@ -83,7 +84,11 @@ public class StatusHub : Hub<IStatusClient>
         // TODO:Consider checking if are a member of this groupId?
         var userName = Context.UserIdentifier!;
 
-        var message = await _messagingService.CreateMessageAsUserInGroup(userName, chatId, data);
+        var message = await _messagingService.CreateMessageAsUserInGroup(
+            userName,
+            new ChatId(chatId),
+            data
+        );
 
         if (message == null)
         {
@@ -92,7 +97,7 @@ public class StatusHub : Hub<IStatusClient>
 
         // TODO:Consider checking if they are friends
         var friendUserName = _db.Chats
-            .Where(s => s.Id == chatId)
+            .Where(s => s.Id.Value == chatId)
             .Select(x => x.ChatParticipants.Select(z => z.UserName).FirstOrDefault())
             .FirstOrDefault();
 

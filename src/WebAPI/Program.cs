@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Application;
+using Application.Services;
 using Infrastructure;
+using Infrastructure.Persistence;
 using WebAPI;
 using WebAPI.Routes;
 using WebAPI.SignalR;

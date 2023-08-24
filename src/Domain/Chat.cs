@@ -1,14 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Domain.Common.Base;
 
 namespace Domain;
 
-public class Chat
+public record ChatId(Guid Value);
+
+public class Chat : BaseEntity<ChatId>
 {
-    [Key]
-    public required Guid Id { get; set; }
     public required string ChatName { get; set; }
-    public virtual ICollection<StatusUser> ChatParticipants { get; set; } =
-        new HashSet<StatusUser>();
-    public virtual ICollection<StatusUser> ChatAdmins { get; set; } = new HashSet<StatusUser>();
-    public virtual ICollection<Message> Messages { get; set; } = new List<Message>();
+
+    // Navigation properties
+    public ICollection<StatusUser> ChatParticipants { get; set; } = new HashSet<StatusUser>();
+    public ICollection<Message> Messages { get; set; } = new List<Message>();
+    //public virtual ICollection<StatusUser> ChatAdmins { get; set; } = new HashSet<StatusUser>();
 }

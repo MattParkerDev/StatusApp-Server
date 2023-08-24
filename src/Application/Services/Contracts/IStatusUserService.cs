@@ -1,6 +1,6 @@
 ﻿using Domain;
 
-namespace Application.Contracts;
+namespace Application.Services.Contracts;
 
 public interface IStatusUserService
 {

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Application.Contracts;
 using Application.Services.Contracts;
 using Domain;
 
@@ -23,7 +22,7 @@ public static class MessageRoutes
                 {
                     var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
 
-                    var messages = messagingService.GetAllMessages(chatId);
+                    var messages = messagingService.GetAllMessages(new ChatId(chatId));
                     return messages.Count != 0
                         ? TypedResults.Ok(messages)
                         : TypedResults.NoContent();
@@ -42,7 +41,9 @@ public static class MessageRoutes
                     var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
 
                     var chats = messagingService.GetAllChatIdsByUserName(userName);
-                    return chats.Count is 0 ? TypedResults.NoContent() : TypedResults.Ok(chats);
+                    return chats.Count is 0
+                        ? TypedResults.NoContent()
+                        : TypedResults.Ok(chats.Select(s => s.Value).ToList());
                 }
             )
             .WithName("GetChatIds");

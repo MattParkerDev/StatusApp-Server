@@ -1,7 +1,7 @@
-﻿using Application.Contracts;
+﻿using Application.Services.Contracts;
 using Domain;
 
-namespace Application;
+namespace Application.Services;
 
 public class MessagingService : IMessagingService
 {
@@ -12,12 +12,12 @@ public class MessagingService : IMessagingService
         _db = db;
     }
 
-    public List<Message> GetAllMessages(Guid chatId)
+    public List<Message> GetAllMessages(ChatId chatId)
     {
-        return _db.Messages.Where(s => s.ChatId == chatId).ToList();
+        return _db.Messages.Where(s => s.Chat.Id == chatId).ToList();
     }
 
-    public List<Guid> GetAllChatIdsByUserName(string userName)
+    public List<ChatId> GetAllChatIdsByUserName(string userName)
     {
         var chats = _db.Chats
             // where user is a chat participant
@@ -40,7 +40,7 @@ public class MessagingService : IMessagingService
 
     public async Task<Message?> CreateMessageAsUserInGroup(
         string userName,
-        Guid chatId,
+        ChatId chatId,
         string data
     )
     {
@@ -67,7 +67,7 @@ public class MessagingService : IMessagingService
     {
         var chat = new Chat
         {
-            Id = Guid.NewGuid(),
+            Id = new ChatId(Guid.NewGuid()),
             ChatName = "New Group Chat",
             ChatParticipants = users
         };

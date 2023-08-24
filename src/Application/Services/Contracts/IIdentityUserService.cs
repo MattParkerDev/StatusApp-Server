@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Domain;
+﻿using Domain;
+using Microsoft.AspNetCore.Identity;
 
-namespace Application.Contracts;
+namespace Application.Services.Contracts;
 
 public interface IIdentityUserService
 {
