@@ -53,19 +53,23 @@ public class FriendshipService : IFriendshipService
 
     public List<Friendship> GetAllFriendships(string userName, bool? areFriends)
     {
-        List<Friendship> friendships;
-        if (areFriends is null)
+        var friendships = areFriends switch
         {
-            friendships = _db.Friendships
-                .Where(s => s.UserName1 == userName || s.UserName2 == userName)
-                .ToList();
-            return friendships;
-        }
-
-        friendships = _db.Friendships
-            .Where(s => s.UserName1 == userName || s.UserName2 == userName)
-            .Where(x => x.UserName1Accepted == areFriends && x.UserName2Accepted == areFriends)
-            .ToList();
+            true
+                => _db.Friendships
+                    .Where(s => s.UserName1 == userName || s.UserName2 == userName)
+                    .Where(x => x.UserName1Accepted == true && x.UserName2Accepted == true)
+                    .ToList(),
+            false
+                => _db.Friendships
+                    .Where(s => s.UserName1 == userName || s.UserName2 == userName)
+                    .Where(x => x.UserName1Accepted == false || x.UserName2Accepted == false)
+                    .ToList(),
+            null
+                => _db.Friendships
+                    .Where(s => s.UserName1 == userName || s.UserName2 == userName)
+                    .ToList(),
+        };
         return friendships;
     }
 

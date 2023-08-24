@@ -8,15 +8,25 @@ namespace Application.UnitTests.FriendshipServiceTests;
 public partial class FriendshipServiceTests
 {
     [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    [InlineData(null)]
-    public void WhenGetAllFriendshipsIsCalled_ReturnsFriendshipList(bool? areFriends)
+    [InlineData(true, true)]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    [InlineData(false, false)]
+    public void WhenGetAllFriendshipsIsCalled_ReturnsFriendshipList(
+        bool user1Accepted,
+        bool user2Accepted
+    )
     {
         //Arrange
         var userName = "TestUserName";
-        var friendship = new Friendship { UserName1 = userName, UserName2Accepted = areFriends ?? false };
+        var friendship = new Friendship
+        {
+            UserName1 = userName,
+            UserName1Accepted = user1Accepted,
+            UserName2Accepted = user2Accepted
+        };
         var friendships = new List<Friendship> { friendship };
+        var areFriends = user1Accepted && user2Accepted;
 
         var options = new DbContextOptions<StatusContext>();
         var chatContextMock = new Mock<StatusContext>(options);
