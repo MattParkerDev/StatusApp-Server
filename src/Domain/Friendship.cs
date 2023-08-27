@@ -10,9 +10,9 @@ public class Friendship
     public DateTime BecameFriendsDate { get; set; }
 
     // Foreign keys
+    public ChatId? ChatId { get; set; } = null!;
     public string UserName1 { get; set; } = string.Empty;
     public string UserName2 { get; set; } = string.Empty;
-    public ChatId? ChatId { get; set; } = null!;
 
     // Navigation properties
     public virtual Chat? Chat { get; set; } = null!;
