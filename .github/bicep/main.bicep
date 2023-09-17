@@ -3,6 +3,7 @@ param server_farm_name string
 param database_server_name string
 param server_region string
 param static_web_app_name string
+param static_web_app_location string
 
 resource postgres_flexible_server 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-01-preview' = {
   name: database_server_name
@@ -103,7 +104,7 @@ resource web_site 'Microsoft.Web/sites@2022-09-01' = {
 
 resource static_web_app 'Microsoft.Web/staticSites@2022-09-01' = {
   name: static_web_app_name
-  location: server_region
+  location: static_web_app_location
   properties: {
     branch: 'main'
     repositoryUrl: 'https://github.com/MattParkerDev/StatusApp-Server'
