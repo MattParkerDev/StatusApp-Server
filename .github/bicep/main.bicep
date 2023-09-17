@@ -2,8 +2,9 @@ param site_name string
 param server_farm_name string
 param database_server_name string
 param server_region string
+param static_web_app_name string
 
-resource postgres_flexible_server 'Microsoft.DBforPostgreSQL/flexibleServers@2022-12-01' = {
+resource postgres_flexible_server 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-01-preview' = {
   name: database_server_name
   location: server_region
   sku: {
@@ -18,7 +19,7 @@ resource postgres_flexible_server 'Microsoft.DBforPostgreSQL/flexibleServers@202
     dataEncryption: {
       type: 'SystemManaged'
     }
-    version: '14'
+    version: '15'
     availabilityZone: '1'
     storage: {
       storageSizeGB: 32
@@ -39,11 +40,10 @@ resource postgres_flexible_server 'Microsoft.DBforPostgreSQL/flexibleServers@202
       startMinute: 0
     }
     replicationRole: 'Primary'
-    replicaCapacity: 5
   }
 }
 
-resource server_farm 'Microsoft.Web/serverfarms@2022-03-01' = {
+resource server_farm 'Microsoft.Web/serverfarms@2022-09-01' = {
   name: server_farm_name
   location: server_region
   sku: {
@@ -70,7 +70,7 @@ resource server_farm 'Microsoft.Web/serverfarms@2022-03-01' = {
 }
 
 
-resource web_site 'Microsoft.Web/sites@2022-03-01' = {
+resource web_site 'Microsoft.Web/sites@2022-09-01' = {
   name: site_name
   location: server_region
   kind: 'app,linux'
@@ -98,5 +98,14 @@ resource web_site 'Microsoft.Web/sites@2022-03-01' = {
       alwaysOn: false
       http20Enabled: false
     } 
+  }
+}
+
+resource static_web_app 'Microsoft.Web/staticSites@2022-09-01' = {
+  name: static_web_app_name
+  location: server_region
+  properties: {
+    branch: 'main'
+    repositoryUrl: 'https://github.com/MattParkerDev/StatusApp-Server'
   }
 }

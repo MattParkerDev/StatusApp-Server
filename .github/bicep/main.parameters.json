@@ -3,10 +3,13 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "site_name": {
-      "value": "statusapp1"
+      "value": "prod-statusapp-api"
+    },
+    "static_web_app_name": {
+      "value": "prod-statusapp-webui"
     },
     "server_farm_name": {
-      "value": "ASP-StatusApp-88b5"
+      "value": "ASP-StatusApp-server_farm"
     },
     "database_server_name": {
       "value": "statusapp-dbserver"
