@@ -16,6 +16,9 @@
     },
     "server_region": {
       "value": "Australia East"
+    },
+    "static_web_app_location": {
+      "value": "East Asia"
     }
   }
 }
