@@ -60,7 +60,7 @@ jobs:
   deploy-bicep:
     runs-on: ubuntu-latest
     # update to conditionally run based on file change
-    if: ${{true == false}}
+    if: ${{true == true}}
     needs: build
     environment:
       name: "Production"
