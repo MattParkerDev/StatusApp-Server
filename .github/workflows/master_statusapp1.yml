@@ -83,7 +83,9 @@ jobs:
           azcliversion: latest
           inlineScript: |
             kv_db_username=$(az keyvault secret show --name "statusapp-database-admin-username" --vault-name "prod-mattparkerdev-vault" --query "value" --output tsv)
+            echo "::addmask::$kv_db_username"
             kv_db_password=$(az keyvault secret show --name "statusapp-database-admin-password" --vault-name "prod-mattparkerdev-vault" --query "value" --output tsv)
+            echo "::addmask::$kv_db_password"
             echo "database_admin_username=$kv_db_username" >> $GITHUB_OUTPUT
             echo "database_admin_password=$kv_db_password" >> $GITHUB_OUTPUT
 
