@@ -17,7 +17,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    if: ${{true == false}}
     steps:
       - uses: actions/checkout@v3.3.0
 
@@ -83,6 +83,7 @@ jobs:
           azcliversion: latest
           inlineScript: |
             secretValue=$(az keyvault secret show --name "statusapp-database-admin-password" --vault-name "prod-mattparkerdev-vault" --query "value" --output tsv)
+            echo "Secret Value: $secretValue"
             echo "::set-output name=database_admin_password::$secretValue"
 
       - name: Deploy Azure Resource Manager (ARM) Template
