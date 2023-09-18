@@ -82,10 +82,10 @@ jobs:
         with:
           azcliversion: latest
           inlineScript: |
-            kv-db-password=$(az keyvault secret show --name "statusapp-database-admin-password" --vault-name "prod-mattparkerdev-vault" --query "value" --output tsv)
-            kv-db-username=$(az keyvault secret show --name "statusapp-database-admin-username" --vault-name "prod-mattparkerdev-vault" --query "value" --output tsv)
-            echo "database_admin_password=$kv-db-password" >> $GITHUB_OUTPUT
-            echo "database_admin_username=$kv-db-username" >> $GITHUB_OUTPUT
+            kv_db_username=$(az keyvault secret show --name "statusapp-database-admin-username" --vault-name "prod-mattparkerdev-vault" --query "value" --output tsv)
+            kv_db_password=$(az keyvault secret show --name "statusapp-database-admin-password" --vault-name "prod-mattparkerdev-vault" --query "value" --output tsv)
+            echo "database_admin_username=$kv_db_username" >> $GITHUB_OUTPUT
+            echo "database_admin_password=$kv_db_password" >> $GITHUB_OUTPUT
 
       - name: Deploy Azure Resource Manager (ARM) Template
         uses: Azure/arm-deploy@v1
