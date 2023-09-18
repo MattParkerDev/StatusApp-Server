@@ -2,6 +2,8 @@ param site_name string
 param server_farm_name string
 param database_server_name string
 @secure()
+param database_admin_username string
+@secure()
 param database_admin_password string
 param server_region string
 param static_web_app_name string
@@ -19,6 +21,7 @@ resource postgres_flexible_server 'Microsoft.DBforPostgreSQL/flexibleServers@202
       activeDirectoryAuth: 'Disabled'
       passwordAuth: 'Enabled'
     }
+    administratorLogin: database_admin_username
     administratorLoginPassword: database_admin_password
     dataEncryption: {
       type: 'SystemManaged'

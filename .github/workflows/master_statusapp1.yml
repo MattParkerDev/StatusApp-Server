@@ -82,16 +82,19 @@ jobs:
         with:
           azcliversion: latest
           inlineScript: |
-            secretValue=$(az keyvault secret show --name "statusapp-database-admin-password" --vault-name "prod-mattparkerdev-vault" --query "value" --output tsv)
-            echo "Secret Value: $secretValue"
-            echo "::set-output name=database_admin_password::$secretValue"
+            kv-db-password=$(az keyvault secret show --name "statusapp-database-admin-password" --vault-name "prod-mattparkerdev-vault" --query "value" --output tsv)
+            kv-db-username=$(az keyvault secret show --name "statusapp-database-admin-username" --vault-name "prod-mattparkerdev-vault" --query "value" --output tsv)
+            echo "{database_admin_password}={$kv-db-password}" >> $GITHUB_OUTPUT
+            echo "{database_admin_username}={$kv-db-username}" >> $GITHUB_OUTPUT
 
       - name: Deploy Azure Resource Manager (ARM) Template
         uses: Azure/arm-deploy@v1
         with:
           resourceGroupName: StatusApp
           template: ./main.bicep
-          parameters: ./main.parameters.json database_admin_password=${{ steps.fetch-kv-secrets.outputs.database_admin_password }}
+          parameters: ./main.parameters.json
+            database_admin_username=${{ steps.fetch-kv-secrets.outputs.database_admin_username }}
+            database_admin_password=${{ steps.fetch-kv-secrets.outputs.database_admin_password }}
 
   deploy-api:
     runs-on: ubuntu-latest
