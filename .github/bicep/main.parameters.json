@@ -9,10 +9,10 @@
       "value": "prod-statusapp-webui"
     },
     "server_farm_name": {
-      "value": "ASP-StatusApp-server_farm"
+      "value": "prod-statusapp-appserviceplan"
     },
     "database_server_name": {
-      "value": "statusapp-dbserver"
+      "value": "prod-statusapp-postgres"
     },
     "server_region": {
       "value": "Australia East"
