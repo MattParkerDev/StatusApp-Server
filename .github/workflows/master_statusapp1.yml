@@ -61,7 +61,6 @@ jobs:
     runs-on: ubuntu-latest
     # update to conditionally run based on file change
     if: ${{true == true}}
-    needs: build
     environment:
       name: "Production"
 
