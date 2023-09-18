@@ -33,11 +33,11 @@ jobs:
       - name: dotnet publish WebUI
         run: dotnet publish ./src/WebUI -c Release --property PublishDir=${{env.DOTNET_ROOT}}/myapp/webui
       # TODO: Build and run unit tests
-#      - name: Bicep Build
-#        uses: Azure/bicep-build-action@v1.0.0
-#        with:
-#          bicepFilePath: ./.github/bicep/main.bicep
-#          outputFilePath: ./.github/bicep/azuredeploy.json
+      #      - name: Bicep Build
+      #        uses: Azure/bicep-build-action@v1.0.0
+      #        with:
+      #          bicepFilePath: ./.github/bicep/main.bicep
+      #          outputFilePath: ./.github/bicep/azuredeploy.json
 
       - name: Upload bicep for deployment job
         uses: actions/upload-artifact@v3.1.2
@@ -76,12 +76,22 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: Fetch Key Vault Secrets
+        id: fetch-kv-secrets
+        uses: azure/CLI@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            secretValue=$(az keyvault secret show --name "statusapp-database-admin-password" --vault-name "prod-mattparkerdev-vault" --query "value" --output tsv)
+            echo "::set-output name=database_admin_password::$secretValue"
+
       - name: Deploy Azure Resource Manager (ARM) Template
         uses: Azure/arm-deploy@v1
         with:
           resourceGroupName: StatusApp
           template: ./main.bicep
           parameters: ./main.parameters.json
+          additionalArguments: --parameters database_admin_password=${{ steps.fetch-kv-secrets.outputs.database_admin_password }}
 
   deploy-api:
     runs-on: ubuntu-latest
