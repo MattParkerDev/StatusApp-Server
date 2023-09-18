@@ -105,6 +105,9 @@ resource web_site 'Microsoft.Web/sites@2022-09-01' = {
 resource static_web_app 'Microsoft.Web/staticSites@2022-09-01' = {
   name: static_web_app_name
   location: static_web_app_location
+  sku: {
+    name: 'Free'
+  }
   properties: {
     branch: 'main'
     repositoryUrl: 'https://github.com/MattParkerDev/StatusApp-Server'
