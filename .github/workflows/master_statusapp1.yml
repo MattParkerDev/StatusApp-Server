@@ -90,8 +90,7 @@ jobs:
         with:
           resourceGroupName: StatusApp
           template: ./main.bicep
-          parameters: ./main.parameters.json
-          additionalArguments: --parameters database_admin_password=${{ steps.fetch-kv-secrets.outputs.database_admin_password }}
+          parameters: ./main.parameters.json database_admin_password=${{ steps.fetch-kv-secrets.outputs.database_admin_password }}
 
   deploy-api:
     runs-on: ubuntu-latest
