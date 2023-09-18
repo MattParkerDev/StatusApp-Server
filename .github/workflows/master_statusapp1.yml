@@ -83,7 +83,6 @@ jobs:
           azcliversion: latest
           inlineScript: |
             secretValue=$(az keyvault secret show --name "statusapp-database-admin-password" --vault-name "prod-mattparkerdev-vault" --query "value" --output tsv)
-            // Write the secret to console for debugging
             echo "Secret Value: $secretValue"
             echo "::set-output name=database_admin_password::$secretValue"
 
