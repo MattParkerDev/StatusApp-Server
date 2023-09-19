@@ -36,7 +36,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{63E0
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{8C999DDF-B14B-45D9-9375-C14ED7CB2D5C}"
 	ProjectSection(SolutionItems) = preProject
-		.github\workflows\master_statusapp1.yml = .github\workflows\master_statusapp1.yml
+		.github\workflows\prod-deploy.yml = .github\workflows\prod-deploy.yml
+		.github\workflows\stage-deploy.yml = .github\workflows\stage-deploy.yml
+		.github\workflows\template-deploy.yml = .github\workflows\template-deploy.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "bicep", "bicep", "{78FCC9EC-4E0C-4729-934B-6018537D6F66}"
