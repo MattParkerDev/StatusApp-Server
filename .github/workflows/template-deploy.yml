@@ -134,9 +134,9 @@ jobs:
         with:
           azcliversion: latest
           inlineScript: |
-            echo "API_CORS_URL=$(az staticwebapp show -n ${{ inputs.AzureStaticWebAppName }} | jq -r '.defaultHostname')" >> $GITHUB_ENV            
+            echo "API_CORS_URL=https://$(az staticwebapp show -n ${{ inputs.AzureStaticWebAppName }} | jq -r '.defaultHostname')" >> $GITHUB_ENV            
 
-      - name: Modify Appsettings.json
+      - name: Modify appsettings.json
         uses: microsoft/variable-substitution@v1
         with:
           files: ./appsettings.json
