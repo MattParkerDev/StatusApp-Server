@@ -21,7 +21,9 @@ resource postgres_flexible_server 'Microsoft.DBforPostgreSQL/flexibleServers@202
       activeDirectoryAuth: 'Disabled'
       passwordAuth: 'Enabled'
     }
+    // After the first deployment, the admin username cannnot be changed
     administratorLogin: database_admin_username
+    // However, the password can be changed
     administratorLoginPassword: database_admin_password
     dataEncryption: {
       type: 'SystemManaged'

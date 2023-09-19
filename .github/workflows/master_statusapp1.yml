@@ -100,7 +100,7 @@ jobs:
           
       - name: Deploy Bicep
         run: |
-          .powershell/deploy-bicep.ps1
+          powershell/deploy-bicep.ps1
 
   deploy-api:
     runs-on: ubuntu-latest
