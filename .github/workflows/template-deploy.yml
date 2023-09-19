@@ -57,11 +57,6 @@ jobs:
       - name: dotnet publish WebUI
         run: dotnet publish ./src/WebUI -c Release --property PublishDir=${{env.DOTNET_ROOT}}/myapp/webui
       #TODO: Build and run unit tests
-      - name: Bicep Build
-        uses: Azure/bicep-build-action@v1.0.0
-        with:
-          bicepFilePath: ./.github/bicep/main.bicep
-          outputFilePath: ./.github/bicep/azuredeploy.json
       
       - name: Modify Bicep Parameters
         uses: microsoft/variable-substitution@v1
