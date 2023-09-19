@@ -1,5 +1,8 @@
-name: Build and Deploy - Production
+name: Prod - Pipeline
 on:
+  push:
+    branches:
+      - master
   workflow_dispatch:
 
 jobs:
