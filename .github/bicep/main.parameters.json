@@ -2,23 +2,23 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "site_name": {
-      "value": "prod-statusapp-api"
+    "web_app_name": {
+      "value": "{{SET FROM PIPELINE}}"
     },
     "static_web_app_name": {
-      "value": "prod-statusapp-webui"
+      "value": "{{SET FROM PIPELINE}}"
     },
     "server_farm_name": {
-      "value": "prod-statusapp-appserviceplan"
+      "value": "{{SET FROM PIPELINE}}"
     },
     "database_server_name": {
-      "value": "prod-statusapp-postgres"
+      "value": "{{SET FROM PIPELINE}}"
     },
-    "server_region": {
-      "value": "Australia East"
+    "server_farm_location": {
+      "value": "{{SET FROM PIPELINE}}"
     },
     "static_web_app_location": {
-      "value": "East Asia"
+      "value": "{{SET FROM PIPELINE}}"
     }
   }
 }

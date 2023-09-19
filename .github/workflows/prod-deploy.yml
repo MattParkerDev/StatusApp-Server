@@ -1,0 +1,22 @@
+name: Prod - Pipeline
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  call-reusable-build-and-deploy:
+    uses: ./.github/workflows/template-deploy.yml
+    with:
+      Environment: 'Production'
+      AzureResourceGroupName: 'prod-statusapp-rg'
+      AzureWebAppName: 'prod-statusapp-api'
+      AzureStaticWebAppName: 'prod-statusapp-webui'
+      AzureServerFarmName: 'prod-statusapp-appserviceplan'
+      AzureDatabaseServerName: 'prod-statusapp-postgres'
+      AzureServerRegion: 'Australia East'
+      AzureStaticWebAppLocation: 'East Asia'
+        
+    secrets:
+      AzureCredentials: ${{ secrets.AZURE_CREDENTIALS }}

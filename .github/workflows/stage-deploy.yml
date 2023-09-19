@@ -1,0 +1,19 @@
+name: Stage - Pipeline
+on:
+  workflow_dispatch:
+
+jobs:
+  call-reusable-build-and-deploy:
+    uses: ./.github/workflows/template-deploy.yml
+    with:
+      Environment: 'Staging'
+      AzureResourceGroupName: 'stage-statusapp-rg'
+      AzureWebAppName: 'stage-statusapp-api'
+      AzureStaticWebAppName: 'stage-statusapp-webui'
+      AzureServerFarmName: 'stage-statusapp-appserviceplan'
+      AzureDatabaseServerName: 'stage-statusapp-postgres'
+      AzureServerRegion: 'Australia East'
+      AzureStaticWebAppLocation: 'East Asia'
+        
+    secrets:
+      AzureCredentials: ${{ secrets.AZURE_CREDENTIALS }}

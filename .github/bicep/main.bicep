@@ -1,17 +1,18 @@
-param site_name string
+param web_app_name string
 param server_farm_name string
 param database_server_name string
+param server_farm_location string
+param static_web_app_name string
+param static_web_app_location string
+
 @secure()
 param database_admin_username string
 @secure()
 param database_admin_password string
-param server_region string
-param static_web_app_name string
-param static_web_app_location string
 
 resource postgres_flexible_server 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-01-preview' = {
   name: database_server_name
-  location: server_region
+  location: server_farm_location
   sku: {
     name: 'Standard_B1ms'
     tier: 'Burstable'
@@ -21,7 +22,9 @@ resource postgres_flexible_server 'Microsoft.DBforPostgreSQL/flexibleServers@202
       activeDirectoryAuth: 'Disabled'
       passwordAuth: 'Enabled'
     }
+    // After the first deployment, the admin username cannnot be changed
     administratorLogin: database_admin_username
+    // However, the password can be changed
     administratorLoginPassword: database_admin_password
     dataEncryption: {
       type: 'SystemManaged'
@@ -52,7 +55,7 @@ resource postgres_flexible_server 'Microsoft.DBforPostgreSQL/flexibleServers@202
 
 resource server_farm 'Microsoft.Web/serverfarms@2022-09-01' = {
   name: server_farm_name
-  location: server_region
+  location: server_farm_location
   sku: {
     name: 'B1'
     tier: 'Basic'
@@ -78,19 +81,19 @@ resource server_farm 'Microsoft.Web/serverfarms@2022-09-01' = {
 
 
 resource web_site 'Microsoft.Web/sites@2022-09-01' = {
-  name: site_name
-  location: server_region
+  name: web_app_name
+  location: server_farm_location
   kind: 'app,linux'
   properties: {
     enabled: true
     hostNameSslStates: [
       {
-        name: '${site_name}.azurewebsites.net'
+        name: '${web_app_name}.azurewebsites.net'
         sslState: 'Disabled'
         hostType: 'Standard'
       }
       {
-        name: '${site_name}.scm.azurewebsites.net'
+        name: '${web_app_name}.scm.azurewebsites.net'
         sslState: 'Disabled'
         hostType: 'Repository'
       }
