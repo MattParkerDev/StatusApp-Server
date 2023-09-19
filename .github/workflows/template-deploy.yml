@@ -153,6 +153,11 @@ jobs:
         uses: actions/download-artifact@v3.0.2
         with:
           name: webui-artifact
+
+      - name: Azure Login
+        uses: Azure/login@v1
+        with:
+          creds: ${{ secrets.AzureCredentials }}
         
       - name: "Mask Deployment Token"
         uses: azure/CLI@v1
