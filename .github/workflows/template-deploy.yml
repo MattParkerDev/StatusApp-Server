@@ -132,13 +132,13 @@ jobs:
       - name: Azure Login
         uses: Azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          creds: ${{ secrets.AzureCredentials }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
-          app-name: "statusapp1"
+          app-name: ${{ inputs.AzureWebAppName }}
           slot-name: "Production"
           package: .
 
