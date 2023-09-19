@@ -43,7 +43,7 @@ jobs:
         uses: actions/upload-artifact@v3.1.2
         with:
           name: bicep
-          path: ./.github/bicep
+          path: ./.github
 
       - name: Upload API artifact for deployment job
         uses: actions/upload-artifact@v3.1.2
@@ -99,9 +99,8 @@ jobs:
 #            database_admin_password=${{ steps.fetch-kv-secrets.outputs.database_admin_password }}
           
       - name: Deploy Bicep
-        working-directory: ./artifact
         run: |
-          ./deploy-bicep.ps1
+          .powershell/deploy-bicep.ps1
 
   deploy-api:
     runs-on: ubuntu-latest
