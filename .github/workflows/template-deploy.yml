@@ -129,6 +129,20 @@ jobs:
         with:
           creds: ${{ secrets.AzureCredentials }}
 
+      - name: "Retrieve Cors Url"
+        uses: azure/CLI@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            echo "API_CORS_URL=$(az staticwebapp show -n ${{ inputs.AzureStaticWebAppName }} | jq -r '.defaultHostname')" >> $GITHUB_ENV            
+
+      - name: Modify Appsettings.json
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: ./appsettings.json
+        env:
+          AllowedOrigins[0]: ${{ env.API_CORS_URL }}
+
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2

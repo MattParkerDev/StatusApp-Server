@@ -65,19 +65,16 @@ public static class DependencyInjection
         });
 
         services.AddEndpointsApiExplorer();
-
+        
+        var allowedOrigins = configuration.GetValue<string[]>("AllowedOrigins");
+        
         services.AddCors(
             options =>
                 options.AddPolicy(
                     name: corsPolicyName,
                     policy =>
                         policy
-                            .WithOrigins(
-                                Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
-                                == "Development"
-                                    ? "https://localhost:5001"
-                                    : "https://red-ground-0805be400.2.azurestaticapps.net"
-                            )
+                            .WithOrigins(allowedOrigins)
                             .AllowAnyMethod()
                             .AllowAnyHeader()
                             .AllowCredentials()
