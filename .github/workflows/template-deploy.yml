@@ -2,12 +2,11 @@
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
 name: Template Build and Deploy
-
 on:
   workflow_call: 
     inputs:
       # The environment to deploy to (Staging or Production)
-      Environment: 
+      environment: 
         required: true
         type: string
 
@@ -40,6 +39,7 @@ on:
 
 jobs:
   build:
+    environment: ${{ inputs.environment }}
     runs-on: ubuntu-latest
 
     steps:
@@ -74,7 +74,7 @@ jobs:
           parameters.database_server_name.value: ${{ inputs.AzureDatabaseServerName }}
           parameters.server_farm_location.value: ${{ inputs.AzureServerRegion }}
           parameters.static_web_app_location.value: ${{ inputs.AzureStaticWebAppLocation }}
-          
+
       - name: Upload bicep for deployment job
         uses: actions/upload-artifact@v3.1.2
         with:
@@ -94,13 +94,11 @@ jobs:
   #          path: ${{env.DOTNET_ROOT}}/myapp/webui
 
   deploy-bicep:
+    environment: ${{ inputs.environment }}
     runs-on: ubuntu-latest
     # update to conditionally run based on file change
     if: ${{true == true}}
     needs: build
-    environment:
-      name: "Production"
-
     steps:
       - name: Download bicep from build job
         uses: actions/download-artifact@v3.0.2
@@ -122,7 +120,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build, deploy-bicep]
     environment:
-      name: "Production"
+      name: ${{ inputs.environment }}
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
@@ -148,7 +146,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build, deploy-bicep]
     environment:
-      name: "Production"
+      name: ${{ inputs.environment }}
       url: ${{ steps.deploy-to-staticwebapp.outputs.static_web_app_url }}
     steps:
       - name: Download artifact from build job

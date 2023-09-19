@@ -4,9 +4,10 @@ on:
 
 jobs:
   call-reusable-build-and-deploy:
+    name: Pipeline
     uses: ./.github/workflows/template-deploy.yml
     with:
-      Environment: 'Staging'
+      environment: 'Staging'
       AzureResourceGroupName: 'stage-statusapp-rg'
       AzureWebAppName: 'stage-statusapp-api'
       AzureStaticWebAppName: 'stage-statusapp-webui'

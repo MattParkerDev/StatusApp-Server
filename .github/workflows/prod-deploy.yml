@@ -9,7 +9,7 @@ jobs:
   call-reusable-build-and-deploy:
     uses: ./.github/workflows/template-deploy.yml
     with:
-      Environment: 'Production'
+      environment: 'Production'
       AzureResourceGroupName: 'prod-statusapp-rg'
       AzureWebAppName: 'prod-statusapp-api'
       AzureStaticWebAppName: 'prod-statusapp-webui'
