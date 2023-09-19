@@ -141,7 +141,7 @@ jobs:
         with:
           files: ./appsettings.json
         env:
-          AllowedOrigins[0]: ${{ env.API_CORS_URL }}
+          AllowedOrigins.0: ${{ env.API_CORS_URL }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
