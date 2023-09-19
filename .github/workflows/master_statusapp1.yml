@@ -30,8 +30,8 @@ jobs:
       - name: dotnet publish API
         run: dotnet publish ./src/WebAPI -c Release --property PublishDir=${{env.DOTNET_ROOT}}/myapp/api
 
-#      - name: dotnet publish WebUI
-#        run: dotnet publish ./src/WebUI -c Release --property PublishDir=${{env.DOTNET_ROOT}}/myapp/webui
+      #      - name: dotnet publish WebUI
+      #        run: dotnet publish ./src/WebUI -c Release --property PublishDir=${{env.DOTNET_ROOT}}/myapp/webui
       # TODO: Build and run unit tests
       #      - name: Bicep Build
       #        uses: Azure/bicep-build-action@v1.0.0
@@ -51,11 +51,11 @@ jobs:
           name: .net-app-api
           path: ${{env.DOTNET_ROOT}}/myapp/api
 
-#      - name: Upload WebUI artifact for deployment job
-#        uses: actions/upload-artifact@v3.1.2
-#        with:
-#          name: .net-app-webui
-#          path: ${{env.DOTNET_ROOT}}/myapp/webui
+  #      - name: Upload WebUI artifact for deployment job
+  #        uses: actions/upload-artifact@v3.1.2
+  #        with:
+  #          name: .net-app-webui
+  #          path: ${{env.DOTNET_ROOT}}/myapp/webui
 
   deploy-bicep:
     runs-on: ubuntu-latest
@@ -102,7 +102,7 @@ jobs:
         shell: pwsh
         working-directory: ./powershell
         run: |
-          powershell/deploy-bicep.ps1
+          ./deploy-bicep.ps1
 
   deploy-api:
     runs-on: ubuntu-latest
