@@ -1,7 +1,5 @@
 . ($PSScriptRoot + "\functions.ps1") -Verbose # Import helper functions
 
-az account show
-
 $kv_db_username = RetrieveSecretFromKeyVault("statusapp-database-admin-username")
 $kv_db_password = RetrieveSecretFromKeyVault("statusapp-database-admin-password")
 
