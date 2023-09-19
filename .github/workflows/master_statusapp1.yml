@@ -76,27 +76,32 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Fetch Key Vault Secrets
-        id: fetch-kv-secrets
-        uses: azure/CLI@v1
-        with:
-          azcliversion: latest
-          inlineScript: |
-            kv_db_username=$(az keyvault secret show --name "statusapp-database-admin-username" --vault-name "prod-mattparkerdev-vault" --query "value" --output tsv)
-            echo "::addmask::$kv_db_username"
-            kv_db_password=$(az keyvault secret show --name "statusapp-database-admin-password" --vault-name "prod-mattparkerdev-vault" --query "value" --output tsv)
-            echo "::addmask::$kv_db_password"
-            echo "database_admin_username=$kv_db_username" >> $GITHUB_OUTPUT
-            echo "database_admin_password=$kv_db_password" >> $GITHUB_OUTPUT
-
-      - name: Deploy Azure Resource Manager (ARM) Template
-        uses: Azure/arm-deploy@v1
-        with:
-          resourceGroupName: StatusApp
-          template: ./main.bicep
-          parameters: ./main.parameters.json
-            database_admin_username=${{ steps.fetch-kv-secrets.outputs.database_admin_username }}
-            database_admin_password=${{ steps.fetch-kv-secrets.outputs.database_admin_password }}
+#      - name: Fetch Key Vault Secrets
+#        id: fetch-kv-secrets
+#        uses: azure/CLI@v1
+#        with:
+#          azcliversion: latest
+#          inlineScript: |
+#            kv_db_username=$(az keyvault secret show --name "statusapp-database-admin-username" --vault-name "prod-mattparkerdev-vault" --query "value" --output tsv)
+#            echo "::addmask::$kv_db_username"
+#            kv_db_password=$(az keyvault secret show --name "statusapp-database-admin-password" --vault-name "prod-mattparkerdev-vault" --query "value" --output tsv)
+#            echo "::addmask::$kv_db_password"
+#            echo "database_admin_username=$kv_db_username" >> $GITHUB_OUTPUT
+#            echo "database_admin_password=$kv_db_password" >> $GITHUB_OUTPUT
+#
+#      - name: Deploy Azure Resource Manager (ARM) Template
+#        uses: Azure/arm-deploy@v1
+#        with:
+#          resourceGroupName: StatusApp
+#          template: ./main.bicep
+#          parameters: ./main.parameters.json
+#            database_admin_username=${{ steps.fetch-kv-secrets.outputs.database_admin_username }}
+#            database_admin_password=${{ steps.fetch-kv-secrets.outputs.database_admin_password }}
+          
+      - name: Deploy Bicep
+        working-directory: ./artifact
+        run: |
+          ./deploy-bicep.ps1
 
   deploy-api:
     runs-on: ubuntu-latest

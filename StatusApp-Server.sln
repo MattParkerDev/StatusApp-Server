@@ -8,10 +8,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 		.gitignore = .gitignore
 		.csharpierrc = .csharpierrc
-		.github\bicep\main.bicep = .github\bicep\main.bicep
-		.github\bicep\main.parameters.json = .github\bicep\main.parameters.json
-		.github\workflows\azure-static-web-apps-red-ground-0805be400.yml = .github\workflows\azure-static-web-apps-red-ground-0805be400.yml
-		.github\workflows\master_statusapp1.yml = .github\workflows\master_statusapp1.yml
 		global.json = global.json
 	EndProjectSection
 EndProject
@@ -30,6 +26,30 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{D23E8309-9E03-4769-B6CC-2959CB36C8F5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application.UnitTests", "tests\Application.UnitTests\Application.UnitTests.csproj", "{BAE42F60-9354-4321-9A9A-A3F88D2C7236}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{9C35DBC4-D8F0-4AD9-B3F0-33A505DA8FBB}"
+	ProjectSection(SolutionItems) = preProject
+		docs\azure-deploy-from-scratch.md = docs\azure-deploy-from-scratch.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{63E090B0-4252-4DC0-A2F1-5BCA2B0BD3BC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{8C999DDF-B14B-45D9-9375-C14ED7CB2D5C}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\master_statusapp1.yml = .github\workflows\master_statusapp1.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "bicep", "bicep", "{78FCC9EC-4E0C-4729-934B-6018537D6F66}"
+	ProjectSection(SolutionItems) = preProject
+		.github\bicep\main.bicep = .github\bicep\main.bicep
+		.github\bicep\main.parameters.json = .github\bicep\main.parameters.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "powershell", "powershell", "{B45AF0CF-D2FE-4A13-91E8-610533EC3410}"
+	ProjectSection(SolutionItems) = preProject
+		.github\powershell\deploy-bicep.ps1 = .github\powershell\deploy-bicep.ps1
+		.github\powershell\functions.ps1 = .github\powershell\functions.ps1
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,5 +95,8 @@ Global
 		{AD3934A2-B583-4940-9901-82AC3BC1619C} = {DF971C14-AD50-4B07-ACED-087B6ECA7500}
 		{ECCD1CBB-0AE9-46CA-8B49-5A94F956F1E5} = {DF971C14-AD50-4B07-ACED-087B6ECA7500}
 		{BAE42F60-9354-4321-9A9A-A3F88D2C7236} = {D23E8309-9E03-4769-B6CC-2959CB36C8F5}
+		{8C999DDF-B14B-45D9-9375-C14ED7CB2D5C} = {63E090B0-4252-4DC0-A2F1-5BCA2B0BD3BC}
+		{78FCC9EC-4E0C-4729-934B-6018537D6F66} = {63E090B0-4252-4DC0-A2F1-5BCA2B0BD3BC}
+		{B45AF0CF-D2FE-4A13-91E8-610533EC3410} = {63E090B0-4252-4DC0-A2F1-5BCA2B0BD3BC}
 	EndGlobalSection
 EndGlobal
