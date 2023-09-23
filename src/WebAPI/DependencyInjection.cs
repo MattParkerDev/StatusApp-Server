@@ -65,9 +65,9 @@ public static class DependencyInjection
         });
 
         services.AddEndpointsApiExplorer();
-        
-        var allowedOrigins = configuration.GetValue<string[]>("AllowedOrigins");
-        
+
+        var allowedOrigins = configuration.GetRequiredSection("AllowedOrigins").Get<string[]>();
+
         services.AddCors(
             options =>
                 options.AddPolicy(
