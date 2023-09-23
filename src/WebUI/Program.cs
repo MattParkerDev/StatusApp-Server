@@ -13,20 +13,24 @@ builder.Services.AddScoped(
     _ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) }
 );
 
+var apiBaseUrl = builder.Configuration.GetValue<string>("ApiBaseUrl");
+
 builder.Services.AddTransient<CookieHandler>();
 builder.Services.AddSingleton<DataState>();
 builder.Services.AddSingleton<AuthService>();
-builder.Services.AddSingleton<SignalRClient>();
 builder.Services.AddSingleton<NotifierService>();
 builder.Services.AddSingleton<ChatService>();
 builder.Services.AddScoped<StatusAppDialogService>();
 builder.Services.AddMudServices();
 
-const string ApiClient = nameof(ApiClient);
+builder.Services.AddSingleton<SignalRClient>(options =>
+{
+    var dataState = options.GetRequiredService<DataState>();
+    var notifierService = options.GetRequiredService<NotifierService>();
+    return new SignalRClient(dataState, notifierService, apiBaseUrl);
+});
 
-var apiBaseUrl = builder.HostEnvironment.IsDevelopment()
-    ? "https://localhost:7104"
-    : "https://prod-statusapp-api.azurewebsites.net";
+const string ApiClient = nameof(ApiClient);
 
 builder.Services
     .AddHttpClient(

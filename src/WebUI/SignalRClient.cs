@@ -11,18 +11,11 @@ public class SignalRClient
     private readonly NotifierService _notifierService;
     private readonly HubConnection _connection;
 
-    public SignalRClient(
-        DataState dataState,
-        IWebAssemblyHostEnvironment hostEnvironment,
-        NotifierService notifierService
-    )
+    public SignalRClient(DataState dataState, NotifierService notifierService, string hubBaseUrl)
     {
         _dataState = dataState;
         _notifierService = notifierService;
-        var hubeBaseUrl = hostEnvironment.IsDevelopment()
-            ? "https://localhost:7104"
-            : "https://statusapp1.azurewebsites.net";
-        var hubUrl = $"{hubeBaseUrl}/statushub";
+        var hubUrl = $"{hubBaseUrl}/statushub";
         _connection = new HubConnectionBuilder()
             .WithUrl(
                 hubUrl,
