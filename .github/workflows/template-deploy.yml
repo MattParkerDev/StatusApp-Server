@@ -54,16 +54,16 @@ jobs:
       - name: dotnet publish API
         run: dotnet publish ./src/WebAPI -c Release --property PublishDir=${{env.DOTNET_ROOT}}/myapp/api
 
-      - name: dotnet publish WebUI
-        run: dotnet publish ./src/WebUI -c Release --property PublishDir=${{env.DOTNET_ROOT}}/myapp/webui
-      #TODO: Build and run unit tests
-
       - name: Modify WebUI appsettings.json
         uses: microsoft/variable-substitution@v1
         with:
           files: ./src/WebUI/wwwroot/appsettings.json
         env:
           ApiBaseUrl: https://${{ inputs.AzureWebAppName }}.azurewebsites.net
+
+      - name: dotnet publish WebUI
+        run: dotnet publish ./src/WebUI -c Release --property PublishDir=${{env.DOTNET_ROOT}}/myapp/webui
+      #TODO: Build and run unit tests
 
       
       - name: Modify Bicep Parameters
