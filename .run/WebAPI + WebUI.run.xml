@@ -1,0 +1,7 @@
+﻿<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="WebAPI + WebUI" type="CompoundRunConfigurationType">
+    <toRun name="WebAPI: https" type="LaunchSettings" />
+    <toRun name="WebUI" type="LaunchSettings" />
+    <method v="2" />
+  </configuration>
+</component>

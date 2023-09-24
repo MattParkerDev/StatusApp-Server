@@ -68,6 +68,12 @@ public class TestDataGeneratorService
         await _statusUserService.CreateUserAsync(newStatusUser2);
         await _statusUserService.CreateUserAsync(newStatusUser3);
 
+        // need to link the friendship to the chat
+
+        // var chat = await _messagingService.CreateChatForUsers(
+        //     new List<StatusUser> { newStatusUser, newStatusUser2 }
+        // );
+
         var friendship1 = await _friendshipService.CreateAcceptedFriendship(
             newStatusUser,
             newStatusUser2
@@ -77,14 +83,10 @@ public class TestDataGeneratorService
             newStatusUser3
         );
 
-        var chat = await _messagingService.CreateChatForUsers(
-            new List<StatusUser> { newStatusUser, newStatusUser2 }
-        );
-
-        var message = await _messagingService.CreateMessageAsUserInGroup(
-            newStatusUser.UserName,
-            chat.Id,
-            "Test Message"
-        );
+        // var message = await _messagingService.CreateMessageAsUserInGroup(
+        //     newStatusUser.UserName,
+        //     chat.Id,
+        //     "Test Message"
+        // );
     }
 }

@@ -18,8 +18,8 @@
         <MudList Style="width: 20%" Clickable="true" SelectedValue="@_selectedChat">
             @foreach (var chat in DataState.Chats)
             {
-                <MudListItem Value="@chat.Id" OnClick="() => SelectChat(chat)">
-                    @($"Someone Someone")
+                <MudListItem Value="@chat.Id" OnClick="async () => await SelectChat(chat)">
+                    @(chat.ChatParticipants.FirstOrDefault(s => s.UserName != DataState.StatusUser.UserName).DisplayName)
                 </MudListItem>
             }
         </MudList>
@@ -56,7 +56,7 @@
 
 @code {
     private string _newMessageString = string.Empty;
-    private Chat? _selectedChat = null;
+    private ChatDto? _selectedChat = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -65,8 +65,9 @@
         DataState.Friendships = await StatusAppClient.GetFriendshipsAsync(areFriends: true);
     }
     
-    public async Task SelectChat(Chat chat)
+    public async Task SelectChat(ChatDto chat)
     {
+        Console.WriteLine("Selecting Chat");
         await ChatService.PopulateMessagesForChat(chat);
         _selectedChat = chat;
         StateHasChanged();
@@ -84,7 +85,7 @@
             // TODO: Create an error
             return;
         }
-        //_selectedChat.Messages.Add(message);
+        _selectedChat.Messages.Add(message);
         _newMessageString = string.Empty;
     }
     

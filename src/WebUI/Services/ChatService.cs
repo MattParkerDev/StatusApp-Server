@@ -13,7 +13,7 @@ public class ChatService
         _dataState = dataState;
     }
 
-    public async Task PopulateMessagesForChat(Chat chat)
+    public async Task PopulateMessagesForChat(ChatDto chat)
     {
         try
         {

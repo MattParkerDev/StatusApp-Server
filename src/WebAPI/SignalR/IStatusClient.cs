@@ -7,8 +7,8 @@ public interface IStatusClient
 {
     // Methods that a client listens for - connection.on(...)
     Task ReceiveBroadcast(string user, string message);
-    Task ReceiveMessage(Message message);
+    Task ReceiveMessage(MessageDto message);
     Task ReceiveUpdatedUser(StatusUserDto friend);
-    Task ReceiveUpdatedFriendship(Friendship friendship);
+    Task ReceiveUpdatedFriendship(FriendshipDto friendship);
     Task DeleteFriend(string userName);
 }

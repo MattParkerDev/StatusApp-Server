@@ -1,5 +1,6 @@
 ﻿using Application.Services.Contracts;
 using Domain;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;
 
@@ -14,7 +15,7 @@ public class MessagingService : IMessagingService
 
     public List<Message> GetAllMessages(ChatId chatId)
     {
-        return _db.Messages.Where(s => s.Chat.Id == chatId).ToList();
+        return _db.Messages.Where(s => s.ChatId == chatId).ToList();
     }
 
     public List<ChatId> GetAllChatIdsByUserName(string userName)
@@ -31,6 +32,7 @@ public class MessagingService : IMessagingService
     public List<Chat> GetAllChatsByUserName(string userName)
     {
         var chats = _db.Chats
+            .Include(x => x.ChatParticipants)
             // where user is a chat participant
             .Where(s => s.ChatParticipants.Any(d => d.UserName == userName))
             .ToList();

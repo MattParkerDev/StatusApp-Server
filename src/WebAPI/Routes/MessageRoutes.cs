@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using Application.DTOs;
+using Application.Mappers;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Application.Services.Contracts;
 using Domain;
+using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Routes;
 
@@ -13,9 +16,8 @@ public static class MessageRoutes
         group
             .MapGet(
                 "/getmessages",
-                Results<Ok<List<Message>>, NoContent> (
+                Results<Ok<List<MessageDto>>, NoContent> (
                     IMessagingService messagingService,
-                    IFriendshipService friendshipService,
                     HttpContext context,
                     Guid chatId
                 ) =>
@@ -23,8 +25,9 @@ public static class MessageRoutes
                     var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
 
                     var messages = messagingService.GetAllMessages(new ChatId(chatId));
+                    var messageDtos = messages.Select(s => s.ToDto()).ToList();
                     return messages.Count != 0
-                        ? TypedResults.Ok(messages)
+                        ? TypedResults.Ok(messageDtos)
                         : TypedResults.NoContent();
                 }
             )
@@ -51,7 +54,7 @@ public static class MessageRoutes
         group
             .MapGet(
                 "/getchats",
-                Results<Ok<List<Chat>>, NoContent> (
+                Results<Ok<List<ChatDto>>, NoContent> (
                     IMessagingService messagingService,
                     HttpContext context
                 ) =>
@@ -59,7 +62,10 @@ public static class MessageRoutes
                     var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
 
                     var chats = messagingService.GetAllChatsByUserName(userName);
-                    return chats.Count is 0 ? TypedResults.NoContent() : TypedResults.Ok(chats);
+                    var chatDtos = chats.Select(s => s.ToDto()).ToList();
+                    return chatDtos.Count is 0
+                        ? TypedResults.NoContent()
+                        : TypedResults.Ok(chatDtos);
                 }
             )
             .WithName("GetChats");

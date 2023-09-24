@@ -73,9 +73,9 @@ public class SignalRClient
     }
 
     // Methods the client can call on the server
-    public async Task<Message?> SendMessageAsync(Guid groupId, string data)
+    public async Task<MessageDto?> SendMessageAsync(Guid chatId, string data)
     {
-        var message = await _connection.InvokeAsync<Message?>("SendMessage", groupId, data);
+        var message = await _connection.InvokeAsync<MessageDto?>("SendMessage", chatId, data);
         return message;
     }
 
@@ -94,7 +94,7 @@ public class SignalRClient
                 Console.WriteLine(encodedMsg);
             }
         );
-        _connection.On<Message>(
+        _connection.On<MessageDto>(
             "ReceiveMessage",
             async (message) =>
             {
@@ -106,7 +106,7 @@ public class SignalRClient
                 }
                 else
                 {
-                    messageList = new List<Message> { message };
+                    messageList = new List<MessageDto> { message };
                 }
                 await _notifierService.Update();
             }

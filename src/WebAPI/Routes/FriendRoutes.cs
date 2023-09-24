@@ -35,7 +35,7 @@ public static class FriendRoutes
         group
             .MapGet(
                 "/getfriendships",
-                Results<Ok<List<Friendship>>, NoContent> (
+                Results<Ok<List<FriendshipDto>>, NoContent> (
                     HttpContext context,
                     IFriendshipService friendshipService,
                     bool? areFriends
@@ -43,8 +43,9 @@ public static class FriendRoutes
                 {
                     var userName = context.User.Identity?.Name ?? throw new ArgumentNullException();
                     var friendships = friendshipService.GetAllFriendships(userName, areFriends);
-                    return friendships.Count != 0
-                        ? TypedResults.Ok(friendships)
+                    var friendshipDtos = friendships.Select(x => x.ToDto()).ToList();
+                    return friendshipDtos.Count != 0
+                        ? TypedResults.Ok(friendshipDtos)
                         : TypedResults.NoContent();
                 }
             )
@@ -116,11 +117,12 @@ public static class FriendRoutes
                         return TypedResults.Conflict();
 
                     var statusUserDto = statusUser!.ToDto();
+                    var friendshipDto = friendship.ToDto();
 
                     // Push this user and friendship to the new friend
                     await hubContext.Clients
                         .User(friendUserName)
-                        .ReceiveUpdatedFriendship(friendship);
+                        .ReceiveUpdatedFriendship(friendshipDto);
                     await hubContext.Clients.User(friendUserName).ReceiveUpdatedUser(statusUserDto);
                     return TypedResults.Ok(friendship);
                 }

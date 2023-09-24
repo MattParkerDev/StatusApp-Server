@@ -20,6 +20,9 @@ public partial class FriendshipServiceTests
         var chatContextMock = new Mock<StatusContext>(options);
         chatContextMock.Setup(db => db.SaveChangesAsync(default)).ReturnsAsync(1).Verifiable();
 
+        chatContextMock.Setup(db => db.Friendships).ReturnsDbSet(new List<Friendship>());
+        chatContextMock.Setup(db => db.Chats).ReturnsDbSet(new List<Chat>());
+
         var statusUserServiceMock = new Mock<IStatusUserService>();
 
         var friendshipService = new FriendshipService(
@@ -45,6 +48,9 @@ public partial class FriendshipServiceTests
         chatContextMock
             .Setup(db => db.SaveChangesAsync(default))
             .ThrowsAsync(new DbUpdateException());
+
+        chatContextMock.Setup(db => db.Friendships).ReturnsDbSet(new List<Friendship>());
+        chatContextMock.Setup(db => db.Chats).ReturnsDbSet(new List<Chat>());
 
         var statusUserServiceMock = new Mock<IStatusUserService>();
 

@@ -2,6 +2,7 @@
 
 public class Message
 {
+    // TODO: Guid for Id and autoincrement int Sequence
     public int? Id { get; set; }
     public string AuthorUserName { get; set; } = string.Empty;
     public string Data { get; set; } = string.Empty;

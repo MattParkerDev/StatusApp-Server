@@ -26,7 +26,7 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="$(Configuration) == 'Debug'">
-        <GenerateNSwag>false</GenerateNSwag>
+        <GenerateNSwag>true</GenerateNSwag>
     </PropertyGroup>
 
     <Target Name="SwaggerPostBuildClientAndSpec" AfterTargets="PostBuildEvent" Condition="$(Configuration) != 'Release' And $(GenerateNSwag) == 'true'">

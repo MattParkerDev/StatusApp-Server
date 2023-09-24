@@ -1,3 +1,5 @@
+using Application.DTOs;
+using Application.Mappers;
 using Application.Services.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
@@ -75,29 +77,28 @@ public class StatusHub : Hub<IStatusClient>
         return Context.UserIdentifier!;
     }
 
-    public async Task<Message?> SendMessage(
+    public async Task<MessageDto?> SendMessage(
         IHubContext<StatusHub, IStatusClient> hubContext,
-        Guid chatId,
+        Guid chatGuid,
         string data
     )
     {
         // TODO:Consider checking if are a member of this groupId?
         var userName = Context.UserIdentifier!;
+        var chatId = new ChatId(chatGuid);
 
-        var message = await _messagingService.CreateMessageAsUserInGroup(
-            userName,
-            new ChatId(chatId),
-            data
-        );
+        var message = await _messagingService.CreateMessageAsUserInGroup(userName, chatId, data);
 
         if (message == null)
         {
             return null;
         }
 
+        var messageDto = message.ToDto();
+
         // TODO:Consider checking if they are friends
         var friendUserName = _db.Chats
-            .Where(s => s.Id.Value == chatId)
+            .Where(s => s.Id == chatId)
             .Select(x => x.ChatParticipants.Select(z => z.UserName).FirstOrDefault())
             .FirstOrDefault();
 
@@ -107,8 +108,8 @@ public class StatusHub : Hub<IStatusClient>
 
         if (friendConnection is not null)
         {
-            await hubContext.Clients.Users(friendUserName!).ReceiveMessage(message);
+            await hubContext.Clients.Users(friendUserName!).ReceiveMessage(messageDto);
         }
-        return message;
+        return messageDto;
     }
 }

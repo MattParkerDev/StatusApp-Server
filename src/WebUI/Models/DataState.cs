@@ -7,6 +7,6 @@ public class DataState
     public List<StatusUserDto> Friends { get; set; } = new List<StatusUserDto>();
 
     //public Dictionary<Guid, List<Message>> Messages { get; set; } = new();
-    public List<Chat> Chats { get; set; } = new List<Chat>();
-    public List<Friendship> Friendships { get; set; } = new List<Friendship>();
+    public List<ChatDto> Chats { get; set; } = new List<ChatDto>();
+    public List<FriendshipDto> Friendships { get; set; } = new List<FriendshipDto>();
 }

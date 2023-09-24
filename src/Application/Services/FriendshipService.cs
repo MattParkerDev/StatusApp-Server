@@ -73,17 +73,24 @@ public class FriendshipService : IFriendshipService
                 => _db.Friendships
                     .Where(s => s.UserName1 == userName || s.UserName2 == userName)
                     .Where(x => x.UserName1Accepted == true && x.UserName2Accepted == true)
+                    .Include(x => x.StatusUser1)
+                    .Include(y => y.StatusUser2)
+                    .Include(z => z.Chat)
                     .ToList(),
             false
                 => _db.Friendships
                     .Where(s => s.UserName1 == userName || s.UserName2 == userName)
                     .Where(x => x.UserName1Accepted == false || x.UserName2Accepted == false)
+                    .Include(x => x.StatusUser1)
+                    .Include(y => y.StatusUser2)
+                    .Include(z => z.Chat)
                     .ToList(),
             null
                 => _db.Friendships
+                    .Where(s => s.UserName1 == userName || s.UserName2 == userName)
                     .Include(x => x.StatusUser1)
                     .Include(y => y.StatusUser2)
-                    .Where(s => s.UserName1 == userName || s.UserName2 == userName)
+                    .Include(z => z.Chat)
                     .ToList(),
         };
         return friendships;
@@ -101,18 +108,21 @@ public class FriendshipService : IFriendshipService
 
     public async Task<List<StatusUserDto>> GetFriendsDtoList(string userName)
     {
-        var friendUserNameList = GetFriendsUserNameList(userName);
         var friendsDtoList = new List<StatusUserDto>();
-        foreach (var name in friendUserNameList)
-        {
-            var statusUser = await _statusUserService.GetUserByNameAsync(name);
-            if (statusUser == null)
-            {
-                //TODO: Review
-                throw new ArgumentNullException(nameof(statusUser));
-            }
-            friendsDtoList.Add(statusUser.ToDto());
-        }
+
+        friendsDtoList = await _db.StatusUsers
+            .Where(
+                s =>
+                    s.Friendships1.Any(
+                        x =>
+                            (x.UserName1 == userName || x.UserName2 == userName)
+                            && x.UserName1Accepted == true
+                            && x.UserName2Accepted == true
+                    )
+            )
+            .Select(x => x.ToDto())
+            .ToListAsync();
+
         return friendsDtoList;
     }
 
@@ -143,6 +153,13 @@ public class FriendshipService : IFriendshipService
     {
         var guid = Guid.NewGuid();
         var time = DateTime.UtcNow;
+
+        var chat = new Chat
+        {
+            ChatName = "New Chat",
+            ChatParticipants = new List<StatusUser>() { user, friendUser }
+        };
+
         var friendship = new Friendship
         {
             UserName1 = user.UserName,
@@ -150,12 +167,7 @@ public class FriendshipService : IFriendshipService
             UserName1Accepted = true,
             UserName2Accepted = true,
             BecameFriendsDate = time,
-        };
-
-        var chat = new Chat
-        {
-            ChatName = "New Chat",
-            ChatParticipants = new List<StatusUser>() { user, friendUser }
+            Chat = chat
         };
 
         _db.Friendships.Add(friendship);
