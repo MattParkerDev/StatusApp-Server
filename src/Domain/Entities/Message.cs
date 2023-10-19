@@ -11,6 +11,7 @@ public class Message
 
     // Foreign keys
     public required ChatId ChatId { get; set; }
+    public required StatusUserId StatusUserId { get; set; }
 
     // Navigation properties
     public Chat Chat { get; set; } = null!;

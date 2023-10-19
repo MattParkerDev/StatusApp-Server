@@ -14,6 +14,6 @@ public class ChatParticipantConfiguration : IEntityTypeConfiguration<ChatPartici
 
         chatParticipant.HasOne(s => s.Chat).WithMany().HasForeignKey(s => s.ChatId);
 
-        chatParticipant.HasOne(s => s.StatusUser).WithMany().HasForeignKey(s => s.UserName);
+        chatParticipant.HasOne(s => s.StatusUser).WithMany().HasForeignKey(s => s.StatusUserId);
     }
 }

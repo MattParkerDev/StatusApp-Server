@@ -35,10 +35,10 @@ public partial class FriendshipServiceTests
 
         var expectedFriendship = new Friendship
         {
-            UserName1 = user.UserName,
-            UserName2 = friendUser.UserName,
-            UserName1Accepted = true,
-            UserName2Accepted = false,
+            StatusUser1Id = user.UserName,
+            StatusUser2Id = friendUser.UserName,
+            StatusUser1Accepted = true,
+            StatusUser2Accepted = false,
         };
 
         var options = new DbContextOptions<StatusContext>();

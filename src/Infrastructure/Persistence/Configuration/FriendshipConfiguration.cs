@@ -12,15 +12,17 @@ public class FriendshipConfiguration : IEntityTypeConfiguration<Friendship>
         friendship.HasOne<Chat>(t => t.Chat);
 
         friendship.Property(t => t.ChatId).HasConversion(x => x.Value, x => new ChatId(x));
+        friendship.Property(t => t.StatusUser1Id).HasConversion(x => x.Value, x => new(x));
+        friendship.Property(t => t.StatusUser2Id).HasConversion(x => x.Value, x => new(x));
 
         friendship
             .HasOne<StatusUser>(s => s.StatusUser1)
-            .WithMany()
-            .HasForeignKey(s => s.UserName1);
+            .WithMany(s => s.Friendships1)
+            .HasForeignKey(s => s.StatusUser1Id);
 
         friendship
             .HasOne<StatusUser>(s => s.StatusUser2)
-            .WithMany()
-            .HasForeignKey(s => s.UserName2);
+            .WithMany(s => s.Friendships2)
+            .HasForeignKey(s => s.StatusUser2Id);
     }
 }

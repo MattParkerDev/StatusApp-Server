@@ -1,6 +1,10 @@
-﻿namespace Domain.Entities;
+﻿using Domain.Common.Base;
 
-public class StatusUser
+namespace Domain.Entities;
+
+public record StatusUserId(Guid Value);
+
+public class StatusUser : BaseEntity<StatusUserId>
 {
     public string UserName { get; set; } = string.Empty;
     public string FirstName { get; set; } = string.Empty;

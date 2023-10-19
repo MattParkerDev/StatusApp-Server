@@ -35,10 +35,10 @@ public partial class FriendshipServiceTests
 
         var expectedFriendship = new Friendship
         {
-            UserName1 = user.UserName,
-            UserName2 = friendUser.UserName,
-            UserName1Accepted = true,
-            UserName2Accepted = true,
+            StatusUser1Id = user.UserName,
+            StatusUser2Id = friendUser.UserName,
+            StatusUser1Accepted = true,
+            StatusUser2Accepted = true,
             BecameFriendsDate = It.IsAny<DateTime>(),
         };
 
@@ -58,9 +58,9 @@ public partial class FriendshipServiceTests
 
         // Assert
         result.Should().BeOfType<Friendship>();
-        result!.UserName1.Should().Be(expectedFriendship.UserName1);
-        result.UserName2.Should().Be(expectedFriendship.UserName2);
-        result.UserName1Accepted.Should().Be(expectedFriendship.UserName1Accepted);
-        result.UserName2Accepted.Should().Be(expectedFriendship.UserName2Accepted);
+        result!.StatusUser1Id.Should().Be(expectedFriendship.StatusUser1Id);
+        result.StatusUser2Id.Should().Be(expectedFriendship.StatusUser2Id);
+        result.StatusUser1Accepted.Should().Be(expectedFriendship.StatusUser1Accepted);
+        result.StatusUser2Accepted.Should().Be(expectedFriendship.StatusUser2Accepted);
     }
 }

@@ -12,7 +12,7 @@ public partial class FriendshipServiceTests
     public async Task WhenAcceptFriendRequestIsCalled_ReturnsTrue()
     {
         //Arrange
-        var myFriendship = new Friendship { UserName1Accepted = false, UserName2Accepted = false };
+        var myFriendship = new Friendship { StatusUser1Accepted = false, StatusUser2Accepted = false };
 
         var options = new DbContextOptions<StatusContext>();
         var chatContextMock = new Mock<StatusContext>(options);
@@ -39,7 +39,7 @@ public partial class FriendshipServiceTests
     public async Task WhenAcceptFriendRequestIsCalled_ReturnsFalse()
     {
         //Arrange
-        var myFriendship = new Friendship { UserName1Accepted = false, UserName2Accepted = false };
+        var myFriendship = new Friendship { StatusUser1Accepted = false, StatusUser2Accepted = false };
 
         var options = new DbContextOptions<StatusContext>();
         var chatContextMock = new Mock<StatusContext>(options);

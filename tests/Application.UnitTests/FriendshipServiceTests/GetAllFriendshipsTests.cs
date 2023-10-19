@@ -22,9 +22,9 @@ public partial class FriendshipServiceTests
         var userName = "TestUserName";
         var friendship = new Friendship
         {
-            UserName1 = userName,
-            UserName1Accepted = user1Accepted,
-            UserName2Accepted = user2Accepted
+            StatusUser1Id = userName,
+            StatusUser1Accepted = user1Accepted,
+            StatusUser2Accepted = user2Accepted
         };
         var friendships = new List<Friendship> { friendship };
         var areFriends = user1Accepted && user2Accepted;

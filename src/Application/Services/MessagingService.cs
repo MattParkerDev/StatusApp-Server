@@ -50,7 +50,8 @@ public class MessagingService : IMessagingService
         {
             ChatId = chatId,
             Data = data,
-            AuthorUserName = userName
+            AuthorUserName = userName,
+            StatusUserId = new StatusUserId(Guid.NewGuid()) // TODO: FIX!!!!!
         };
         _db.Messages.Add(message);
         try

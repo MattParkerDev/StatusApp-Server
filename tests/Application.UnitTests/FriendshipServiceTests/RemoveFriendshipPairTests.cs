@@ -15,7 +15,7 @@ public partial class FriendshipServiceTests
         var userName = "TestUserName";
         var friendUserName = "AnotherUserName";
 
-        var myFriendship = new Friendship { UserName1 = userName, UserName2 = friendUserName };
+        var myFriendship = new Friendship { StatusUser1Id = userName, StatusUser2Id = friendUserName };
 
         var options = new DbContextOptions<StatusContext>();
         var chatContextMock = new Mock<StatusContext>(options);

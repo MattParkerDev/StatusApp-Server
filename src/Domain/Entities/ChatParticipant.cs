@@ -7,6 +7,7 @@ public class ChatParticipant
     // Foreign keys
     public required ChatId ChatId { get; set; }
     public required string UserName { get; set; }
+    public required StatusUserId StatusUserId { get; set; }
     public bool IsAdmin { get; set; } = false;
 
     // Navigation properties

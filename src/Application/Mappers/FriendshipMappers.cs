@@ -10,10 +10,10 @@ public static class FriendshipMappers
         var dto = new FriendshipDto
         {
             Id = friendship.Id,
-            UserName1 = friendship.UserName1,
-            UserName2 = friendship.UserName2,
-            UserName1Accepted = friendship.UserName1Accepted,
-            UserName2Accepted = friendship.UserName2Accepted,
+            UserName1 = friendship.StatusUser1!.UserName,
+            UserName2 = friendship.StatusUser2!.UserName,
+            UserName1Accepted = friendship.StatusUser1Accepted,
+            UserName2Accepted = friendship.StatusUser2Accepted,
             BecameFriendsDate = friendship.BecameFriendsDate,
             ChatId = friendship.ChatId.Value
         };

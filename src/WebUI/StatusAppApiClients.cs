@@ -1404,15 +1404,15 @@ namespace WebUI
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
         public System.Guid Id { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("userName1Accepted")]
+        [System.Text.Json.Serialization.JsonPropertyName("statusUser1Accepted")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public bool UserName1Accepted { get; set; }
+        public bool StatusUser1Accepted { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("userName2Accepted")]
+        [System.Text.Json.Serialization.JsonPropertyName("statusUser2Accepted")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public bool UserName2Accepted { get; set; }
+        public bool StatusUser2Accepted { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("becameFriendsDate")]
 
@@ -1424,15 +1424,15 @@ namespace WebUI
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
         public ChatId ChatId { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("userName1")]
+        [System.Text.Json.Serialization.JsonPropertyName("statusUser1Id")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string UserName1 { get; set; }
+        public StatusUserId StatusUser1Id { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("userName2")]
+        [System.Text.Json.Serialization.JsonPropertyName("statusUser2Id")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string UserName2 { get; set; }
+        public StatusUserId StatusUser2Id { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("chat")]
 
@@ -1453,6 +1453,17 @@ namespace WebUI
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.20.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class ChatId
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("value")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public System.Guid Value { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.20.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class StatusUserId
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("value")]
@@ -1484,7 +1495,7 @@ namespace WebUI
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.20.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class StatusUser
+    public partial class StatusUser : BaseEntityOfStatusUserId
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("userName")]
@@ -1530,6 +1541,17 @@ namespace WebUI
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.20.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public abstract partial class BaseEntityOfStatusUserId
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public StatusUserId Id { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.20.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class Message
     {
 
@@ -1562,6 +1584,11 @@ namespace WebUI
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
         public ChatId ChatId { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("statusUserId")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public StatusUserId StatusUserId { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("chat")]
 

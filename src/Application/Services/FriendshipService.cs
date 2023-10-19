@@ -20,8 +20,8 @@ public class FriendshipService : IFriendshipService
     public async Task<bool> AcceptFriendRequest(Friendship friendship)
     {
         var datetime = DateTime.UtcNow;
-        friendship.UserName1Accepted = true;
-        friendship.UserName2Accepted = true;
+        friendship.StatusUser1Accepted = true;
+        friendship.StatusUser2Accepted = true;
         friendship.BecameFriendsDate = datetime;
 
         var chat = new Chat
@@ -59,8 +59,11 @@ public class FriendshipService : IFriendshipService
             .Include(y => y.StatusUser2)
             .FirstOrDefault(
                 s =>
-                    (s.UserName1 == userName || s.UserName1 == friendUserName)
-                    && (s.UserName2 == userName || s.UserName2 == friendUserName)
+                    (s.StatusUser1.UserName == userName || s.StatusUser1.UserName == friendUserName)
+                    && (
+                        s.StatusUser2.UserName == userName
+                        || s.StatusUser2.UserName == friendUserName
+                    )
             );
         return friendship;
     }
@@ -71,23 +74,32 @@ public class FriendshipService : IFriendshipService
         {
             true
                 => _db.Friendships
-                    .Where(s => s.UserName1 == userName || s.UserName2 == userName)
-                    .Where(x => x.UserName1Accepted == true && x.UserName2Accepted == true)
+                    .Where(
+                        s =>
+                            s.StatusUser1.UserName == userName || s.StatusUser2.UserName == userName
+                    )
+                    .Where(x => x.StatusUser1Accepted == true && x.StatusUser2Accepted == true)
                     .Include(x => x.StatusUser1)
                     .Include(y => y.StatusUser2)
                     .Include(z => z.Chat)
                     .ToList(),
             false
                 => _db.Friendships
-                    .Where(s => s.UserName1 == userName || s.UserName2 == userName)
-                    .Where(x => x.UserName1Accepted == false || x.UserName2Accepted == false)
+                    .Where(
+                        s =>
+                            s.StatusUser1.UserName == userName || s.StatusUser2.UserName == userName
+                    )
+                    .Where(x => x.StatusUser1Accepted == false || x.StatusUser2Accepted == false)
                     .Include(x => x.StatusUser1)
                     .Include(y => y.StatusUser2)
                     .Include(z => z.Chat)
                     .ToList(),
             null
                 => _db.Friendships
-                    .Where(s => s.UserName1 == userName || s.UserName2 == userName)
+                    .Where(
+                        s =>
+                            s.StatusUser1.UserName == userName || s.StatusUser2.UserName == userName
+                    )
                     .Include(x => x.StatusUser1)
                     .Include(y => y.StatusUser2)
                     .Include(z => z.Chat)
@@ -99,8 +111,8 @@ public class FriendshipService : IFriendshipService
     public List<string> GetFriendsUserNameList(string userName)
     {
         var friendUserNameList = _db.Friendships
-            .Where(s => s.UserName1 == userName && s.UserName2Accepted == true)
-            .Select(x => x.UserName2)
+            .Where(s => s.StatusUser1.UserName == userName && s.StatusUser2Accepted == true)
+            .Select(x => x.StatusUser2.UserName)
             .ToList();
 
         return friendUserNameList;
@@ -115,9 +127,12 @@ public class FriendshipService : IFriendshipService
                 s =>
                     s.Friendships1.Any(
                         x =>
-                            (x.UserName1 == userName || x.UserName2 == userName)
-                            && x.UserName1Accepted == true
-                            && x.UserName2Accepted == true
+                            (
+                                x.StatusUser1.UserName == userName
+                                || x.StatusUser2.UserName == userName
+                            )
+                            && x.StatusUser1Accepted == true
+                            && x.StatusUser2Accepted == true
                     )
             )
             .Select(x => x.ToDto())
@@ -130,10 +145,10 @@ public class FriendshipService : IFriendshipService
     {
         var friendship = new Friendship
         {
-            UserName1 = user.UserName,
-            UserName2 = friendUser.UserName,
-            UserName1Accepted = true,
-            UserName2Accepted = false,
+            StatusUser1Id = user.Id,
+            StatusUser2Id = friendUser.Id,
+            StatusUser1Accepted = true,
+            StatusUser2Accepted = false,
         };
 
         _db.Friendships.Add(friendship);
@@ -162,10 +177,10 @@ public class FriendshipService : IFriendshipService
 
         var friendship = new Friendship
         {
-            UserName1 = user.UserName,
-            UserName2 = friendUser.UserName,
-            UserName1Accepted = true,
-            UserName2Accepted = true,
+            StatusUser1Id = user.Id,
+            StatusUser2Id = friendUser.Id,
+            StatusUser1Accepted = true,
+            StatusUser2Accepted = true,
             BecameFriendsDate = time,
             Chat = chat
         };

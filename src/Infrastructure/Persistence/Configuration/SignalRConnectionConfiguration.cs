@@ -10,6 +10,6 @@ public class SignalRConnectionConfiguration : IEntityTypeConfiguration<SignalRCo
     {
         signalRConnection.HasKey(t => t.ConnectionId);
 
-        signalRConnection.HasOne(s => s.StatusUser).WithMany().HasForeignKey(s => s.UserName);
+        signalRConnection.HasOne(s => s.StatusUser).WithMany().HasForeignKey(s => s.StatusUserId);
     }
 }

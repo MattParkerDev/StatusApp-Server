@@ -15,7 +15,7 @@ public partial class FriendshipServiceTests
         var userName = "TestUserName";
         var friendUserName = "AnotherUserName";
         var groupId = Guid.NewGuid();
-        var friendship = new Friendship { UserName1 = userName, UserName2 = friendUserName, };
+        var friendship = new Friendship { StatusUser1Id = userName, StatusUser2Id = friendUserName, };
         var friendships = new List<Friendship> { friendship };
 
         var options = new DbContextOptions<StatusContext>();

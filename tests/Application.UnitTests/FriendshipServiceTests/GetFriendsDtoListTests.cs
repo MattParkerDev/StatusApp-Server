@@ -17,9 +17,9 @@ public partial class FriendshipServiceTests
         var friendUserName = "AnotherUserName";
         var friendship = new Friendship
         {
-            UserName1 = userName,
-            UserName2 = friendUserName,
-            UserName2Accepted = true
+            StatusUser1Id = userName,
+            StatusUser2Id = friendUserName,
+            StatusUser2Accepted = true
         };
         var friendships = new List<Friendship> { friendship };
 

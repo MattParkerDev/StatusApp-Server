@@ -3,14 +3,14 @@
 public class Friendship
 {
     public Guid Id { get; set; }
-    public bool UserName1Accepted { get; set; } = false;
-    public bool UserName2Accepted { get; set; } = false;
+    public bool StatusUser1Accepted { get; set; } = false;
+    public bool StatusUser2Accepted { get; set; } = false;
     public DateTime BecameFriendsDate { get; set; }
 
     // Foreign keys
     public ChatId? ChatId { get; set; } = null!;
-    public string UserName1 { get; set; } = string.Empty;
-    public string UserName2 { get; set; } = string.Empty;
+    public required StatusUserId StatusUser1Id { get; set; }
+    public required StatusUserId StatusUser2Id { get; set; }
 
     // Navigation properties
     public virtual Chat? Chat { get; set; } = null!;
