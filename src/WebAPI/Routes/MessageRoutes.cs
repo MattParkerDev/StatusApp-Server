@@ -2,8 +2,7 @@
 using Application.Mappers;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Application.Services.Contracts;
-using Domain;
-using Microsoft.AspNetCore.Mvc;
+using Domain.Entities;
 
 namespace WebAPI.Routes;
 

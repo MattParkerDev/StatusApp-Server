@@ -1,7 +1,7 @@
 using Application.DTOs;
 using Application.Mappers;
 using Application.Services.Contracts;
-using Domain;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;

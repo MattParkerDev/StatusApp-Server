@@ -4,9 +4,8 @@ using Microsoft.AspNetCore.SignalR;
 using Application.DTOs;
 using Application.Mappers;
 using Application.Services.Contracts;
-using Domain;
+using Domain.Entities;
 //TODO: Remove
-using Infrastructure;
 using Infrastructure.Persistence;
 using WebAPI.SignalR;
 

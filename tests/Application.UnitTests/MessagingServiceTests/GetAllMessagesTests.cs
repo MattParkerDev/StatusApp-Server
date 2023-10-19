@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Application;
 using Application.Services;
-using Domain;
-using Infrastructure;
+using Domain.Entities;
 using Infrastructure.Persistence;
 
 namespace Application.UnitTests.MessagingServiceTests;

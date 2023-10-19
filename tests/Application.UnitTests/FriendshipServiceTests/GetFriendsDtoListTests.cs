@@ -1,8 +1,7 @@
 ﻿using Application.DTOs;
 using Application.Services;
 using Application.Services.Contracts;
-using Domain;
-using Infrastructure;
+using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 

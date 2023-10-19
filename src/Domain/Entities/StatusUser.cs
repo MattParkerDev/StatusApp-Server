@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Domain.Common.Base;
-
-namespace Domain;
+﻿namespace Domain.Entities;
 
 public class StatusUser
 {

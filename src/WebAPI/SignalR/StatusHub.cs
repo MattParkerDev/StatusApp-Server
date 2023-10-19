@@ -4,8 +4,7 @@ using Application.Services.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using Domain;
-using Infrastructure;
+using Domain.Entities;
 using Infrastructure.Persistence;
 
 namespace WebAPI.SignalR;

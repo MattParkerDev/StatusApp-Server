@@ -1,4 +1,4 @@
-﻿using Domain;
+﻿using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace Application.Services.Contracts;

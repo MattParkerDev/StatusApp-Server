@@ -1,5 +1,5 @@
 ﻿using Application.Services.Contracts;
-using Domain;
+using Domain.Entities;
 
 namespace Application.Services;
 

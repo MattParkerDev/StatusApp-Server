@@ -1,6 +1,4 @@
-﻿using Domain;
-
-namespace Application.DTOs;
+﻿namespace Application.DTOs;
 
 public class StatusUserDto
 {
@@ -11,16 +9,5 @@ public class StatusUserDto
     public bool Online { get; set; }
 
     // TODO: Review, not best practice?
-    public StatusUser FromDto()
-    {
-        var statusUser = new StatusUser
-        {
-            UserName = UserName,
-            FirstName = FirstName,
-            LastName = LastName,
-            Status = Status,
-            Online = Online
-        };
-        return statusUser;
-    }
+    
 }

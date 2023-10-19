@@ -1,5 +1,5 @@
 ﻿using Application.DTOs;
-using Domain;
+using Domain.Entities;
 
 namespace Application.Mappers;
 
