@@ -53,6 +53,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "powershell", "powershell", 
 		.github\powershell\functions.ps1 = .github\powershell\functions.ps1
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAPI.IntegrationTests", "tests\WebAPI.IntegrationTests\WebAPI.IntegrationTests.csproj", "{CEF3A2B7-DD19-4F53-8536-D772F553ED89}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,10 @@ Global
 		{BAE42F60-9354-4321-9A9A-A3F88D2C7236}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BAE42F60-9354-4321-9A9A-A3F88D2C7236}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BAE42F60-9354-4321-9A9A-A3F88D2C7236}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEF3A2B7-DD19-4F53-8536-D772F553ED89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEF3A2B7-DD19-4F53-8536-D772F553ED89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEF3A2B7-DD19-4F53-8536-D772F553ED89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEF3A2B7-DD19-4F53-8536-D772F553ED89}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -100,5 +106,6 @@ Global
 		{8C999DDF-B14B-45D9-9375-C14ED7CB2D5C} = {63E090B0-4252-4DC0-A2F1-5BCA2B0BD3BC}
 		{78FCC9EC-4E0C-4729-934B-6018537D6F66} = {63E090B0-4252-4DC0-A2F1-5BCA2B0BD3BC}
 		{B45AF0CF-D2FE-4A13-91E8-610533EC3410} = {63E090B0-4252-4DC0-A2F1-5BCA2B0BD3BC}
+		{CEF3A2B7-DD19-4F53-8536-D772F553ED89} = {D23E8309-9E03-4769-B6CC-2959CB36C8F5}
 	EndGlobalSection
 EndGlobal
