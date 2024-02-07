@@ -6,7 +6,7 @@
 		<UserSecretsId>56d1ef9f-3f17-4bab-8744-e55442e52ff9</UserSecretsId>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="NSwag.AspNetCore" Version="14.0.2" />
+		<PackageReference Include="NSwag.AspNetCore" Version="14.0.3" />
 		<PackageReference Include="NSwag.MSBuild" Version="14.0.3">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
