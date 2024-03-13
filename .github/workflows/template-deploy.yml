@@ -43,10 +43,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3.3.0
+      - uses: actions/checkout@v4
 
       - name: Set up .NET Core
-        uses: actions/setup-dotnet@v3.0.3
+        uses: actions/setup-dotnet@v4
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
@@ -79,19 +79,19 @@ jobs:
           parameters.static_web_app_location.value: ${{ inputs.AzureStaticWebAppLocation }}
 
       - name: Upload bicep for deployment job
-        uses: actions/upload-artifact@v3.1.2
+        uses: actions/upload-artifact@v4
         with:
           name: bicep-artifact
           path: ./.github
 
       - name: Upload API artifact for deployment job
-        uses: actions/upload-artifact@v3.1.2
+        uses: actions/upload-artifact@v4
         with:
           name: api-artifact
           path: ${{env.DOTNET_ROOT}}/myapp/api
 
       - name: Upload WebUI artifact for deployment job
-        uses: actions/upload-artifact@v3.1.2
+        uses: actions/upload-artifact@v4
         with:
           name: webui-artifact
           path: ${{env.DOTNET_ROOT}}/myapp/webui
@@ -104,12 +104,12 @@ jobs:
     needs: build
     steps:
       - name: Download bicep from build job
-        uses: actions/download-artifact@v3.0.2
+        uses: actions/download-artifact@v4
         with:
           name: bicep-artifact
 
       - name: Azure Login
-        uses: Azure/login@v1
+        uses: Azure/login@v2
         with:
           creds: ${{ secrets.AzureCredentials }}
 
@@ -128,17 +128,17 @@ jobs:
 
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v3.0.2
+        uses: actions/download-artifact@v4
         with:
           name: api-artifact
 
       - name: Azure Login
-        uses: Azure/login@v1
+        uses: Azure/login@v2
         with:
           creds: ${{ secrets.AzureCredentials }}
 
       - name: "Retrieve Cors Url"
-        uses: azure/CLI@v1
+        uses: azure/CLI@v2
         with:
           azcliversion: latest
           inlineScript: |
@@ -153,7 +153,7 @@ jobs:
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
+        uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ inputs.AzureWebAppName }}
           slot-name: "Production"
@@ -167,24 +167,24 @@ jobs:
       url: ${{ steps.deploy-to-staticwebapp.outputs.static_web_app_url }}
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v3.0.2
+        uses: actions/download-artifact@v4
         with:
           name: webui-artifact
 
       - name: Azure Login
-        uses: Azure/login@v1
+        uses: Azure/login@v2
         with:
           creds: ${{ secrets.AzureCredentials }}
         
       - name: "Mask Deployment Token"
-        uses: azure/CLI@v1
+        uses: azure/CLI@v2
         with:
           azcliversion: latest
           inlineScript: |
             echo "::add-mask::$(az staticwebapp secrets list -n ${{ inputs.AzureStaticWebAppName }} | jq -r '.properties.apiKey')"  
 
       - name: "Retrieve Deployment Token"
-        uses: azure/CLI@v1
+        uses: azure/CLI@v2
         with:
           azcliversion: latest
           inlineScript: |
