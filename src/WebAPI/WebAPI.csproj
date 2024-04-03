@@ -6,8 +6,8 @@
 		<UserSecretsId>56d1ef9f-3f17-4bab-8744-e55442e52ff9</UserSecretsId>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="NSwag.AspNetCore" Version="14.0.3" />
-		<PackageReference Include="NSwag.MSBuild" Version="14.0.3">
+		<PackageReference Include="NSwag.AspNetCore" Version="14.0.7" />
+		<PackageReference Include="NSwag.MSBuild" Version="14.0.7">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
@@ -24,6 +24,6 @@
 		<GenerateNSwag>true</GenerateNSwag>
 	</PropertyGroup>
 	<Target Name="SwaggerPostBuildClientAndSpec" AfterTargets="PostBuildEvent" Condition="$(Configuration) != 'Release' And $(GenerateNSwag) == 'true'">
-		<Exec WorkingDirectory="$(ProjectDir)" EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" Command="$(NSwagExe_Net70) run nswag.json /variables:Configuration=$(Configuration)" />
+		<Exec WorkingDirectory="$(ProjectDir)" EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" Command="$(NSwagExe_Net80) run nswag.json /variables:Configuration=$(Configuration)" />
 	</Target>
 </Project>
