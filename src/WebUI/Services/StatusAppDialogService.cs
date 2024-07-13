@@ -18,7 +18,7 @@ public class StatusAppDialogService
         {
             CloseOnEscapeKey = false,
             CloseButton = false,
-            DisableBackdropClick = true,
+            BackdropClick = false,
             NoHeader = true
         };
         var dialog = await _dialogService.ShowAsync<LoginDialog>(string.Empty, options);
@@ -33,7 +33,7 @@ public class StatusAppDialogService
         {
             CloseOnEscapeKey = true,
             CloseButton = false,
-            DisableBackdropClick = false,
+            BackdropClick = true,
             NoHeader = true,
             MaxWidth = MaxWidth.ExtraExtraLarge
         };

@@ -14,7 +14,7 @@
 
 <MudPaper>
     <MudStack Row="true" Style="width: 100%">
-        <MudList Style="width: 20%" Clickable="true" SelectedValue="@_selectedChat">
+        <MudList Style="width: 20%" ReadOnly="false"  SelectedValue="@_selectedChat">
             @foreach (var chat in DataState.Chats)
             {
                 <MudListItem Value="@chat.Id" OnClick="async () => await SelectChat(chat)">
@@ -27,7 +27,7 @@
             @if (_selectedChat is not null)
             {
                 <MudContainer Style="max-height: 55vh; height: 55vh; overflow-y: scroll">
-                    <MudList>
+                    <MudList T="string">
                         @foreach (var message in _selectedChat.Messages)
                         {
                             <MudListItem>
